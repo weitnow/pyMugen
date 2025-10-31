@@ -1,0 +1,153 @@
+{ "frames": {
+   "titleScreen 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "sourceSize": { "w": 256, "h": 144 },
+    "duration": 200
+   },
+   "titleScreen 1.aseprite": {
+    "frame": { "x": 256, "y": 0, "w": 256, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "sourceSize": { "w": 256, "h": 144 },
+    "duration": 200
+   },
+   "titleScreen 2.aseprite": {
+    "frame": { "x": 512, "y": 0, "w": 256, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "sourceSize": { "w": 256, "h": 144 },
+    "duration": 200
+   },
+   "titleScreen 3.aseprite": {
+    "frame": { "x": 768, "y": 0, "w": 256, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "sourceSize": { "w": 256, "h": 144 },
+    "duration": 200
+   },
+   "titleScreen 4.aseprite": {
+    "frame": { "x": 1024, "y": 0, "w": 256, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "sourceSize": { "w": 256, "h": 144 },
+    "duration": 200
+   },
+   "titleScreen 5.aseprite": {
+    "frame": { "x": 1280, "y": 0, "w": 256, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "sourceSize": { "w": 256, "h": 144 },
+    "duration": 200
+   },
+   "titleScreen 6.aseprite": {
+    "frame": { "x": 1536, "y": 0, "w": 256, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "sourceSize": { "w": 256, "h": 144 },
+    "duration": 200
+   },
+   "titleScreen 7.aseprite": {
+    "frame": { "x": 1792, "y": 0, "w": 256, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "sourceSize": { "w": 256, "h": 144 },
+    "duration": 200
+   },
+   "titleScreen 8.aseprite": {
+    "frame": { "x": 2048, "y": 0, "w": 256, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "sourceSize": { "w": 256, "h": 144 },
+    "duration": 200
+   },
+   "titleScreen 9.aseprite": {
+    "frame": { "x": 2304, "y": 0, "w": 256, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "sourceSize": { "w": 256, "h": 144 },
+    "duration": 200
+   },
+   "titleScreen 10.aseprite": {
+    "frame": { "x": 2560, "y": 0, "w": 256, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "sourceSize": { "w": 256, "h": 144 },
+    "duration": 200
+   },
+   "titleScreen 11.aseprite": {
+    "frame": { "x": 2816, "y": 0, "w": 256, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "sourceSize": { "w": 256, "h": 144 },
+    "duration": 200
+   },
+   "titleScreen 12.aseprite": {
+    "frame": { "x": 3072, "y": 0, "w": 256, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "sourceSize": { "w": 256, "h": 144 },
+    "duration": 200
+   },
+   "titleScreen 13.aseprite": {
+    "frame": { "x": 3328, "y": 0, "w": 256, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "sourceSize": { "w": 256, "h": 144 },
+    "duration": 200
+   },
+   "titleScreen 14.aseprite": {
+    "frame": { "x": 3584, "y": 0, "w": 256, "h": 144 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 144 },
+    "sourceSize": { "w": 256, "h": 144 },
+    "duration": 200
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.3.10.1-x64",
+  "image": "titleScreen.png",
+  "format": "RGBA8888",
+  "size": { "w": 3840, "h": 144 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "Titlescreen", "from": 0, "to": 2, "direction": "forward", "color": "#000000ff" },
+   { "name": "Transition", "from": 3, "to": 14, "direction": "forward", "color": "#000000ff" }
+  ],
+  "layers": [
+   { "name": "BG", "opacity": 255, "blendMode": "normal" },
+   { "name": "Sky", "opacity": 255, "blendMode": "normal" },
+   { "name": "Hills", "opacity": 255, "blendMode": "normal" },
+   { "name": "HueLightSaturation", "opacity": 51, "blendMode": "normal" },
+   { "name": "Temple", "opacity": 255, "blendMode": "normal" },
+   { "name": "Text", "opacity": 255, "blendMode": "normal" },
+   { "name": "Blood", "opacity": 255, "blendMode": "normal" },
+   { "name": "Fighter", "opacity": 255, "blendMode": "normal" },
+   { "name": "Fighterdead", "opacity": 255, "blendMode": "normal" },
+   { "name": "Effects", "opacity": 255, "blendMode": "normal" },
+   { "name": "UpperInfo", "opacity": 255, "blendMode": "normal" },
+   { "name": "DeadskullFx", "opacity": 255, "blendMode": "normal" },
+   { "name": "Deadskull", "opacity": 255, "blendMode": "normal" },
+   { "name": "Fighterblood", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

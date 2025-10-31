@@ -1,0 +1,41 @@
+{ "frames": {
+   "thepit 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 416, "h": 120 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 416, "h": 120 },
+    "sourceSize": { "w": 416, "h": 120 },
+    "duration": 100
+   },
+   "thepit 1.aseprite": {
+    "frame": { "x": 416, "y": 0, "w": 416, "h": 120 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 416, "h": 120 },
+    "sourceSize": { "w": 416, "h": 120 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.3.10.1-x64",
+  "image": "thepit.png",
+  "format": "RGBA8888",
+  "size": { "w": 832, "h": 120 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "b", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
+   { "name": "Stage1", "from": 1, "to": 1, "direction": "forward", "color": "#000000ff" }
+  ],
+  "layers": [
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" },
+   { "name": "Stones", "opacity": 255, "blendMode": "normal" },
+   { "name": "Floor", "opacity": 255, "blendMode": "normal" },
+   { "name": "Doors", "opacity": 255, "blendMode": "normal" },
+   { "name": "EyesInTheDark", "opacity": 255, "blendMode": "normal" },
+   { "name": "WhitenLayer", "opacity": 38, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

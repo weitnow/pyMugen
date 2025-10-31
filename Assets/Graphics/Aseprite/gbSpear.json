@@ -1,0 +1,45 @@
+{ "frames": {
+   "gbSpear 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 16, "h": 9 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 9 },
+    "sourceSize": { "w": 16, "h": 9 },
+    "duration": 100
+   },
+   "gbSpear 1.aseprite": {
+    "frame": { "x": 16, "y": 0, "w": 16, "h": 9 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 9 },
+    "sourceSize": { "w": 16, "h": 9 },
+    "duration": 100
+   },
+   "gbSpear 2.aseprite": {
+    "frame": { "x": 32, "y": 0, "w": 16, "h": 9 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 9 },
+    "sourceSize": { "w": 16, "h": 9 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.3.14.3-x64",
+  "image": "gbSpear.png",
+  "format": "RGBA8888",
+  "size": { "w": 48, "h": 9 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "Unconnected", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
+   { "name": "Connected", "from": 1, "to": 1, "direction": "forward", "color": "#000000ff" },
+   { "name": "Head", "from": 2, "to": 2, "direction": "forward", "color": "#000000ff" }
+  ],
+  "layers": [
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}
