@@ -19,21 +19,43 @@ class ResourceManager:
         with open(json_path, "r") as file:
             data = json.load(file)
 
+        # spritesheet holds a pygame.Surface of the entire image  
         spritesheet = pygame.image.load(image_path).convert_alpha()
-        frames = {}
-        frames_data = data["frames"]
 
-        # Sort by frame index so animation order is correct
-        sorted_keys = sorted(frames_data.keys(), key=lambda k: int(k.split()[1].split(".")[0]))
+        # frames: int -> Surface ; durations: int -> duration (ms)
+        frames: Dict[int, pygame.Surface] = {}
+        durations: Dict[int, int] = {}
+        for k, v in data["frames"].items():
+            idx = int(k)
+            rect = pygame.Rect(v["frame"]["x"], v["frame"]["y"], v["frame"]["w"], v["frame"]["h"])
+            frames[idx] = spritesheet.subsurface(rect).copy()
+            durations[idx] = v.get("duration", 100)
 
-        for key in sorted_keys:
-            frame_info = frames_data[key]["frame"]
-            rect = pygame.Rect(frame_info["x"], frame_info["y"], frame_info["w"], frame_info["h"])
-            frames[key] = spritesheet.subsurface(rect).copy()
+        # Handle tags only if present
+        tags = data.get("meta", {}).get("frameTags", [])
 
-        tags = data["meta"]["frameTags"]
+        self.animations[name] = AnimationData(spritesheet, frames, tags, durations)
 
-        self.animations[name] = AnimationData(spritesheet, frames, tags)
 
     def get_animation_data(self, name: str) -> AnimationData:
-        return self.animations[name] 
+        return self.animations[name]
+
+
+if __name__ == "__main__":
+    pygame.init()
+    screen = pygame.display.set_mode((640, 480))
+    clock = pygame.time.Clock()
+
+    resources = ResourceManager()
+    resources.load_spritesheet(
+        "gbFighter",
+        "Assets/Graphics/Aseprite/gbFighter.png",
+        "Assets/Graphics/Aseprite/gbFighter.json"
+    )
+
+
+"""
+    gbFighter, Idle, from, to, 
+
+    gbFighter, 0, surface, duration
+"""

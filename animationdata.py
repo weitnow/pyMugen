@@ -1,10 +1,20 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import pygame
 
 class AnimationData:
-    def __init__(self, spritesheet: pygame.Surface, frames: Dict[str, pygame.Surface], tags: List[dict]):
+    def __init__(
+        self,
+        spritesheet: pygame.Surface,
+        frames: Dict[int, pygame.Surface],
+        tags: List[dict],
+        durations: Optional[Dict[int, int]] = None,
+    ):
         self.spritesheet = spritesheet
-        self.frames = frames    # { "gbFighter 0.aseprite": pygame.Surface, ... }       -> Dict[str, pygame.Surface]
+        # frames: mapping from frame index (int) -> pygame.Surface
+        self.frames = frames
+        # durations: mapping from frame index (int) -> duration in ms
+        self.durations = durations or {}
         self.tags = tags        # [ { "name": "Idle", "from": 0, "to": 2, ... }, ... ]  -> List[dict]
-        self.frame_keys = list(frames.keys())  # in sorted order    -> List[string], z.B. "gbFighter 0.asperite"
+        # Keep frame keys sorted so numeric frame indices map predictably
+        self.frame_keys = sorted(list(self.frames.keys()))  # ordered list of frame indices (ints)
         

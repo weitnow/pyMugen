@@ -30,14 +30,18 @@ class GameObject(pygame.sprite.Sprite):
         self.update_image()
 
     def update_image(self):
-        key: str = self.anim_data.frame_keys[self.current_frame_index] # for example "gbFighter 0.aseprite"
-        self.image = self.anim_data.frames[key] # frames is a Dict['gbFighter 0.aseprite, pygame.Surface]
+        # frame_keys is an ordered list of integer frame indices; map current_frame_index to that key
+        key = self.anim_data.frame_keys[self.current_frame_index]
+        self.image = self.anim_data.frames[key]
+        # update rect size to match the new image while preserving topleft position
+        topleft = self.rect.topleft
+        self.rect = self.image.get_rect(topleft=topleft)
 
     def update(self, dt: int):
         tag = self.current_tag
         start, end = tag["from"], tag["to"]
         direction_type = tag.get("direction", "forward")
-        duration = 100  # fixed duration for now (can be improved)
+        duration = 100  # fixed duration for now (can be improved) #TODO: get duration from frame data
 
         self.timer += dt
         while self.timer >= duration:
