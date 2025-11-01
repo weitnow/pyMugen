@@ -39,6 +39,18 @@ class ResourceManager:
             "tags": tags
         }
 
+     # --- SINGLE PNG ---
+    def load_png(self, name: str, image_path: str):
+        if name in self.animations:
+            return
+
+        image = pygame.image.load(image_path).convert_alpha()
+        self.animations[name] = {
+            "frames": {0: image},
+            "durations": {0: 0},
+            "tags": []
+        }
+
     def get_animation_instance(self, name: str) -> AnimationData:
         """Returns a fresh AnimationData instance (unique state)"""
         base = self.animations[name]
@@ -48,3 +60,5 @@ class ResourceManager:
             base["durations"],
             base["tags"]
         )
+    
+   
