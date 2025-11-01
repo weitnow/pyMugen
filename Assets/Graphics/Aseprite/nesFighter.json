@@ -1,193 +1,192 @@
 { "frames": {
-   "nesFighter 0.aseprite": {
+   "0": {
+    "frame": { "x": 32, "y": 64, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "1": {
+    "frame": { "x": 0, "y": 128, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "2": {
+    "frame": { "x": 128, "y": 96, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "3": {
+    "frame": { "x": 96, "y": 96, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "4": {
+    "frame": { "x": 64, "y": 96, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "5": {
+    "frame": { "x": 32, "y": 96, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "6": {
+    "frame": { "x": 0, "y": 96, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "7": {
+    "frame": { "x": 128, "y": 64, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "8": {
+    "frame": { "x": 96, "y": 64, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "9": {
+    "frame": { "x": 64, "y": 64, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "10": {
     "frame": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
+    "duration": 100
    },
-   "nesFighter 1.aseprite": {
-    "frame": { "x": 32, "y": 0, "w": 32, "h": 32 },
+   "11": {
+    "frame": { "x": 0, "y": 64, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
+    "duration": 100
    },
-   "nesFighter 2.aseprite": {
-    "frame": { "x": 64, "y": 0, "w": 32, "h": 32 },
+   "12": {
+    "frame": { "x": 128, "y": 32, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
+    "duration": 100
    },
-   "nesFighter 3.aseprite": {
-    "frame": { "x": 96, "y": 0, "w": 32, "h": 32 },
+   "13": {
+    "frame": { "x": 96, "y": 32, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
+    "duration": 100
    },
-   "nesFighter 4.aseprite": {
+   "14": {
+    "frame": { "x": 64, "y": 32, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "15": {
+    "frame": { "x": 32, "y": 32, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "16": {
+    "frame": { "x": 0, "y": 32, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "17": {
     "frame": { "x": 128, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
+    "duration": 100
    },
-   "nesFighter 5.aseprite": {
-    "frame": { "x": 160, "y": 0, "w": 32, "h": 32 },
+   "18": {
+    "frame": { "x": 96, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
+    "duration": 100
    },
-   "nesFighter 6.aseprite": {
-    "frame": { "x": 192, "y": 0, "w": 32, "h": 32 },
+   "19": {
+    "frame": { "x": 64, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
+    "duration": 100
    },
-   "nesFighter 7.aseprite": {
-    "frame": { "x": 224, "y": 0, "w": 32, "h": 32 },
+   "20": {
+    "frame": { "x": 32, "y": 0, "w": 32, "h": 32 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
-   },
-   "nesFighter 8.aseprite": {
-    "frame": { "x": 256, "y": 0, "w": 32, "h": 32 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
-    "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
-   },
-   "nesFighter 9.aseprite": {
-    "frame": { "x": 288, "y": 0, "w": 32, "h": 32 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
-    "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
-   },
-   "nesFighter 10.aseprite": {
-    "frame": { "x": 320, "y": 0, "w": 32, "h": 32 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
-    "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
-   },
-   "nesFighter 11.aseprite": {
-    "frame": { "x": 352, "y": 0, "w": 32, "h": 32 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
-    "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
-   },
-   "nesFighter 12.aseprite": {
-    "frame": { "x": 384, "y": 0, "w": 32, "h": 32 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
-    "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
-   },
-   "nesFighter 13.aseprite": {
-    "frame": { "x": 416, "y": 0, "w": 32, "h": 32 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
-    "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
-   },
-   "nesFighter 14.aseprite": {
-    "frame": { "x": 448, "y": 0, "w": 32, "h": 32 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
-    "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
-   },
-   "nesFighter 15.aseprite": {
-    "frame": { "x": 480, "y": 0, "w": 32, "h": 32 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
-    "sourceSize": { "w": 32, "h": 32 },
-    "duration": 200
-   },
-   "nesFighter 16.aseprite": {
-    "frame": { "x": 512, "y": 0, "w": 32, "h": 32 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
-    "sourceSize": { "w": 32, "h": 32 },
-    "duration": 200
-   },
-   "nesFighter 17.aseprite": {
-    "frame": { "x": 544, "y": 0, "w": 32, "h": 32 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
-    "sourceSize": { "w": 32, "h": 32 },
-    "duration": 200
-   },
-   "nesFighter 18.aseprite": {
-    "frame": { "x": 576, "y": 0, "w": 32, "h": 32 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
-    "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
-   },
-   "nesFighter 19.aseprite": {
-    "frame": { "x": 608, "y": 0, "w": 32, "h": 32 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
-    "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
-   },
-   "nesFighter 20.aseprite": {
-    "frame": { "x": 640, "y": 0, "w": 32, "h": 32 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
-    "sourceSize": { "w": 32, "h": 32 },
-    "duration": 300
+    "duration": 100
    }
  },
  "meta": {
   "app": "http://www.aseprite.org/",
-  "version": "1.3.7-x64",
+  "version": "1.3.15.5-x64",
   "image": "nesFighter.png",
   "format": "RGBA8888",
-  "size": { "w": 672, "h": 32 },
+  "size": { "w": 160, "h": 160 },
   "scale": "1",
   "frameTags": [
-   { "name": "Punch", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
+   { "name": "Punching", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
    { "name": "Idle", "from": 1, "to": 2, "direction": "forward", "color": "#000000ff" },
-   { "name": "Walk", "from": 2, "to": 3, "direction": "forward", "color": "#000000ff" },
-   { "name": "Jump", "from": 5, "to": 5, "direction": "forward", "color": "#000000ff" },
-   { "name": "Death", "from": 6, "to": 7, "direction": "forward", "color": "#000000ff" },
+   { "name": "Walking", "from": 2, "to": 3, "direction": "forward", "color": "#000000ff" },
+   { "name": "Jumping", "from": 5, "to": 5, "direction": "forward", "color": "#000000ff" },
    { "name": "Hit", "from": 6, "to": 6, "direction": "forward", "color": "#000000ff" },
-   { "name": "Face Down", "from": 7, "to": 7, "direction": "forward", "color": "#000000ff" },
-   { "name": "Block", "from": 8, "to": 8, "direction": "forward", "color": "#000000ff" },
+   { "name": "OnFloor", "from": 7, "to": 7, "direction": "forward", "color": "#000000ff" },
+   { "name": "StandingBlock", "from": 8, "to": 8, "direction": "forward", "color": "#000000ff" },
    { "name": "Duck", "from": 9, "to": 9, "direction": "forward", "color": "#000000ff" },
-   { "name": "DuckBlock", "from": 10, "to": 10, "direction": "forward", "color": "#000000ff" },
-   { "name": "DuckKick", "from": 11, "to": 11, "direction": "forward", "color": "#000000ff" },
-   { "name": "JumpPunch", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" },
+   { "name": "DuckingBlock", "from": 10, "to": 10, "direction": "forward", "color": "#000000ff" },
+   { "name": "DuckingKick", "from": 11, "to": 11, "direction": "forward", "color": "#000000ff" },
+   { "name": "JumpAttack", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" },
    { "name": "SpecialMove", "from": 15, "to": 17, "direction": "forward", "color": "#000000ff" },
    { "name": "FireProjectile", "from": 18, "to": 19, "direction": "forward", "color": "#000000ff" },
    { "name": "Projectile", "from": 20, "to": 20, "direction": "forward", "color": "#000000ff" }
