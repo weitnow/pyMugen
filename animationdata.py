@@ -1,6 +1,5 @@
 class AnimationData:
-    def __init__(self, spritesheet, frames, durations, tags):
-        self.spritesheet = spritesheet
+    def __init__(self, frames, durations, tags):
         self.frames = frames
         self.durations = durations
         self.tags = tags

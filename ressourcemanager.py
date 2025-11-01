@@ -33,7 +33,6 @@ class ResourceManager:
 
         # store base data (shared)
         self.animations[name] = {
-            "spritesheet": spritesheet,
             "frames": frames,
             "durations": durations,
             "tags": tags
@@ -55,7 +54,6 @@ class ResourceManager:
         """Returns a fresh AnimationData instance (unique state)"""
         base = self.animations[name]
         return AnimationData(
-            base["spritesheet"],
             base["frames"],
             base["durations"],
             base["tags"]
