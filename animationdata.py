@@ -1,36 +1,44 @@
+import pygame
+from typing import Dict, List
+
 class AnimationData:
-    def __init__(self, frames, durations, tags):
-        self.frames = frames
-        self.durations = durations
-        self.tags = tags
+    def __init__(self, frames: Dict[int, pygame.Surface], durations: Dict[int, int] = None, tags: List[dict] = None):
+        self.frames = frames                     # int -> Surface
+        self.durations = durations or {i: 100 for i in frames}   # fallback 100ms
+        self.tags = tags or []                   # list of {"name": str, "from": int, "to": int}
 
         self.current_tag = None
-        self.current_frame = 0
-        self.elapsed = 0
+        self.current_frame_idx = 0
+        self.timer = 0
         self.playing = False
-        self.frame_range = (0, len(frames) - 1)
 
+    # --- TAG-BASED ANIMATION ---
     def set_tag(self, tag_name: str):
         for tag in self.tags:
             if tag["name"] == tag_name:
-                self.frame_range = (tag["from"], tag["to"])
-                self.current_frame = tag["from"]
-                self.elapsed = 0
-                self.current_tag = tag_name
+                self.current_tag = tag
+                self.current_frame_idx = tag["from"]
+                self.timer = 0
                 self.playing = True
                 return
-        print(f"Warning: Tag '{tag_name}' not found")
 
-    def update(self, dt: float):
-        if not self.playing:
-            return
-        self.elapsed += dt
-        duration = self.durations[self.current_frame]
-        if self.elapsed >= duration:
-            self.elapsed = 0
-            self.current_frame += 1
-            if self.current_frame > self.frame_range[1]:
-                self.current_frame = self.frame_range[0]
+    # --- FRAME-BASED ANIMATION (for spritesheets without tags) ---
+    def set_frame(self, frame_idx: int):
+        if frame_idx in self.frames:
+            self.current_frame_idx = frame_idx
+            self.current_tag = None
+            self.timer = 0
+            self.playing = False
 
-    def get_current_frame(self):
-        return self.frames[self.current_frame]
+    def update(self, dt: int):
+        if self.current_tag and self.playing:
+            self.timer += dt
+            idx = self.current_frame_idx
+            if self.timer >= self.durations[idx]:
+                self.timer -= self.durations[idx]
+                self.current_frame_idx += 1
+                if self.current_frame_idx > self.current_tag["to"]:
+                    self.current_frame_idx = self.current_tag["from"]
+
+    def get_current_frame(self) -> pygame.Surface:
+        return self.frames[self.current_frame_idx]

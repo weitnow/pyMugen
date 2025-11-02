@@ -1,37 +1,43 @@
 import pygame
 from ressourcemanager import ResourceManager
+from animationdata import AnimationData
 
-class GameObject(pygame.sprite.Sprite):
-    def __init__(self, pos=(0, 0)):
-        super().__init__()
-        self.animations = {}
-        self.current_anim = None
-        self.image = None
-        self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
+class GameObject:
+    def __init__(self, pos):
+        self.pos = pygame.Vector2(pos)
+        self.animations: dict[str, AnimationData] = {}
+        self.current_anim: AnimationData | None = None
+        self.visible = True
 
+    # --- load animation instance from ResourceManager ---
     def get_anim(self, name: str):
-        """Requests a new AnimationData instance from ResourceManager"""
         rm = ResourceManager()
-        anim = rm.get_animation_instance(name)
-        self.animations[name] = anim
-        return anim
+        if name not in self.animations:
+            self.animations[name] = rm.get_animation_instance(name)
 
+    # --- select active animation ---
     def set_anim(self, name: str):
         if name in self.animations:
             self.current_anim = self.animations[name]
-        else:
-            print(f"Animation '{name}' not found for this object")
 
+    # --- set tag-based animation (for spritesheets with frameTags) ---
     def set_frame_tag(self, tag_name: str):
         if self.current_anim:
             self.current_anim.set_tag(tag_name)
 
-    def update(self, dt):
+    # --- set a specific frame (for spritesheets without tags or static images) ---
+    def set_frame(self, frame_index: int):
+        if self.current_anim:
+            self.current_anim.set_frame(frame_index)
+
+    # --- update animation timer ---
+    def update(self, dt: int):
         if self.current_anim:
             self.current_anim.update(dt)
-            self.image = self.current_anim.get_current_frame()
-            self.rect.size = self.image.get_size()
 
-    def draw(self, screen):
-        if self.image:
-            screen.blit(self.image, self.rect)
+    # --- draw current frame ---
+    def draw(self, surface: pygame.Surface):
+        if not self.visible or not self.current_anim:
+            return
+        frame = self.current_anim.get_current_frame()
+        surface.blit(frame, self.pos)

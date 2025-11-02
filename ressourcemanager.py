@@ -27,7 +27,7 @@ class ResourceManager:
             idx = int(k)
             rect = pygame.Rect(v["frame"]["x"], v["frame"]["y"], v["frame"]["w"], v["frame"]["h"])
             frames[idx] = spritesheet.subsurface(rect).copy()
-            durations[idx] = v.get("duration", 100)
+            durations[idx] = v.get("duration", 100)  # default 100ms TODO: make this configurable
 
         tags = data.get("meta", {}).get("frameTags", [])
 

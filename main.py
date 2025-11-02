@@ -21,8 +21,10 @@ debug_surface = pygame.Surface(DEBUG_RES, pygame.SRCALPHA)  # supports transpare
 
 # --- Load resources ---
 resources = ResourceManager()
-resources.load_spritesheet("gbFighter", "Assets/Graphics/Aseprite/gbFighter.png", "Assets/Graphics/Aseprite/gbFighter.json")
-resources.load_spritesheet("nesFighter", "Assets/Graphics/Aseprite/nesFighter.png", "Assets/Graphics/Aseprite/nesFighter.json")
+resources.load_spritesheet("gbFighter", "Assets/Graphics/Aseprite/gbFighter.png", "Assets/Graphics/Aseprite/gbFighter.json") # example spritesheet with tags
+resources.load_spritesheet("nesFighter", "Assets/Graphics/Aseprite/nesFighter.png", "Assets/Graphics/Aseprite/nesFighter.json") 
+resources.load_spritesheet("debug32", "Assets/Graphics/Aseprite/debug32.png", "Assets/Graphics/Aseprite/debug32.json") # example spritesheet without tags
+resources.load_png("debug32x32", "Assets/Graphics/Aseprite/debug32x32.png") # example single PNG
 
 # --- Create objects ---
 player = GameObject((100, 100))
@@ -35,6 +37,17 @@ enemy = GameObject((150, 100))
 enemy.get_anim("gbFighter")
 enemy.set_anim("gbFighter")
 enemy.set_frame_tag("Idle")
+
+debugbox_asprite = GameObject((10, 10))
+debugbox_asprite.get_anim("debug32")
+debugbox_asprite.set_anim("debug32")
+debugbox_asprite.set_frame(1) # second frame of spritesheet
+
+debugbox = GameObject((50, 50))
+debugbox.get_anim("debug32x32")
+debugbox.set_anim("debug32x32")
+debugbox.set_frame(0) # has only one frame
+
 
 # --- Coordinate conversion helpers ---
 def game_to_debug(x, y):
@@ -82,11 +95,15 @@ while running:
     # --- Update ---
     player.update(dt)
     enemy.update(dt)
+    debugbox_asprite.update(dt)
+    debugbox.update(dt)
 
     # --- Draw gameview ---
     game_surface.fill((30, 30, 30))
     player.draw(game_surface)
     enemy.draw(game_surface)
+    debugbox_asprite.draw(game_surface)
+    debugbox.draw(game_surface)
 
     # --- Draw debugview ---
     debug_surface.fill((0, 0, 0, 0))  # clear transparent
