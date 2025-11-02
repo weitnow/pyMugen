@@ -1,7 +1,9 @@
 import pygame
+import globals
 from ressourcemanager import ResourceManager
 from animationdata import AnimationData
 from debugmanager import DebugManager
+
 
 class GameObject:
     def __init__(self, pos):
@@ -50,7 +52,7 @@ class GameObject:
 
     def draw_debug(self, debug_surface, to_debug_coords):
         debug = DebugManager()
-        scale = 8  # same as GameView debug scale
+        scale = globals.DEBUG_SCALE
 
         if self.hurtbox and debug.show_hurtboxes:
             debug.draw_hitbox(debug_surface, self.hurtbox, (0, 0, 255, 180), to_debug_coords, scale, self.pos)

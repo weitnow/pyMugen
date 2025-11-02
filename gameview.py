@@ -1,8 +1,8 @@
 import pygame
-
+import globals
 
 class GameView:
-    def __init__(self, base_width=256, base_height=144, debug_scale=8):
+    def __init__(self, base_width=globals.GAME_RES[0], base_height=globals.GAME_RES[1], debug_scale=globals.DEBUG_SCALE):
         self.base_width = base_width
         self.base_height = base_height
         self.debug_scale = debug_scale

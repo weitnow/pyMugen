@@ -4,21 +4,13 @@ from gameobject import GameObject
 from gameview import GameView
 from debugmanager import DebugManager
 
-# --- Configuration ---
-GAME_RES = (256, 144)
-DEBUG_SCALE = 8
-DEBUG_RES = (GAME_RES[0] * DEBUG_SCALE, GAME_RES[1] * DEBUG_SCALE)
-
 # --- Initialize ---
 pygame.init()
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 display_info = pygame.display.Info()
-SCREEN_RES = (display_info.current_w, display_info.current_h)
 clock = pygame.time.Clock()
 
-# --- Game & Debug canvases ---
-game_surface = pygame.Surface(GAME_RES)
-debug_surface = pygame.Surface(DEBUG_RES, pygame.SRCALPHA)  # supports transparency
+# --- Create GameView and DebugView ---
+view = GameView()
 
 # --- Load resources ---
 resources = ResourceManager()
@@ -30,8 +22,6 @@ resources.load_png("debug32x32", "Assets/Graphics/Aseprite/debug32x32.png") # ex
 # --- Create DebugManager ---
 debug_manager = DebugManager()
 
-# --- Create GameView and DebugView ---
-view = GameView(GAME_RES[0], GAME_RES[1], DEBUG_SCALE)
 
 # --- Create objects ---
 player = GameObject((100, 100))
