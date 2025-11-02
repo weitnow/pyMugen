@@ -1,6 +1,8 @@
 import pygame
 import time
 import globals
+import psutil
+import time
 
 class DebugManager:
     _instance = None
@@ -16,6 +18,10 @@ class DebugManager:
         self.last_time = time.time()
         self.fps = 0
         self.frame_time_ms = 0
+
+        # For CPU updates
+        self.last_cpu_update_time = 0
+        self.cpu_percent = 0
 
     # --- Toggles ---
     def handle_input(self, event):
@@ -35,13 +41,28 @@ class DebugManager:
         if now - self.last_time > 0:
             self.fps = 1000.0 / dt if dt > 0 else 0
         self.last_time = now
+        self.update_system_info()
 
     def draw_fps(self, surface):
         if not globals.show_fps_info:
             return
-        text = f"FPS: {self.fps:.1f}"
+
+        process = psutil.Process()
+        mem_info = process.memory_info()
+        mem_used_mb = mem_info.rss / (1024 * 1024)
+
+        text = f"FPS: {self.fps:.1f} | CPU: {self.cpu_percent:.1f}% | RAM: {mem_used_mb:.1f} MB"
         img = self.font.render(text, True, (255, 255, 255))
         surface.blit(img, (4, 4))
+        
+    # Call this every frame
+    def update_system_info(self):
+        now = time.time()
+        if now - self.last_cpu_update_time > 5:  # update every 5 seconds
+            self.cpu_percent = psutil.cpu_percent(interval=None)
+            self.last_cpu_update_time = now   
+        
+        
 
     # --- Drawing ---
     def draw_hitbox(self, surface, rect: pygame.Rect, color, to_debug_coords, scale, pos):
@@ -69,3 +90,6 @@ class DebugManager:
     def draw_text(self, surface, text, x, y):
         img = self.font.render(text, True, (255, 255, 255))
         surface.blit(img, (x, y))
+
+
+

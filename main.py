@@ -8,7 +8,7 @@ import globals
 # --- Initialize ---
 pygame.init()
 display_info = pygame.display.Info()
-clock = pygame.time.Clock()
+clock = pygame.time.Clock() 
 
 # --- Create GameView and DebugView ---
 view = GameView()
