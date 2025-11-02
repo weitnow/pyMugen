@@ -8,6 +8,7 @@ class GameView:
         self.debug_scale = globals.DEBUG_SCALE
 
         self.debug_draw = False
+        self.show_overlay = True
 
         # main surfaces (game view and debug overlay)
         self.game_surface = pygame.Surface((self.base_width, self.base_height))
@@ -19,14 +20,17 @@ class GameView:
 
         # overlay image (optional) - draws a gameboy-style border
         self.overlay_image = pygame.image.load("Assets/Graphics/Aseprite/overlay.png").convert_alpha()
-        self.overlay_surface = None  # will be created dynamically when drawing
-
+        self.overlay_screen_rect = pygame.Rect(145, 25, 209, 155) # transparent area in PNG
 
     # --- Convert GameView coordinates to DebugView ---
     def to_debug_coords(self, x: float, y: float):
         return x * self.debug_scale, y * self.debug_scale
+    
+    def clear(self):
+        self.game_surface.fill((30, 30, 30))
+        self.debug_surface.fill((0, 0, 0, 0))
 
-    # --- Draw GameView to fullscreen with aspect ratio ---
+    # --- Draw everything ---
     def draw_to_screen(self):
         window_w, window_h = self.fullscreen.get_size()
         game_aspect = self.base_width / self.base_height
@@ -77,6 +81,4 @@ class GameView:
 
         pygame.display.flip()
 
-    def clear(self):
-        self.game_surface.fill((30, 30, 30))
-        self.debug_surface.fill((0, 0, 0, 0))
+    
