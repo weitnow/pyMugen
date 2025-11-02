@@ -1,6 +1,7 @@
 import pygame
 from ressourcemanager import ResourceManager
 from gameobject import GameObject
+from gameview import GameView
 
 # --- Configuration ---
 GAME_RES = (256, 144)
@@ -25,6 +26,9 @@ resources.load_spritesheet("gbFighter", "Assets/Graphics/Aseprite/gbFighter.png"
 resources.load_spritesheet("nesFighter", "Assets/Graphics/Aseprite/nesFighter.png", "Assets/Graphics/Aseprite/nesFighter.json") 
 resources.load_spritesheet("debug32", "Assets/Graphics/Aseprite/debug32.png", "Assets/Graphics/Aseprite/debug32.json") # example spritesheet without tags
 resources.load_png("debug32x32", "Assets/Graphics/Aseprite/debug32x32.png") # example single PNG
+
+# --- Create GameView and DebugView ---
+view = GameView()
 
 # --- Create objects ---
 player = GameObject((100, 100))
