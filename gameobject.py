@@ -54,13 +54,13 @@ class GameObject:
         debug = DebugManager()
         scale = globals.DEBUG_SCALE
 
-        if self.hurtbox and debug.show_hurtboxes:
+        if self.hurtbox and globals.show_hurtboxes:
             debug.draw_hitbox(debug_surface, self.hurtbox, (0, 0, 255, 180), to_debug_coords, scale, self.pos)
 
-        if self.hitbox and debug.show_hitboxes:
+        if self.hitbox and globals.show_hitboxes:
             debug.draw_hitbox(debug_surface, self.hitbox, (255, 0, 0, 180), to_debug_coords, scale, self.pos)
 
-        if self.current_anim and debug.show_bounding_boxes:
+        if self.current_anim and globals.show_bounding_boxes:
             frame_rect = pygame.Rect(self.pos.x, self.pos.y, *self.current_anim.get_current_frame().get_size())
             debug.draw_bounding_box(debug_surface, frame_rect, to_debug_coords, scale)
 

@@ -3,6 +3,7 @@ from ressourcemanager import ResourceManager
 from gameobject import GameObject
 from gameview import GameView
 from debugmanager import DebugManager
+import globals
 
 # --- Initialize ---
 pygame.init()
@@ -93,7 +94,7 @@ while running:
     debugbox.draw(view.game_surface)
 
     # Draw debug overlay
-    if debug_manager.show_hitboxes or debug_manager.show_hurtboxes or debug_manager.show_bounding_boxes or debug_manager.show_fps_info:
+    if globals.show_hitboxes or globals.show_hurtboxes or globals.show_bounding_boxes or globals.show_fps_info:
         player.draw_debug(view.debug_surface, view.to_debug_coords)
         enemy.draw_debug(view.debug_surface, view.to_debug_coords)
         debugbox_asprite.draw_debug(view.debug_surface, view.to_debug_coords)

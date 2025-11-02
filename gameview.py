@@ -20,7 +20,7 @@ class GameView:
 
         # overlay image (optional) - draws a gameboy-style border
         self.overlay_image = pygame.image.load("Assets/Graphics/Aseprite/overlay.png").convert_alpha()
-        self.overlay_screen_rect = pygame.Rect(145, 25, 209, 155) # transparent area in PNG
+        self.overlay_screen_rect = pygame.Rect(*globals.OVERLAY_VIEWPORT) # transparent area in PNG
 
     # --- Convert GameView coordinates to DebugView ---
     def to_debug_coords(self, x: float, y: float):
@@ -33,52 +33,67 @@ class GameView:
     # --- Draw everything ---
     def draw_to_screen(self):
         window_w, window_h = self.fullscreen.get_size()
-        game_aspect = self.base_width / self.base_height
-        window_aspect = window_w / window_h
 
-        if window_aspect > game_aspect:
-            # window wider → pillarbox
-            scale = window_h / self.base_height
-            new_width = int(self.base_width * scale)
-            new_height = window_h
-            offset_x = (window_w - new_width) // 2
-            offset_y = 0
+        # --- calculate rendering area depending on overlay ---
+        if self.show_overlay:
+            # scale overlay to fill screen height
+            ow, oh = self.overlay_image.get_size()
+            overlay_scale = window_h / oh
+            overlay_scaled_w = int(ow * overlay_scale)
+            overlay_scaled_h = window_h
+            overlay_x = (window_w - overlay_scaled_w) // 2
+
+            overlay_scaled = pygame.transform.scale(
+                self.overlay_image, (overlay_scaled_w, overlay_scaled_h)
+            )
+
+            # calculate scaled "screen window" area within overlay
+            render_rect = pygame.Rect(
+                overlay_x + int(self.overlay_screen_rect.x * overlay_scale),
+                int(self.overlay_screen_rect.y * overlay_scale),
+                int(self.overlay_screen_rect.w * overlay_scale),
+                int(self.overlay_screen_rect.h * overlay_scale)
+            )
         else:
-            # window taller → letterbox
-            scale = window_w / self.base_width
-            new_width = window_w
+            # use full screen height, centered horizontally
+            render_rect = pygame.Rect(0, 0, window_w, window_h)
+
+        # --- draw game content ---
+        game_aspect = self.base_width / self.base_height
+        target_aspect = render_rect.w / render_rect.h
+
+        if target_aspect > game_aspect:
+            # target wider → letterbox
+            scale = render_rect.h / self.base_height
+            new_width = int(self.base_width * scale)
+            new_height = render_rect.h
+            offset_x = render_rect.x + (render_rect.w - new_width) // 2
+            offset_y = render_rect.y
+        else:
+            # target taller → fill height
+            scale = render_rect.w / self.base_width
+            new_width = render_rect.w
             new_height = int(self.base_height * scale)
-            offset_x = 0
-            offset_y = (window_h - new_height) // 2
+            offset_x = render_rect.x
+            offset_y = render_rect.y + (render_rect.h - new_height) // 2
 
-        # scale game view
-        scaled = pygame.transform.scale(self.game_surface, (new_width, new_height))
+        # scale and draw game surface
+        scaled_game = pygame.transform.scale(self.game_surface, (new_width, new_height))
         self.fullscreen.fill((0, 0, 0))
-        self.fullscreen.blit(scaled, (offset_x, offset_y))
+        self.fullscreen.blit(scaled_game, (offset_x, offset_y))
 
-        # draw debug overlay if enabled
+        # draw debug overlay
         if self.debug_draw:
             debug_scaled = pygame.transform.scale(self.debug_surface, (new_width, new_height))
             debug_scaled.set_alpha(160)
             self.fullscreen.blit(debug_scaled, (offset_x, offset_y))
-        
-        # --- draw GameBoy overlay ---
-        if self.overlay_image:
-            ow, oh = self.overlay_image.get_size()
-            overlay_scale = window_h / oh  # fill vertically (full height)
-            overlay_scaled_w = int(ow * overlay_scale)
-            overlay_scaled_h = window_h
 
-            overlay_scaled = pygame.transform.scale(
-                self.overlay_image,
-                (overlay_scaled_w, overlay_scaled_h)
-            )
-
-            # center horizontally
-            overlay_x = (window_w - overlay_scaled_w) // 2
+        # draw overlay (if enabled)
+        if self.show_overlay:
             self.fullscreen.blit(overlay_scaled, (overlay_x, 0))
 
-
         pygame.display.flip()
+
+
 
     

@@ -1,5 +1,6 @@
 import pygame
 import time
+import globals
 
 class DebugManager:
     _instance = None
@@ -11,10 +12,6 @@ class DebugManager:
         return cls._instance
 
     def _init(self):
-        self.show_hitboxes = True
-        self.show_hurtboxes = True
-        self.show_bounding_boxes = False
-        self.show_fps_info = True
         self.font = pygame.font.Font(None, 20)
         self.last_time = time.time()
         self.fps = 0
@@ -24,13 +21,13 @@ class DebugManager:
     def handle_input(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_F1:
-                self.show_hitboxes = not self.show_hitboxes
+                globals.show_hitboxes = not globals.show_hitboxes
             elif event.key == pygame.K_F2:
-                self.show_hurtboxes = not self.show_hurtboxes
+                globals.show_hurtboxes = not globals.show_hurtboxes
             elif event.key == pygame.K_F3:
-                self.show_bounding_boxes = not self.show_bounding_boxes
+                globals.show_bounding_boxes = not globals.show_bounding_boxes
             elif event.key == pygame.K_F4:
-                self.show_fps_info = not self.show_fps_info
+                globals.show_fps_info = not globals.show_fps_info
 
     def update_timing(self, dt):
         now = time.time()
@@ -40,7 +37,7 @@ class DebugManager:
         self.last_time = now
 
     def draw_fps(self, surface):
-        if not self.show_fps_info:
+        if not globals.show_fps_info:
             return
         text = f"FPS: {self.fps:.1f}"
         img = self.font.render(text, True, (255, 255, 255))
