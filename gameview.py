@@ -7,9 +7,6 @@ class GameView:
         self.base_height = globals.GAME_RES[1]
         self.debug_scale = globals.DEBUG_SCALE
 
-        self.debug_draw = False
-        self.show_overlay = True
-
         # main surfaces (game view and debug overlay)
         self.game_surface = pygame.Surface((self.base_width, self.base_height))
         self.debug_surface = pygame.Surface((self.base_width * self.debug_scale, self.base_height * self.debug_scale), pygame.SRCALPHA)
@@ -35,7 +32,7 @@ class GameView:
         window_w, window_h = self.fullscreen.get_size()
 
         # --- calculate rendering area depending on overlay ---
-        if self.show_overlay:
+        if globals.show_overlay:
             # scale overlay to fill screen height
             ow, oh = self.overlay_image.get_size()
             overlay_scale = window_h / oh
@@ -83,13 +80,13 @@ class GameView:
         self.fullscreen.blit(scaled_game, (offset_x, offset_y))
 
         # draw debug overlay
-        if self.debug_draw:
+        if globals.debug_draw:
             debug_scaled = pygame.transform.scale(self.debug_surface, (new_width, new_height))
             debug_scaled.set_alpha(160)
             self.fullscreen.blit(debug_scaled, (offset_x, offset_y))
 
         # draw overlay (if enabled)
-        if self.show_overlay:
+        if globals.show_overlay:
             self.fullscreen.blit(overlay_scaled, (overlay_x, 0))
 
         pygame.display.flip()

@@ -99,9 +99,11 @@ while running:
         enemy.draw_debug(view.debug_surface, view.to_debug_coords)
         debugbox_asprite.draw_debug(view.debug_surface, view.to_debug_coords)
         debugbox.draw_debug(view.debug_surface, view.to_debug_coords)
-        view.debug_draw = True
+        globals.debug_draw = True
+        globals.show_overlay = False
     else:
-        view.debug_draw = False
+        globals.debug_draw = False
+        globals.show_overlay = True
 
     debug_manager.draw_fps(view.debug_surface) # draw directly to final screen
 
