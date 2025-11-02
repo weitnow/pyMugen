@@ -6,7 +6,7 @@ from debugmanager import DebugManager
 
 # --- Configuration ---
 GAME_RES = (256, 144)
-DEBUG_SCALE = 6
+DEBUG_SCALE = 8
 DEBUG_RES = (GAME_RES[0] * DEBUG_SCALE, GAME_RES[1] * DEBUG_SCALE)
 
 # --- Initialize ---
@@ -31,7 +31,7 @@ resources.load_png("debug32x32", "Assets/Graphics/Aseprite/debug32x32.png") # ex
 debug_manager = DebugManager()
 
 # --- Create GameView and DebugView ---
-view = GameView()
+view = GameView(GAME_RES[0], GAME_RES[1], DEBUG_SCALE)
 
 # --- Create objects ---
 player = GameObject((100, 100))
@@ -103,7 +103,7 @@ while running:
     debugbox.draw(view.game_surface)
 
     # Draw debug overlay
-    if debug_manager.show_hitboxes or debug_manager.show_hurtboxes or debug_manager.show_bounding_boxes or debug_manager.show_frame_info:
+    if debug_manager.show_hitboxes or debug_manager.show_hurtboxes or debug_manager.show_bounding_boxes or debug_manager.show_fps_info:
         player.draw_debug(view.debug_surface, view.to_debug_coords)
         enemy.draw_debug(view.debug_surface, view.to_debug_coords)
         debugbox_asprite.draw_debug(view.debug_surface, view.to_debug_coords)
@@ -111,8 +111,6 @@ while running:
         view.debug_draw = True
     else:
         view.debug_draw = False
-
-    
 
     debug_manager.draw_fps(view.debug_surface) # draw directly to final screen
 

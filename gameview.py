@@ -1,5 +1,6 @@
 import pygame
 
+
 class GameView:
     def __init__(self, base_width=256, base_height=144, debug_scale=8):
         self.base_width = base_width

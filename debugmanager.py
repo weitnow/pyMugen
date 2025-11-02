@@ -15,7 +15,7 @@ class DebugManager:
         self.show_hurtboxes = True
         self.show_bounding_boxes = False
         self.show_fps_info = True
-        self.font = pygame.font.Font(None, 14)
+        self.font = pygame.font.Font(None, 20)
         self.last_time = time.time()
         self.fps = 0
         self.frame_time_ms = 0
@@ -42,7 +42,7 @@ class DebugManager:
     def draw_fps(self, surface):
         if not self.show_fps_info:
             return
-        text = f"FPS: {self.fps:.1f}  Frame: {self.frame_time_ms:.1f}ms"
+        text = f"FPS: {self.fps:.1f}"
         img = self.font.render(text, True, (255, 255, 255))
         surface.blit(img, (4, 4))
 
