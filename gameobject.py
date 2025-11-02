@@ -109,4 +109,4 @@ class GameObject:
                 self.pos.y + offset.y,
                 *self.current_anim.get_current_frame().get_size()
             )
-            debug.draw_bounding_box(debug_surface, frame_rect, to_debug_coords, scale)
+            debug.draw_bounding_box(debug_surface, frame_rect, to_debug_coords, scale, self.origin_center_bottom)

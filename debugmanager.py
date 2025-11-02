@@ -49,10 +49,22 @@ class DebugManager:
         w, h = rect.width * scale, rect.height * scale
         pygame.draw.rect(surface, color, (x, y, w, h), 2)
 
-    def draw_bounding_box(self, surface, sprite_rect, to_debug_coords, scale):
+    def draw_bounding_box(self, surface, sprite_rect, to_debug_coords, scale, origin_center_bottom=False):
+        # Draw the rectangle as before
         x, y = to_debug_coords(sprite_rect.x, sprite_rect.y)
         w, h = sprite_rect.width * scale, sprite_rect.height * scale
         pygame.draw.rect(surface, (255, 255, 0, 120), (x, y, w, h), 1)
+
+        # Draw the origin
+        if origin_center_bottom:
+            origin_x = sprite_rect.x + sprite_rect.width / 2
+            origin_y = sprite_rect.y + sprite_rect.height
+        else:
+            origin_x = sprite_rect.x
+            origin_y = sprite_rect.y
+
+        ox, oy = to_debug_coords(origin_x, origin_y)
+        pygame.draw.circle(surface, (0, 255, 0), (int(ox), int(oy)), 3)
 
     def draw_text(self, surface, text, x, y):
         img = self.font.render(text, True, (255, 255, 255))
