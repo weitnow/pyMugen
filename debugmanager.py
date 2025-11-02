@@ -1,4 +1,5 @@
 import pygame
+import time
 
 class DebugManager:
     _instance = None
@@ -13,8 +14,11 @@ class DebugManager:
         self.show_hitboxes = True
         self.show_hurtboxes = True
         self.show_bounding_boxes = False
-        self.show_frame_info = False
-        self.font = pygame.font.Font(None, 12)
+        self.show_fps_info = True
+        self.font = pygame.font.Font(None, 14)
+        self.last_time = time.time()
+        self.fps = 0
+        self.frame_time_ms = 0
 
     # --- Toggles ---
     def handle_input(self, event):
@@ -26,7 +30,21 @@ class DebugManager:
             elif event.key == pygame.K_F3:
                 self.show_bounding_boxes = not self.show_bounding_boxes
             elif event.key == pygame.K_F4:
-                self.show_frame_info = not self.show_frame_info
+                self.show_fps_info = not self.show_fps_info
+
+    def update_timing(self, dt):
+        now = time.time()
+        self.frame_time_ms = dt
+        if now - self.last_time > 0:
+            self.fps = 1000.0 / dt if dt > 0 else 0
+        self.last_time = now
+
+    def draw_fps(self, surface):
+        if not self.show_fps_info:
+            return
+        text = f"FPS: {self.fps:.1f}  Frame: {self.frame_time_ms:.1f}ms"
+        img = self.font.render(text, True, (255, 255, 255))
+        surface.blit(img, (4, 4))
 
     # --- Drawing ---
     def draw_hitbox(self, surface, rect: pygame.Rect, color, to_debug_coords, scale, pos):

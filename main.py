@@ -2,6 +2,7 @@ import pygame
 from ressourcemanager import ResourceManager
 from gameobject import GameObject
 from gameview import GameView
+from debugmanager import DebugManager
 
 # --- Configuration ---
 GAME_RES = (256, 144)
@@ -25,6 +26,9 @@ resources.load_spritesheet("gbFighter", "Assets/Graphics/Aseprite/gbFighter.png"
 resources.load_spritesheet("nesFighter", "Assets/Graphics/Aseprite/nesFighter.png", "Assets/Graphics/Aseprite/nesFighter.json") 
 resources.load_spritesheet("debug32", "Assets/Graphics/Aseprite/debug32.png", "Assets/Graphics/Aseprite/debug32.json") # example spritesheet without tags
 resources.load_png("debug32x32", "Assets/Graphics/Aseprite/debug32x32.png") # example single PNG
+
+# --- Create DebugManager ---
+debug_manager = DebugManager()
 
 # --- Create GameView and DebugView ---
 view = GameView()
@@ -78,12 +82,13 @@ def blit_scaled_center(source, target):
 running = True
 while running:
     dt = clock.tick(60)
+    # --- Update CORE-Systems ---
+    debug_manager.update_timing(dt)
+    # --- Event Handling ---
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
             running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_F1:
-                view.debug_draw = not view.debug_draw
+        debug_manager.handle_input(event)
 
     # --- Update ---
     player.update(dt)
@@ -91,39 +96,30 @@ while running:
     debugbox_asprite.update(dt)
     debugbox.update(dt)
 
-
-    """
-    # --- Draw gameview ---
-    game_surface.fill((30, 30, 30))
-    player.draw(game_surface)
-    enemy.draw(game_surface)       
-    debugbox_asprite.draw(game_surface)
-    debugbox.draw(game_surface)
-
-    # --- Draw debugview ---
-    debug_surface.fill((0, 0, 0, 0))  # clear transparent
-
-
-    # --- Combine ---
-    blit_scaled_center(game_surface, screen)
-
-  
-
-    pygame.display.flip()
-    """
-
     view.clear()
     player.draw(view.game_surface)
     enemy.draw(view.game_surface)
     debugbox_asprite.draw(view.game_surface)
     debugbox.draw(view.game_surface)
 
-    if view.debug_draw:
+    # Draw debug overlay
+    if debug_manager.show_hitboxes or debug_manager.show_hurtboxes or debug_manager.show_bounding_boxes or debug_manager.show_frame_info:
         player.draw_debug(view.debug_surface, view.to_debug_coords)
         enemy.draw_debug(view.debug_surface, view.to_debug_coords)
         debugbox_asprite.draw_debug(view.debug_surface, view.to_debug_coords)
         debugbox.draw_debug(view.debug_surface, view.to_debug_coords)
+        view.debug_draw = True
+    else:
+        view.debug_draw = False
+
+    
+
+    debug_manager.draw_fps(view.debug_surface) # draw directly to final screen
 
     view.draw_to_screen()
+
+
+
+  
 
 pygame.quit()

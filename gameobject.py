@@ -1,6 +1,7 @@
 import pygame
 from ressourcemanager import ResourceManager
 from animationdata import AnimationData
+from debugmanager import DebugManager
 
 class GameObject:
     def __init__(self, pos):
@@ -47,15 +48,18 @@ class GameObject:
     def set_hurtbox(self, rect: pygame.Rect):
         self.hurtbox = rect
 
-    def draw_debug(self, debug_surface: pygame.Surface, to_debug_coords):
-        if self.hurtbox:
-            x, y = to_debug_coords(self.hurtbox.x + self.pos.x, self.hurtbox.y + self.pos.y)
-            w = self.hurtbox.width * 8
-            h = self.hurtbox.height * 8
-            pygame.draw.rect(debug_surface, (0, 0, 255, 180), (x, y, w, h), 2)
+    def draw_debug(self, debug_surface, to_debug_coords):
+        debug = DebugManager()
+        scale = 8  # same as GameView debug scale
 
-        if self.hitbox:
-            x, y = to_debug_coords(self.hitbox.x + self.pos.x, self.hitbox.y + self.pos.y)
-            w = self.hitbox.width * 8
-            h = self.hitbox.height * 8
-            pygame.draw.rect(debug_surface, (255, 0, 0, 180), (x, y, w, h), 2)
+        if self.hurtbox and debug.show_hurtboxes:
+            debug.draw_hitbox(debug_surface, self.hurtbox, (0, 0, 255, 180), to_debug_coords, scale, self.pos)
+
+        if self.hitbox and debug.show_hitboxes:
+            debug.draw_hitbox(debug_surface, self.hitbox, (255, 0, 0, 180), to_debug_coords, scale, self.pos)
+
+        if self.current_anim and debug.show_bounding_boxes:
+            frame_rect = pygame.Rect(self.pos.x, self.pos.y, *self.current_anim.get_current_frame().get_size())
+            debug.draw_bounding_box(debug_surface, frame_rect, to_debug_coords, scale)
+
+     
