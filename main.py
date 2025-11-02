@@ -26,6 +26,7 @@ debug_manager = DebugManager()
 
 # --- Create objects ---
 player = GameObject((100, 100))
+player.origin_center_bottom = True
 player.get_anim("gbFighter")
 player.get_anim("nesFighter")
 player.set_anim("nesFighter")
@@ -35,6 +36,7 @@ player.set_hurtbox(pygame.Rect(5, 10, 20, 30))
 player.set_hitbox(pygame.Rect(25, 10, 20, 15))
 
 enemy = GameObject((150, 100))
+enemy.origin_center_bottom = True
 enemy.get_anim("gbFighter")
 enemy.set_anim("gbFighter")
 enemy.set_frame_tag("Idle")

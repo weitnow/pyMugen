@@ -15,6 +15,8 @@ class GameObject:
         self.hurtbox: pygame.Rect | None = None
         self.hitbox: pygame.Rect | None = None
 
+        self.origin_center_bottom: bool = False  # False = top-left, True = center-bottom
+
     # --- Animation Management ---
     def get_anim(self, name: str):
         rm = ResourceManager()
@@ -41,7 +43,17 @@ class GameObject:
         if not self.visible or not self.current_anim:
             return
         frame = self.current_anim.get_current_frame()
-        surface.blit(frame, self.pos)
+
+        if self.origin_center_bottom:
+            draw_pos = self.pos.copy()
+            w, h = frame.get_size()
+            # adjust x to center, y to bottom
+            draw_pos.x -= w / 2
+            draw_pos.y -= h
+        else:
+            draw_pos = self.pos
+
+        surface.blit(frame, draw_pos)
 
     # --- Debug helpers ---
     def set_hitbox(self, rect: pygame.Rect):
