@@ -7,7 +7,7 @@ from gameview import GameView
 GAME_RES = (256, 144)
 DEBUG_SCALE = 6
 DEBUG_RES = (GAME_RES[0] * DEBUG_SCALE, GAME_RES[1] * DEBUG_SCALE)
-DEBUG_DRAW = True  # toggle for debug overlay
+DEBUG_DRAW = False  # toggle for debug overlay
 
 # --- Initialize ---
 pygame.init()
@@ -37,10 +37,15 @@ player.get_anim("nesFighter")
 player.set_anim("nesFighter")
 player.set_frame_tag("Idle")
 
+player.set_hurtbox(pygame.Rect(5, 10, 20, 30))
+player.set_hitbox(pygame.Rect(25, 10, 20, 15))
+
 enemy = GameObject((150, 100))
 enemy.get_anim("gbFighter")
 enemy.set_anim("gbFighter")
 enemy.set_frame_tag("Idle")
+enemy.set_hurtbox(pygame.Rect(6, 8, 20, 28))
+enemy.set_hitbox(pygame.Rect(22, 8, 20, 14))
 
 debugbox_asprite = GameObject((10, 10))
 debugbox_asprite.get_anim("debug32")
@@ -53,24 +58,6 @@ debugbox.set_anim("debug32x32")
 debugbox.set_frame(0) # has only one frame
 
 
-# --- Coordinate conversion helpers ---
-def game_to_debug(x, y):
-    """Convert gameview coordinates to debugview coordinates"""
-    return int(x * DEBUG_SCALE), int(y * DEBUG_SCALE)
-
-def draw_hitbox_debug(obj):
-    """Example: draw a hitbox and hurtbox in debug view"""
-    if not hasattr(obj, "rect"):
-        return
-    hx, hy = game_to_debug(obj.rect.x, obj.rect.y)
-    hw, hh = obj.rect.width * DEBUG_SCALE, obj.rect.height * DEBUG_SCALE
-
-    # Draw hurtbox (blue)
-    pygame.draw.rect(debug_surface, (0, 0, 255, 80), (hx, hy, hw, hh), 2)
-
-    # Example hitbox (red)
-    # In a real system you'd use obj.hitbox etc.
-    pygame.draw.rect(debug_surface, (255, 0, 0, 80), (hx + 8, hy, hw - 16, hh), 2)
 
 # --- Aspect ratio scaler ---
 def blit_scaled_center(source, target):
@@ -105,15 +92,14 @@ while running:
     # --- Draw gameview ---
     game_surface.fill((30, 30, 30))
     player.draw(game_surface)
-    enemy.draw(game_surface)
+    enemy.draw(game_surface)       
     debugbox_asprite.draw(game_surface)
     debugbox.draw(game_surface)
 
     # --- Draw debugview ---
     debug_surface.fill((0, 0, 0, 0))  # clear transparent
     if DEBUG_DRAW:
-        draw_hitbox_debug(player)
-        draw_hitbox_debug(enemy)
+        pass # could add debug-specific drawings here
 
     # --- Combine ---
     blit_scaled_center(game_surface, screen)
