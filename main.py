@@ -7,7 +7,6 @@ from gameview import GameView
 GAME_RES = (256, 144)
 DEBUG_SCALE = 6
 DEBUG_RES = (GAME_RES[0] * DEBUG_SCALE, GAME_RES[1] * DEBUG_SCALE)
-DEBUG_DRAW = False  # toggle for debug overlay
 
 # --- Initialize ---
 pygame.init()
@@ -82,6 +81,9 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
             running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_F1:
+                view.debug_draw = not view.debug_draw
 
     # --- Update ---
     player.update(dt)
@@ -89,6 +91,8 @@ while running:
     debugbox_asprite.update(dt)
     debugbox.update(dt)
 
+
+    """
     # --- Draw gameview ---
     game_surface.fill((30, 30, 30))
     player.draw(game_surface)
@@ -98,17 +102,28 @@ while running:
 
     # --- Draw debugview ---
     debug_surface.fill((0, 0, 0, 0))  # clear transparent
-    if DEBUG_DRAW:
-        pass # could add debug-specific drawings here
+
 
     # --- Combine ---
     blit_scaled_center(game_surface, screen)
 
-    if DEBUG_DRAW:
-        scaled_debug = pygame.transform.scale(debug_surface, screen.get_size())
-        scaled_debug.set_alpha(128)
-        screen.blit(scaled_debug, (0, 0))
+  
 
     pygame.display.flip()
+    """
+
+    view.clear()
+    player.draw(view.game_surface)
+    enemy.draw(view.game_surface)
+    debugbox_asprite.draw(view.game_surface)
+    debugbox.draw(view.game_surface)
+
+    if view.debug_draw:
+        player.draw_debug(view.debug_surface, view.to_debug_coords)
+        enemy.draw_debug(view.debug_surface, view.to_debug_coords)
+        debugbox_asprite.draw_debug(view.debug_surface, view.to_debug_coords)
+        debugbox.draw_debug(view.debug_surface, view.to_debug_coords)
+
+    view.draw_to_screen()
 
 pygame.quit()
