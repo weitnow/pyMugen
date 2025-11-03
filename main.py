@@ -25,12 +25,15 @@ debug_manager = DebugManager()
 
 
 # --- Create objects ---
-player = GameObject((100, 100))
+player = GameObject((100, 100), rotatable=True)
 player.origin_center_bottom = True
 player.get_anim("gbFighter")
 player.get_anim("nesFighter")
 player.set_anim("nesFighter")
 player.set_frame_tag("Idle")
+player.set_rotation(45)
+player.set_rotation(0)
+player.set_flip(True, True)
 
 player.set_hurtbox(pygame.Rect(5, 10, 20, 30))
 player.set_hitbox(pygame.Rect(25, 10, 20, 15))

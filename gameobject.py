@@ -1,4 +1,5 @@
 import pygame
+import math
 import globals
 from ressourcemanager import ResourceManager
 from animationdata import AnimationData
@@ -6,20 +7,25 @@ from debugmanager import DebugManager
 
 
 class GameObject:
-    def __init__(self, pos: tuple[float, float]):
+    def __init__(self, pos: tuple[float, float], rotatable: bool = False):
         self.pos = pygame.Vector2(pos)
         self.visible = True
         self.active = True
+        self.rotatable = rotatable
 
         self.animations: dict[str, AnimationData] = {}
         self.current_anim: AnimationData | None = None
 
-        # hitboxes stored relative to origin
         self.hurtbox: pygame.Rect | None = None
         self.hitbox: pygame.Rect | None = None
 
-        # False = top-left, True = center-bottom
         self.origin_center_bottom: bool = False
+
+        # Rotation + flip cache
+        self.rotation_cache: dict[int, pygame.Surface] = {}
+        self.flip_x = False
+        self.flip_y = False
+        self.current_angle = 0  # in degrees
 
     # -----------------------
     # Animation Management
@@ -28,6 +34,8 @@ class GameObject:
         rm = ResourceManager()
         if name not in self.animations:
             self.animations[name] = rm.get_animation_instance(name)
+            if self.rotatable:
+                self._build_rotation_cache(self.animations[name])
         return self.animations[name]
 
     def set_anim(self, name: str):
@@ -49,20 +57,42 @@ class GameObject:
             self.current_anim.update(dt)
 
     # -----------------------
+    # Rotation + Flipping
+    # -----------------------
+    def _build_rotation_cache(self, anim: AnimationData):
+        """Precompute rotated frames for each animation frame in 45° steps."""
+        for frame_idx in range(len(anim.frames)):
+            frame = anim.frames[frame_idx]
+            for angle in range(0, 360, 45):
+                rotated = pygame.transform.rotate(frame, angle)
+                self.rotation_cache[(frame_idx, angle, False, False)] = rotated
+                self.rotation_cache[(frame_idx, angle, True, False)] = pygame.transform.flip(rotated, True, False)
+                self.rotation_cache[(frame_idx, angle, False, True)] = pygame.transform.flip(rotated, False, True)
+                self.rotation_cache[(frame_idx, angle, True, True)] = pygame.transform.flip(rotated, True, True)
+
+    def set_rotation(self, angle: float):
+        """Set the object’s rotation angle, snapped to nearest 45°."""
+        if not self.rotatable:
+            return
+        self.current_angle = (round(angle / 45) * 45) % 360
+
+    def set_flip(self, flip_x: bool = False, flip_y: bool = False):
+        self.flip_x = flip_x
+        self.flip_y = flip_y
+
+    # -----------------------
     # Origin / Positioning
     # -----------------------
-    def _compute_origin_offset(self) -> pygame.Vector2:
-        """Returns the offset to apply based on origin mode."""
+    def _compute_origin_offset(self, image: pygame.Surface) -> pygame.Vector2:
         offset = pygame.Vector2(0, 0)
-        if self.origin_center_bottom and self.current_anim:
-            w, h = self.current_anim.get_current_frame().get_size()
+        if self.origin_center_bottom:
+            w, h = image.get_size()
             offset.x = -w / 2
             offset.y = -h
         return offset
 
-    def get_draw_position(self) -> pygame.Vector2:
-        """Returns the actual top-left position for blitting."""
-        return self.pos + self._compute_origin_offset()
+    def get_draw_position(self, image: pygame.Surface) -> pygame.Vector2:
+        return self.pos + self._compute_origin_offset(image)
 
     # -----------------------
     # Drawing
@@ -70,8 +100,19 @@ class GameObject:
     def draw(self, surface: pygame.Surface):
         if not self.visible or not self.current_anim or not self.active:
             return
+
         frame = self.current_anim.get_current_frame()
-        surface.blit(frame, self.get_draw_position())
+
+        # If rotatable, fetch from cache
+        if self.rotatable:
+            frame_idx = self.current_anim.current_frame_idx
+            key = (frame_idx, self.current_angle, self.flip_x, self.flip_y)
+            frame = self.rotation_cache.get(key, frame)
+
+        elif self.flip_x or self.flip_y:
+            frame = pygame.transform.flip(frame, self.flip_x, self.flip_y)
+
+        surface.blit(frame, self.get_draw_position(frame))
 
     # -----------------------
     # Hitbox / Hurtbox
@@ -83,11 +124,10 @@ class GameObject:
         self.hurtbox = self._store_relative_rect(rect, relative_to_origin)
 
     def _store_relative_rect(self, rect: pygame.Rect, relative_to_origin: bool) -> pygame.Rect:
-        """Stores a rectangle relative to the object's origin."""
         if relative_to_origin:
             return rect.copy()
         else:
-            offset = self._compute_origin_offset()
+            offset = self._compute_origin_offset(self.current_anim.get_current_frame())
             return rect.move(-offset)
 
     # -----------------------
@@ -96,7 +136,9 @@ class GameObject:
     def draw_debug(self, debug_surface, to_debug_coords):
         debug = DebugManager()
         scale = globals.DEBUG_SCALE
-        offset = self._compute_origin_offset()
+
+        frame = self.current_anim.get_current_frame() if self.current_anim else None
+        offset = self._compute_origin_offset(frame) if frame else pygame.Vector2(0, 0)
 
         if self.hurtbox and globals.show_hurtboxes:
             debug.draw_hitbox(debug_surface, self.hurtbox.move(offset),
@@ -106,10 +148,10 @@ class GameObject:
             debug.draw_hitbox(debug_surface, self.hitbox.move(offset),
                               (255, 0, 0, 180), to_debug_coords, scale, self.pos)
 
-        if self.current_anim and globals.show_bounding_boxes:
+        if frame and globals.show_bounding_boxes:
             frame_rect = pygame.Rect(
                 self.pos.x + offset.x,
                 self.pos.y + offset.y,
-                *self.current_anim.get_current_frame().get_size()
+                *frame.get_size()
             )
             debug.draw_bounding_box(debug_surface, frame_rect, to_debug_coords, scale, self.origin_center_bottom)
