@@ -51,7 +51,7 @@ debugbox_asprite.set_frame(1) # second frame of spritesheet
 debugbox = GameObject((50, 50))
 debugbox.get_anim("debug32x32")
 debugbox.set_anim("debug32x32")
-debugbox.set_frame(0) # has only one frame
+
 
 
 # --- Main loop ---
@@ -68,22 +68,16 @@ while running:
 
     # --- Update ---
     player.update(dt)
-    enemy.update(dt)
-    debugbox_asprite.update(dt)
-    debugbox.update(dt)
+
 
     view.clear()
     player.draw(view.game_surface)
-    enemy.draw(view.game_surface)
-    debugbox_asprite.draw(view.game_surface)
-    debugbox.draw(view.game_surface)
+
 
     # Draw debug overlay
     if globals.show_hitboxes or globals.show_hurtboxes or globals.show_bounding_boxes or globals.show_fps_info:
         player.draw_debug(view.debug_surface, view.to_debug_coords)
-        enemy.draw_debug(view.debug_surface, view.to_debug_coords)
-        debugbox_asprite.draw_debug(view.debug_surface, view.to_debug_coords)
-        debugbox.draw_debug(view.debug_surface, view.to_debug_coords)
+  
         globals.debug_draw = True
         globals.show_overlay = False
     else:

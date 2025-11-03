@@ -24,11 +24,15 @@ class AnimationData:
 
     # --- FRAME-BASED ANIMATION (for spritesheets without tags) ---
     def set_frame(self, frame_idx: int):
-        if frame_idx in self.frames:
-            self.current_frame_idx = frame_idx
-            self.current_tag = None
-            self.timer = 0
-            self.playing = False
+        if frame_idx not in self.frames:
+            raise ValueError(f"Frame index {frame_idx} not in animation frames.")
+        
+        self.current_frame_idx = frame_idx
+        self.current_tag = None
+        self.timer = 0
+        self.playing = False
+
+            
 
     def update(self, dt: int):
         if self.current_tag and self.playing:
