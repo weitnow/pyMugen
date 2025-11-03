@@ -54,23 +54,6 @@ debugbox.set_anim("debug32x32")
 debugbox.set_frame(0) # has only one frame
 
 
-
-# --- Aspect ratio scaler ---
-def blit_scaled_center(source, target):
-    """Scale source surface to fit target while keeping aspect ratio and black bars"""
-    sw, sh = source.get_size()
-    tw, th = target.get_size()
-
-    scale = min(tw / sw, th / sh)
-    new_size = (int(sw * scale), int(sh * scale))
-    scaled = pygame.transform.scale(source, new_size)
-
-    x = (tw - new_size[0]) // 2
-    y = (th - new_size[1]) // 2
-
-    target.fill((0, 0, 0))
-    target.blit(scaled, (x, y))
-
 # --- Main loop ---
 running = True
 while running:

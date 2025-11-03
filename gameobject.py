@@ -9,6 +9,7 @@ class GameObject:
     def __init__(self, pos: tuple[float, float]):
         self.pos = pygame.Vector2(pos)
         self.visible = True
+        self.active = True
 
         self.animations: dict[str, AnimationData] = {}
         self.current_anim: AnimationData | None = None
@@ -42,6 +43,8 @@ class GameObject:
             self.current_anim.set_frame(frame_index)
 
     def update(self, dt: int):
+        if not self.active:
+            return
         if self.current_anim:
             self.current_anim.update(dt)
 
@@ -65,7 +68,7 @@ class GameObject:
     # Drawing
     # -----------------------
     def draw(self, surface: pygame.Surface):
-        if not self.visible or not self.current_anim:
+        if not self.visible or not self.current_anim or not self.active:
             return
         frame = self.current_anim.get_current_frame()
         surface.blit(frame, self.get_draw_position())
