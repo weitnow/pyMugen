@@ -1,5 +1,4 @@
 import pygame
-import math
 import globals
 from ressourcemanager import ResourceManager
 from animationdata import AnimationData
