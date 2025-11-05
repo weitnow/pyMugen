@@ -8,8 +8,9 @@ class Action(Enum):
     MOVE_RIGHT = auto()
     MOVE_LEFT = auto()
     MOVE_DOWN = auto()
-    JUMP = auto()
-    PUNCH = auto()
+    MOVE_UP = auto()
+    MOVE_A = auto()
+    MOVE_B = auto()
 
 class Special(Enum):
     FIREBALL = auto()
@@ -31,8 +32,9 @@ class InputManager:
             pygame.K_d: Action.MOVE_RIGHT,
             pygame.K_a: Action.MOVE_LEFT,
             pygame.K_s: Action.MOVE_DOWN,
-            pygame.K_w: Action.JUMP,
-            pygame.K_z: Action.PUNCH
+            pygame.K_w: Action.MOVE_UP,
+            pygame.K_z: Action.MOVE_A,
+            pygame.K_u: Action.MOVE_B
         }
 
     def get_pressed_actions(self):
@@ -41,7 +43,9 @@ class InputManager:
         for key, action in self.key_map.items():
             if keys[key]:
                 pressed_actions.add(action)
+        print(pressed_actions) #TODO: remove
         return pressed_actions
+
 
 # --- Player Controller ---
 class PlayerController:
@@ -77,7 +81,7 @@ class PlayerController:
             {Action.MOVE_DOWN},
             {Action.MOVE_DOWN, Action.MOVE_RIGHT},
             {Action.MOVE_RIGHT},
-            {Action.PUNCH}
+            {Action.MOVE_A}
         ]
 
         # Shoryuken: →, ↓, ↓→, Punch
@@ -86,7 +90,7 @@ class PlayerController:
             {Action.MOVE_LEFT},
             {Action.MOVE_RIGHT},
             {Action.MOVE_RIGHT},
-            {Action.PUNCH}
+            {Action.MOVE_A}
         ]
 
         buffer_actions = [actions for _, actions in self.input_buffer]

@@ -72,6 +72,9 @@ while running:
             running = False
         debug_manager.handle_input(event)
 
+    # --- Input Handling ---
+    pressed = input_manager.get_pressed_actions() # pressed is a set of Actions
+
     # --- Update ---
     player.update(dt)
 
