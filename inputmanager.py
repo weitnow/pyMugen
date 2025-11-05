@@ -17,8 +17,8 @@ class Special(Enum):
     SHORYUKEN = auto()
 
 # --- Input Manager ---
-class InputManager:
 
+class InputManager:
     _instance = None
 
     def __new__(cls):
@@ -28,23 +28,75 @@ class InputManager:
         return cls._instance
 
     def _init(self):
-        self.key_map = {
-            pygame.K_d: Action.MOVE_RIGHT,
-            pygame.K_a: Action.MOVE_LEFT,
-            pygame.K_s: Action.MOVE_DOWN,
-            pygame.K_w: Action.MOVE_UP,
-            pygame.K_z: Action.MOVE_A,
-            pygame.K_u: Action.MOVE_B
+        # --- Keyboard mappings for 2 players ---
+        self.key_maps = [
+            {  # Player 1
+                pygame.K_d: Action.MOVE_RIGHT,
+                pygame.K_a: Action.MOVE_LEFT,
+                pygame.K_s: Action.MOVE_DOWN,
+                pygame.K_w: Action.MOVE_UP,
+                pygame.K_z: Action.MOVE_A,
+                pygame.K_u: Action.MOVE_B,
+            },
+            {  # Player 2
+                pygame.K_RIGHT: Action.MOVE_RIGHT,
+                pygame.K_LEFT: Action.MOVE_LEFT,
+                pygame.K_DOWN: Action.MOVE_DOWN,
+                pygame.K_UP: Action.MOVE_UP,
+                pygame.K_KP1: Action.MOVE_A,
+                pygame.K_KP2: Action.MOVE_B,
+            },
+        ]
+
+        # --- Controller setup ---
+        pygame.joystick.init()
+        self.joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
+     
+
+        # --- Controller button mapping (Xbox layout) ---
+        self.button_map = {
+            0: Action.MOVE_A,  # A
+            1: Action.MOVE_B,  # B
         }
 
-    def get_pressed_actions(self):
+        # --- Store pressed actions per player ---
+        self.pressed_actions = [set(), set()]
+
+    def get_pressed_actions(self, player_index: int):
+        """Return the set of actions for a specific player (0 or 1)."""
+        if player_index not in (0, 1):
+            return set()
+
+        actions = self.pressed_actions[player_index]
+        actions.clear()
+
+        # --- Keyboard input ---
         keys = pygame.key.get_pressed()
-        pressed_actions = set()
-        for key, action in self.key_map.items():
+        for key, action in self.key_maps[player_index].items():
             if keys[key]:
-                pressed_actions.add(action)
-        print(pressed_actions) #TODO: remove
-        return pressed_actions
+                actions.add(action)
+
+        # --- Controller input ---
+        if player_index < len(self.joysticks):
+            js = self.joysticks[player_index]
+
+            # Buttons
+            for btn_id, action in self.button_map.items():
+                if js.get_button(btn_id):
+                    actions.add(action)
+
+            # D-Pad (Hat)
+            hat_x, hat_y = js.get_hat(0)
+            if hat_x == 1:
+                actions.add(Action.MOVE_RIGHT)
+            elif hat_x == -1:
+                actions.add(Action.MOVE_LEFT)
+            if hat_y == 1:
+                actions.add(Action.MOVE_UP)
+            elif hat_y == -1:
+                actions.add(Action.MOVE_DOWN)
+
+        return actions
 
 
 # --- Player Controller ---

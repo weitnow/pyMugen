@@ -73,7 +73,8 @@ while running:
         debug_manager.handle_input(event)
 
     # --- Input Handling ---
-    pressed = input_manager.get_pressed_actions() # pressed is a set of Actions
+    p1_actions = input_manager.get_pressed_actions(0) # p1_actions is a set of Actions
+    p2_actions = input_manager.get_pressed_actions(1)
 
     # --- Update ---
     player.update(dt)
