@@ -12,6 +12,14 @@ class GameObject:
         self.active = True
         self.rotatable = rotatable
 
+        # Physics
+        self.vel = pygame.Vector2(0, 0)
+        self.on_ground = True
+        self.speed = 0.1
+        self.jump_velocity = -0.4
+        self.gravity =0.001 # TODO: move to globals or physics manager
+        self.ground_y = 140  # TODO: move to globals or physics manager
+        
         self.animations: dict[str, AnimationData] = {}
         self.current_anim: AnimationData | None = None
 
@@ -52,6 +60,18 @@ class GameObject:
     def update(self, dt: int):
         if not self.active:
             return
+        
+        # Gravity
+        self.vel.y += self.gravity * dt
+        self.pos.y += self.vel.y * dt
+
+        # Ground collision
+        if self.pos.y >= self.ground_y:
+            self.pos.y = self.ground_y
+            self.vel.y = 0
+            self.on_ground = True
+
+        
         if self.current_anim:
             self.current_anim.update(dt)
 

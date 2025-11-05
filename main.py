@@ -41,7 +41,7 @@ player.set_frame_tag("Idle")
 player.set_hurtbox(pygame.Rect(5, 10, 20, 30))
 player.set_hitbox(pygame.Rect(25, 10, 20, 15))
 
-enemy = GameObject((150, 100))
+enemy = GameObject((150, 10))
 enemy.origin_center_bottom = True
 enemy.get_anim("gbFighter")
 enemy.set_anim("gbFighter")
@@ -75,6 +75,8 @@ while running:
     # --- Input Handling ---
     p1_actions = input_manager.get_pressed_actions(0) # p1_actions is a set of Actions
     p2_actions = input_manager.get_pressed_actions(1)
+
+    player.controller.update(p1_actions)
 
     # --- Update ---
     player.update(dt)
