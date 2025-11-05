@@ -17,7 +17,16 @@ class Special(Enum):
 
 # --- Input Manager ---
 class InputManager:
-    def __init__(self):
+
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(InputManager, cls).__new__(cls)
+            cls._instance._init()
+        return cls._instance
+
+    def _init(self):
         self.key_map = {
             pygame.K_d: Action.MOVE_RIGHT,
             pygame.K_a: Action.MOVE_LEFT,

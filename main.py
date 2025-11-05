@@ -4,6 +4,7 @@ from gameobject import GameObject
 from gameview import GameView
 from debugmanager import DebugManager
 from GameObjects.fighter import Fighter
+from inputmanager import InputManager, Action, Special #TODO: remove unused imports
 
 import globals
 
@@ -11,6 +12,9 @@ import globals
 pygame.init()
 display_info = pygame.display.Info()
 clock = pygame.time.Clock() 
+
+# --- Create InputManager ---
+input_manager = InputManager()
 
 # --- Create GameView and DebugView ---
 view = GameView()
