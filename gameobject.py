@@ -1,7 +1,7 @@
 import pygame
 import globals
 from ressourcemanager import ResourceManager
-from animationdata import AnimationData
+from ressourcemanager import AnimationData
 from debugmanager import DebugManager
 
 
