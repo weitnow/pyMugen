@@ -141,7 +141,7 @@ class PlayerController:
     (e.g. Fighter movement, attacks, etc).
     """
     def __init__(self):
-        # Actions dict used externally (e.g. Fighter) to know what the player intends
+        # Actions dict used externally (e.g. Fighter) to know what the player intends -> {Action.RIGHT: False, Action.LEFT: False, ...}
         self.actions: dict[Action, bool] = {
             action: False for action in Action
         }
@@ -165,17 +165,15 @@ class PlayerController:
             self.actions[action] = True   # set currently pressed actions to True {Action.RIGHT: True, Action.LEFT: False, ...}
 
         # Add to buffer
-        self._input_buffer.append((current_time, pressed_actions))
+        self._input_buffer.append((current_time, pressed_actions)) # e.g. deque([(time1, {Action.RIGHT, Action.A}), (time2, {Action.DOWN}), ...])
         
-        if globals.stop_game_for_debugging:
-            print("stopping game for debugging")
-
-        # Remove old inputs
+        # Remove old inputs if beyond buffer time
         while self._input_buffer and current_time - self._input_buffer[0][0] > self._buffer_time:
             self._input_buffer.popleft()
 
+
         # Check for specials
-        self.check_specials()
+        # self.check_specials()
 
     def check_specials(self):
         # Fireball: ↓, ↓→, →, A
