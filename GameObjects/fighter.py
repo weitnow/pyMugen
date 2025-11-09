@@ -12,13 +12,13 @@ class Fighter(GameObject):
         actions = self.controller.actions
 
         # Horizontal movement
-        if actions[Action.MOVE_RIGHT]:
+        if actions[Action.RIGHT]:
             self.pos.x += self.speed * dt
-        if actions[Action.MOVE_LEFT]:
+        if actions[Action.LEFT]:
             self.pos.x -= self.speed * dt
 
         # Jump
-        if actions[Action.MOVE_UP] and self.on_ground:
+        if actions[Action.UP] and self.on_ground:
             self.vel.y = self.jump_velocity
             self.on_ground = False
 

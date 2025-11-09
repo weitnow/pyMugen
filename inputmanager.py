@@ -5,19 +5,24 @@ import time
 
 # --- Enums ---
 class Action(Enum):
-    MOVE_RIGHT = auto()
-    MOVE_LEFT = auto()
-    MOVE_DOWN = auto()
-    MOVE_UP = auto()
-    MOVE_A = auto()
-    MOVE_B = auto()
+    RIGHT = auto()
+    LEFT = auto()
+    DOWN = auto()
+    UP = auto()
+    A = auto()
+    B = auto()
+    X = auto()
+    Y = auto()
+    LB = auto()
+    RB = auto()
+    LT = auto()
+    RT = auto()
 
 class Special(Enum):
     FIREBALL = auto()
     SHORYUKEN = auto()
 
 # --- Input Manager ---
-
 class InputManager:
     _instance = None
 
@@ -31,32 +36,48 @@ class InputManager:
         # --- Keyboard mappings for 2 players ---
         self.key_maps = [
             {  # Player 1
-                pygame.K_d: Action.MOVE_RIGHT,
-                pygame.K_a: Action.MOVE_LEFT,
-                pygame.K_s: Action.MOVE_DOWN,
-                pygame.K_w: Action.MOVE_UP,
-                pygame.K_z: Action.MOVE_A,
-                pygame.K_u: Action.MOVE_B,
+                pygame.K_d: Action.RIGHT,
+                pygame.K_a: Action.LEFT,
+                pygame.K_s: Action.DOWN,
+                pygame.K_w: Action.UP,
+                pygame.K_z: Action.A,
+                pygame.K_u: Action.B,
+                pygame.K_j: Action.X,
+                pygame.K_i: Action.Y,
+                pygame.K_q: Action.LB,
+                pygame.K_e: Action.RB,
+                pygame.K_1: Action.LT,
+                pygame.K_2: Action.RT,
             },
             {  # Player 2
-                pygame.K_RIGHT: Action.MOVE_RIGHT,
-                pygame.K_LEFT: Action.MOVE_LEFT,
-                pygame.K_DOWN: Action.MOVE_DOWN,
-                pygame.K_UP: Action.MOVE_UP,
-                pygame.K_KP1: Action.MOVE_A,
-                pygame.K_KP2: Action.MOVE_B,
+                pygame.K_RIGHT: Action.RIGHT,
+                pygame.K_LEFT: Action.LEFT,
+                pygame.K_DOWN: Action.DOWN,
+                pygame.K_UP: Action.UP,
+                pygame.K_KP1: Action.A,
+                pygame.K_KP2: Action.B,
+                pygame.K_KP3: Action.X,
+                pygame.K_KP4: Action.Y,
+                pygame.K_KP5: Action.LB,
+                pygame.K_KP6: Action.RB,
+                pygame.K_KP7: Action.LT,
+                pygame.K_KP8: Action.RT,
             },
         ]
 
         # --- Controller setup ---
         pygame.joystick.init()
         self.joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
-     
 
         # --- Controller button mapping (Xbox layout) ---
+        # Button indices may differ per controller model!
         self.button_map = {
-            0: Action.MOVE_A,  # A
-            1: Action.MOVE_B,  # B
+            0: Action.A,   # A
+            1: Action.B,   # B
+            2: Action.X,   # X
+            3: Action.Y,   # Y
+            4: Action.LB,  # LB
+            5: Action.RB,  # RB
         }
 
         # --- Store pressed actions per player ---
@@ -80,21 +101,29 @@ class InputManager:
         if player_index < len(self.joysticks):
             js = self.joysticks[player_index]
 
-            # Buttons
+            # Buttons (A, B, X, Y, LB, RB)
             for btn_id, action in self.button_map.items():
                 if js.get_button(btn_id):
                     actions.add(action)
 
+            # Triggers (LT, RT) — analog inputs
+            lt = js.get_axis(2)  # Left trigger axis
+            rt = js.get_axis(5)  # Right trigger axis
+            if lt > 0.5:
+                actions.add(Action.LT)
+            if rt > 0.5:
+                actions.add(Action.RT)
+
             # D-Pad (Hat)
             hat_x, hat_y = js.get_hat(0)
             if hat_x == 1:
-                actions.add(Action.MOVE_RIGHT)
+                actions.add(Action.RIGHT)
             elif hat_x == -1:
-                actions.add(Action.MOVE_LEFT)
+                actions.add(Action.LEFT)
             if hat_y == 1:
-                actions.add(Action.MOVE_UP)
+                actions.add(Action.UP)
             elif hat_y == -1:
-                actions.add(Action.MOVE_DOWN)
+                actions.add(Action.DOWN)
 
         return actions
 
@@ -103,7 +132,7 @@ class InputManager:
 class PlayerController:
     def __init__(self):
         self.actions = {action: False for action in Action}
-        self.input_buffer = deque()  # store tuples (timestamp, pressed_actions)
+        self.input_buffer = deque()
         self.specials = []
 
         self.buffer_time = 0.6  # 600 ms input buffer
@@ -128,21 +157,20 @@ class PlayerController:
         self.check_specials()
 
     def check_specials(self):
-        # Fireball: ↓, ↓→, →, Punch
+        # Fireball: ↓, ↓→, →, A
         fireball_seq = [
-            {Action.MOVE_DOWN},
-            {Action.MOVE_DOWN, Action.MOVE_RIGHT},
-            {Action.MOVE_RIGHT},
-            {Action.MOVE_A}
+            {Action.DOWN},
+            {Action.DOWN, Action.RIGHT},
+            {Action.RIGHT},
+            {Action.A},
         ]
 
-        # Shoryuken: →, ↓, ↓→, Punch
+        # Shoryuken: →, ↓, ↓→, A
         shoryuken_seq = [
-            {Action.MOVE_LEFT},
-            {Action.MOVE_LEFT},
-            {Action.MOVE_RIGHT},
-            {Action.MOVE_RIGHT},
-            {Action.MOVE_A}
+            {Action.RIGHT},
+            {Action.DOWN},
+            {Action.DOWN, Action.RIGHT},
+            {Action.A},
         ]
 
         buffer_actions = [actions for _, actions in self.input_buffer]
