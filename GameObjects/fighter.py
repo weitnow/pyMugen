@@ -22,6 +22,5 @@ class Fighter(GameObject):
             self.vel.y = self.jump_velocity
             self.on_ground = False
 
-        print(self.on_ground, self.vel.y)
         super().update(dt) # update physics and animation
         
