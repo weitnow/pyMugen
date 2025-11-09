@@ -1,10 +1,11 @@
-import pygame
-from enum import Enum, auto
-from collections import deque
 import time
-import globals
+from collections import deque
+from dataclasses import dataclass
+from typing import Optional, Set
+from enum import Enum, auto
+import pygame
 
-# --- Enums ---
+# --- Actions ---
 class Action(Enum):
     RIGHT = auto()
     LEFT = auto()
@@ -19,9 +20,27 @@ class Action(Enum):
     LT = auto()
     RT = auto()
 
+    # Diagonal directions
+    DOWN_RIGHT = auto()
+    DOWN_LEFT = auto()
+    UP_RIGHT = auto()
+    UP_LEFT = auto()
+
+# --- Specials ---
 class Special(Enum):
     FIREBALL = auto()
     SHORYUKEN = auto()
+    CHARGE = auto()
+    HOLD_A = auto()
+
+# --- InputStep dataclass ---
+@dataclass
+class InputStep:
+    actions: Set[Action] = frozenset()       # Buttons/directions to hold
+    min_duration: float = 0                  # Minimum hold time (seconds)
+    max_duration: Optional[float] = None    # Optional maximum allowed time for this step
+    release: bool = False                    # True if step requires actions to be released
+
 
 # --- Input Manager ---
 class InputManager:
@@ -128,89 +147,142 @@ class InputManager:
 
         return actions
 
-
-# --- Player Controller ---
+# --- PlayerController ---
 class PlayerController:
-    """
-    Handles player input buffering and special move detection.
-
-    This class collects raw input each frame (via InputManager),
-    keeps a short buffer for detecting complex move sequences
-    (like fireballs or shoryukens), and exposes `self.actions` —
-    a dictionary of current frame input states — for use by gameplay code
-    (e.g. Fighter movement, attacks, etc).
-    """
     def __init__(self):
-        # Actions dict used externally (e.g. Fighter) to know what the player intends -> {Action.RIGHT: False, Action.LEFT: False, ...}
-        self.actions: dict[Action, bool] = {
-            action: False for action in Action
+        # Current frame actions
+        self.actions: dict[Action, bool] = {action: False for action in Action}
+        # Detected specials
+        self.specials: list[Special] = []
+        # Input buffer: deque of (timestamp, frozenset[Action])
+        self._input_buffer: deque[tuple[float, frozenset[Action]]] = deque()
+        # How long to keep inputs in buffer
+        self._buffer_time: float = 0.7
+
+        # Diagonal mappings
+        self.DIAGONALS = {
+            frozenset({Action.DOWN, Action.RIGHT}): Action.DOWN_RIGHT,
+            frozenset({Action.DOWN, Action.LEFT}): Action.DOWN_LEFT,
+            frozenset({Action.UP, Action.RIGHT}): Action.UP_RIGHT,
+            frozenset({Action.UP, Action.LEFT}): Action.UP_LEFT,
         }
 
-        # Contains any detected specials since last frame
-        self.specials: list[Special] = []
+        # --- Define patterns for specials ---
+        self.specials_definitions = {
+            Special.FIREBALL: (
+                [
+                    InputStep(actions={Action.DOWN}),
+                    InputStep(actions={Action.DOWN_RIGHT}),
+                    InputStep(actions={Action.RIGHT}),
+                    InputStep(actions={Action.A}),
+                ],
+                0.7
+            ),
+            Special.SHORYUKEN: (
+                [
+                    InputStep(actions={Action.RIGHT}),
+                    InputStep(actions={Action.DOWN}),
+                    InputStep(actions={Action.DOWN_RIGHT}),
+                    InputStep(actions={Action.A}),
+                ],
+                0.7
+            ),
+            Special.HOLD_A: (
+                [
+                    InputStep(actions={Action.A}, min_duration=2.0),
+                    InputStep(actions={Action.A}, release=True, min_duration=0)
+                ],
+                5.0
+            ),
+            Special.CHARGE: (
+                [
+                    InputStep(actions={Action.LEFT}, min_duration=2.0),
+                    InputStep(actions={Action.RIGHT, Action.A}, max_duration=0.3)
+                ],
+                2.5
+            ),
+        }
 
-        # Stores recent input frames for special move detection
-        self._input_buffer: deque[tuple[float, set[Action]]] = deque()
+    # --- Normalize diagonals ---
+    def normalize_diagonals(self, actions: frozenset[Action]) -> frozenset[Action]:
+        new_actions = set(actions)
+        for combo, diagonal_action in self.DIAGONALS.items():
+            if combo.issubset(actions):
+                new_actions -= combo
+                new_actions.add(diagonal_action)
+        return frozenset(new_actions)
 
-        # Input buffer duration (seconds)
-        self._buffer_time: float = 0.6
-
-    def update(self, pressed_actions):  # is called every frame with the current set of pressed Actions per frame per player
+    # --- Update per frame ---
+    def update(self, pressed_actions: Set[Action]):
         current_time = time.time()
 
-        # Reset intentions
+        # Update current actions dict
         for action in self.actions:
-            self.actions[action] = False    # reset all actions to False {Action.RIGHT: False, Action.LEFT: False, ...}
+            self.actions[action] = False
         for action in pressed_actions:
-            self.actions[action] = True   # set currently pressed actions to True {Action.RIGHT: True, Action.LEFT: False, ...}
+            self.actions[action] = True
 
-         # --- Only add to buffer if different from last entry ---
+        # Only add to buffer if changed
         if not self._input_buffer or pressed_actions != self._input_buffer[-1][1]:
-            # Store an immutable copy (important: avoid mutable reference issues)
             self._input_buffer.append((current_time, frozenset(pressed_actions)))
 
-        # --- Remove old inputs ---
+        # Remove old inputs beyond buffer time
         while self._input_buffer and current_time - self._input_buffer[0][0] > self._buffer_time:
             self._input_buffer.popleft()
-            
-        # Check for specials
+
+        # Check specials
         self.check_specials()
 
+    # --- Check all specials ---
     def check_specials(self):
-        # Fireball: ↓, ↓→, →, A
-        fireball_seq = [
-            {Action.DOWN},
-            {Action.DOWN, Action.RIGHT},
-            {Action.RIGHT},
-            {Action.A},
-        ]
+        for special, (pattern, max_total_time) in self.specials_definitions.items():
+            if self.match_pattern(pattern, max_total_time):
+                self.specials.append(special)
+                print(f"🎯 {special.name} executed!")
+                self._input_buffer.clear()  # Clear buffer after detection
 
-        # Shoryuken: →, ↓, ↓→, A
-        shoryuken_seq = [
-            {Action.LEFT},
-            {Action.LEFT},
-            {Action.RIGHT},
-            {Action.RIGHT},
-            {Action.B},
-        ]
-
-        buffer_actions = [actions for _, actions in self._input_buffer]
-
-        def match_sequence(sequence):
-            seq_index = 0
-            for actions in buffer_actions:
-                if sequence[seq_index].issubset(actions):
-                    seq_index += 1
-                    if seq_index == len(sequence):
-                        return True
+    # --- Match pattern ---
+    def match_pattern(self, pattern: list[InputStep], max_total_time: float) -> bool:
+        if not self._input_buffer:
             return False
 
-        if match_sequence(fireball_seq):
-            self.specials.append(Special.FIREBALL)
-            print("🔥 FIREBALL EXECUTED!")
-            self._input_buffer.clear()
+        buf_list = list(self._input_buffer)
+        start_time = buf_list[0][0]
+        pattern_index = 0
+        step_start_time = None
 
-        elif match_sequence(shoryuken_seq):
-            self.specials.append(Special.SHORYUKEN)
-            print("💥 SHORYUKEN EXECUTED!")
-            self._input_buffer.clear()
+        for t, actions in buf_list:
+            normalized_actions = self.normalize_diagonals(actions)
+            current_step = pattern[pattern_index]
+
+            if current_step.release:
+                step_matched = current_step.actions.isdisjoint(normalized_actions)
+                if step_matched:
+                    # Release step only needs one frame of release
+                    pattern_index += 1
+                    step_start_time = None
+                    if pattern_index >= len(pattern):
+                        if t - start_time <= max_total_time:
+                            return True
+                        else:
+                            return False
+                # Don't reset step_start_time for release steps
+            else:
+                step_matched = current_step.actions.issubset(normalized_actions)
+                if step_matched:
+                    if step_start_time is None:
+                        step_start_time = t
+                    # Check min_duration
+                    if t - step_start_time >= current_step.min_duration:
+                        pattern_index += 1
+                        step_start_time = None
+                        if pattern_index >= len(pattern):
+                            if t - start_time <= max_total_time:
+                                return True
+                            else:
+                                return False
+                else:
+                    # Reset step timer if broken
+                    step_start_time = None
+
+        return False
