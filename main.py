@@ -76,6 +76,7 @@ while running:
     p1_actions = input_manager.get_pressed_actions(0) # p1_actions is a set of Actions
     p2_actions = input_manager.get_pressed_actions(1)
 
+    # in player a new PlayerController is created by default
     player.controller.update(p1_actions)
 
     # --- Update ---

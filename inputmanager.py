@@ -131,7 +131,7 @@ class InputManager:
 # --- Player Controller ---
 class PlayerController:
     def __init__(self):
-        self.actions = {action: False for action in Action}
+        self.actions = {action: False for action in Action} # creates a dict with all Actions set to False like {Action.RIGHT: False, Action.LEFT: False, ...}
         self.input_buffer = deque()
         self.specials = []
 
