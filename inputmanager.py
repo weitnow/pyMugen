@@ -164,16 +164,17 @@ class PlayerController:
         for action in pressed_actions:
             self.actions[action] = True   # set currently pressed actions to True {Action.RIGHT: True, Action.LEFT: False, ...}
 
-        # Add to buffer
-        self._input_buffer.append((current_time, pressed_actions)) # e.g. deque([(time1, {Action.RIGHT, Action.A}), (time2, {Action.DOWN}), ...])
-        
-        # Remove old inputs if beyond buffer time
+         # --- Only add to buffer if different from last entry ---
+        if not self._input_buffer or pressed_actions != self._input_buffer[-1][1]:
+            # Store an immutable copy (important: avoid mutable reference issues)
+            self._input_buffer.append((current_time, frozenset(pressed_actions)))
+
+        # --- Remove old inputs ---
         while self._input_buffer and current_time - self._input_buffer[0][0] > self._buffer_time:
             self._input_buffer.popleft()
-
-
+            
         # Check for specials
-        # self.check_specials()
+        self.check_specials()
 
     def check_specials(self):
         # Fireball: ↓, ↓→, →, A
