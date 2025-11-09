@@ -22,4 +22,5 @@ show_hitboxes = False
 show_hurtboxes = False
 show_bounding_boxes = False
 show_fps_info = False
+stop_game_for_debugging = False
 # 

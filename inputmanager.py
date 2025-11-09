@@ -2,6 +2,7 @@ import pygame
 from enum import Enum, auto
 from collections import deque
 import time
+import globals
 
 # --- Enums ---
 class Action(Enum):
@@ -130,28 +131,48 @@ class InputManager:
 
 # --- Player Controller ---
 class PlayerController:
+    """
+    Handles player input buffering and special move detection.
+
+    This class collects raw input each frame (via InputManager),
+    keeps a short buffer for detecting complex move sequences
+    (like fireballs or shoryukens), and exposes `self.actions` —
+    a dictionary of current frame input states — for use by gameplay code
+    (e.g. Fighter movement, attacks, etc).
+    """
     def __init__(self):
-        self.actions = {action: False for action in Action} # creates a dict with all Actions set to False like {Action.RIGHT: False, Action.LEFT: False, ...}
-        self.input_buffer = deque()
-        self.specials = []
+        # Actions dict used externally (e.g. Fighter) to know what the player intends
+        self.actions: dict[Action, bool] = {
+            action: False for action in Action
+        }
 
-        self.buffer_time = 0.6  # 600 ms input buffer
+        # Contains any detected specials since last frame
+        self.specials: list[Special] = []
 
-    def update(self, pressed_actions):
+        # Stores recent input frames for special move detection
+        self._input_buffer: deque[tuple[float, set[Action]]] = deque()
+
+        # Input buffer duration (seconds)
+        self._buffer_time: float = 0.6
+
+    def update(self, pressed_actions):  # is called every frame with the current set of pressed Actions per frame per player
         current_time = time.time()
 
         # Reset intentions
         for action in self.actions:
-            self.actions[action] = False
+            self.actions[action] = False    # reset all actions to False {Action.RIGHT: False, Action.LEFT: False, ...}
         for action in pressed_actions:
-            self.actions[action] = True
+            self.actions[action] = True   # set currently pressed actions to True {Action.RIGHT: True, Action.LEFT: False, ...}
 
         # Add to buffer
-        self.input_buffer.append((current_time, pressed_actions))
+        self._input_buffer.append((current_time, pressed_actions))
+        
+        if globals.stop_game_for_debugging:
+            print("stopping game for debugging")
 
         # Remove old inputs
-        while self.input_buffer and current_time - self.input_buffer[0][0] > self.buffer_time:
-            self.input_buffer.popleft()
+        while self._input_buffer and current_time - self._input_buffer[0][0] > self._buffer_time:
+            self._input_buffer.popleft()
 
         # Check for specials
         self.check_specials()
@@ -167,13 +188,14 @@ class PlayerController:
 
         # Shoryuken: →, ↓, ↓→, A
         shoryuken_seq = [
+            {Action.LEFT},
+            {Action.LEFT},
             {Action.RIGHT},
-            {Action.DOWN},
-            {Action.DOWN, Action.RIGHT},
-            {Action.A},
+            {Action.RIGHT},
+            {Action.B},
         ]
 
-        buffer_actions = [actions for _, actions in self.input_buffer]
+        buffer_actions = [actions for _, actions in self._input_buffer]
 
         def match_sequence(sequence):
             seq_index = 0
@@ -187,9 +209,9 @@ class PlayerController:
         if match_sequence(fireball_seq):
             self.specials.append(Special.FIREBALL)
             print("🔥 FIREBALL EXECUTED!")
-            self.input_buffer.clear()
+            self._input_buffer.clear()
 
         elif match_sequence(shoryuken_seq):
             self.specials.append(Special.SHORYUKEN)
             print("💥 SHORYUKEN EXECUTED!")
-            self.input_buffer.clear()
+            self._input_buffer.clear()

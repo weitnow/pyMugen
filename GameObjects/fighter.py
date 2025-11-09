@@ -9,7 +9,7 @@ class Fighter(GameObject):
 
     def update(self, dt):
 
-        actions = self.controller.actions
+        actions = self.controller.actions # has a dict like {Action.RIGHT: True, Action.LEFT: False, Action.B: True, ...}
 
         # Horizontal movement
         if actions[Action.RIGHT]:

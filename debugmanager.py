@@ -34,6 +34,8 @@ class DebugManager:
                 globals.show_bounding_boxes = not globals.show_bounding_boxes
             elif event.key == pygame.K_F4:
                 globals.show_fps_info = not globals.show_fps_info
+            elif event.key == pygame.K_F5:
+                globals.stop_game_for_debugging = not globals.stop_game_for_debugging
 
     def update_timing(self, dt):
         now = time.time()
