@@ -31,7 +31,7 @@ debug_manager = DebugManager()
 
 
 # --- Create objects ---
-player = Fighter((100, 100))
+player = Fighter((100, 100), 0) # 0 = player index = player 1
 player.get_anim("gbFighter")
 player.get_anim("nesFighter")
 player.set_anim("nesFighter")
@@ -75,16 +75,16 @@ while running:
 
     # --- Input Handling ---
     # Player 1
-    pressed_p1 = input_manager.get_pressed_actions(0)
-    just_pressed_p1 = input_manager.get_just_pressed_actions(0)
+    #pressed_p1 = input_manager.get_pressed_actions(0)
+    #just_pressed_p1 = input_manager.get_just_pressed_actions(0)
 
     # Player 2
-    pressed_p2 = input_manager.get_pressed_actions(1)
-    just_pressed_p2 = input_manager.get_just_pressed_actions(1)
+    #pressed_p2 = input_manager.get_pressed_actions(1)
+    #just_pressed_p2 = input_manager.get_just_pressed_actions(1)
 
 
     # in player a new PlayerController is created by default
-    player.controller.update(pressed_p1)
+    player.controller.update()
 
     # --- Update ---
     player.update(dt)

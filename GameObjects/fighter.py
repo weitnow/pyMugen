@@ -2,10 +2,10 @@ from gameobject import GameObject
 from inputmanager import PlayerController, Action
 
 class Fighter(GameObject):
-    def __init__(self, pos: tuple[float, float]):
+    def __init__(self, pos: tuple[float, float], player_index: int = 0):
         super().__init__(pos, rotatable=True)
         self.origin_center_bottom = True
-        self.controller = PlayerController()
+        self.controller = PlayerController(player_index)
 
     def update(self, dt):
 

@@ -177,7 +177,9 @@ class InputManager:
 
 # --- PlayerController ---
 class PlayerController:
-    def __init__(self):
+    def __init__(self, player_index: int):
+        self.player_index = player_index
+        self.input_manager = InputManager() # singleton instance, needed for querying input states
         # Current frame actions
         self.actions: dict[Action, bool] = {action: False for action in Action}
         # Detected specials
@@ -241,7 +243,9 @@ class PlayerController:
         return frozenset(new_actions)
 
     # --- Update per frame ---
-    def update(self, pressed_actions: Set[Action]):
+    def update(self):
+        pressed_actions = self.input_manager.get_pressed_actions(self.player_index)
+        just_pressed = self.input_manager.get_just_pressed_actions(self.player_index) # TODO: use it accordingly
         current_time = time.time()
 
         # Update current actions dict
