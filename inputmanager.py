@@ -38,7 +38,7 @@ class Special(Enum):
 class InputStep:
     actions: Set[Action] = frozenset()       # Buttons/directions to hold
     min_duration: float = 0                  # Minimum hold time (seconds)
-    max_duration: Optional[float] = None    # Optional maximum allowed time for this step
+    max_duration: Optional[float] = None     # Optional maximum allowed time for this step
     release: bool = False                    # True if step requires actions to be released
 
 
@@ -129,9 +129,9 @@ class InputManager:
             # Triggers (LT, RT) — analog inputs
             lt = js.get_axis(2)  # Left trigger axis
             rt = js.get_axis(5)  # Right trigger axis
-            if lt > 0.5:
+            if lt > 0.3: # threshold how much the trigger has to be pressed
                 actions.add(Action.LT)
-            if rt > 0.5:
+            if rt > 0.3:
                 actions.add(Action.RT)
 
             # D-Pad (Hat)
@@ -243,13 +243,15 @@ class PlayerController:
 
     # --- Match pattern ---
     def match_pattern(self, pattern: list[InputStep], max_total_time: float) -> bool:
-        if not self._input_buffer:
+        # Early out if buffer is empty
+        if not self._input_buffer: 
             return False
 
-        buf_list = list(self._input_buffer)
-        start_time = buf_list[0][0]
-        pattern_index = 0
-        step_start_time = None
+        # Prepare buffer for iteration
+        buf_list = list(self._input_buffer) # convert to list to iterate over it multiple times
+        start_time = buf_list[0][0] # time of first input in buffer, used to ensure total time does not exceed max_total_time
+        pattern_index = 0 # keeps track of which step in the pattern we are currently tryting to match
+        step_start_time = None # Records when the current step started for checking min_duration
 
         for t, actions in buf_list:
             normalized_actions = self.normalize_diagonals(actions)
