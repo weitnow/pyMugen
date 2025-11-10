@@ -90,46 +90,63 @@ class InputManager:
         self.joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
 
         # --- Controller button mapping (Xbox layout) ---
-        # Button indices may differ per controller model!
         self.button_map = {
-            0: Action.A,   # A
-            1: Action.B,   # B
-            2: Action.X,   # X
-            3: Action.Y,   # Y
-            4: Action.LB,  # LB
-            5: Action.RB,  # RB
+            0: Action.A,
+            1: Action.B,
+            2: Action.X,
+            3: Action.Y,
+            4: Action.LB,
+            5: Action.RB,
         }
 
-        # --- Store pressed actions per player ---
-        self.pressed_actions = [set(), set()]
+        # --- State storage per player ---
+        self.pressed_actions = [set(), set()]       # current frame
+        self.prev_pressed_actions = [set(), set()]  # previous frame
+        self.just_pressed_actions = [set(), set()]  # newly pressed this frame
 
-    def get_pressed_actions(self, player_index: int):
-        """Return the set of actions for a specific player (0 or 1)."""
-        if player_index not in (0, 1):
-            return set()
+    # -----------------------------------------------------
+    # --- Update all input states (call once per frame) ---
+    # -----------------------------------------------------
+    def update(self):
+        """Call this once per frame to update all player inputs."""
+        for player_index in (0, 1):
+            # Save previous frame
+            self.prev_pressed_actions[player_index] = self.pressed_actions[player_index].copy()
 
-        actions = self.pressed_actions[player_index]
-        actions.clear()
+            # Update current pressed actions
+            current = self._get_pressed_actions_now(player_index)
+            self.pressed_actions[player_index] = current
 
-        # --- Keyboard input ---
+            # Determine just pressed actions
+            just_pressed = current - self.prev_pressed_actions[player_index]
+            self.just_pressed_actions[player_index] = just_pressed
+
+    # -----------------------------------------------------
+    # --- Internal: get current pressed state immediately ---
+    # -----------------------------------------------------
+    def _get_pressed_actions_now(self, player_index: int) -> set:
+        """Collect all currently pressed actions for a player."""
+        actions = set()
+
+        # --- Keyboard ---
         keys = pygame.key.get_pressed()
         for key, action in self.key_maps[player_index].items():
             if keys[key]:
                 actions.add(action)
 
-        # --- Controller input ---
+        # --- Controller ---
         if player_index < len(self.joysticks):
             js = self.joysticks[player_index]
 
-            # Buttons (A, B, X, Y, LB, RB)
+            # Buttons
             for btn_id, action in self.button_map.items():
                 if js.get_button(btn_id):
                     actions.add(action)
 
-            # Triggers (LT, RT) — analog inputs
-            lt = js.get_axis(2)  # Left trigger axis
-            rt = js.get_axis(5)  # Right trigger axis
-            if lt > 0.3: # threshold how much the trigger has to be pressed
+            # Triggers (analog)
+            lt = js.get_axis(2)
+            rt = js.get_axis(5)
+            if lt > 0.3:
                 actions.add(Action.LT)
             if rt > 0.3:
                 actions.add(Action.RT)
@@ -146,6 +163,17 @@ class InputManager:
                 actions.add(Action.DOWN)
 
         return actions
+
+    # -----------------------------------------------------
+    # --- Public getters ---
+    # -----------------------------------------------------
+    def get_pressed_actions(self, player_index: int) -> set:
+        """Returns all currently held actions."""
+        return self.pressed_actions[player_index]
+
+    def get_just_pressed_actions(self, player_index: int) -> set:
+        """Returns actions that were pressed this frame (transitioned from up → down)."""
+        return self.just_pressed_actions[player_index]
 
 # --- PlayerController ---
 class PlayerController:
@@ -253,12 +281,14 @@ class PlayerController:
         pattern_index = 0 # keeps track of which step in the pattern we are currently tryting to match
         step_start_time = None # Records when the current step started for checking min_duration
 
+        # Iterate over the input buffer
         for t, actions in buf_list:
-            normalized_actions = self.normalize_diagonals(actions)
-            current_step = pattern[pattern_index]
+            normalized_actions = self.normalize_diagonals(actions) # converts diagonal inputs to single. this makes matching easier.
+            current_step = pattern[pattern_index] # the current InputStep we are trying to match
 
-            if current_step.release:
-                step_matched = current_step.actions.isdisjoint(normalized_actions)
+            # Handle release steps
+            if current_step.release: #if release is True, the player must relese certain button(s)
+                step_matched = current_step.actions.isdisjoint(normalized_actions) # isdijoint() checks if two sets have no elements in common. if so then it returns True otherwise False
                 if step_matched:
                     # Release step only needs one frame of release
                     pattern_index += 1

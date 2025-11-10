@@ -66,6 +66,7 @@ while running:
     dt = clock.tick(60)
     # --- Update CORE-Systems ---
     debug_manager.update_timing(dt)
+    input_manager.update() 
     # --- Event Handling ---
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
@@ -73,11 +74,17 @@ while running:
         debug_manager.handle_input(event)
 
     # --- Input Handling ---
-    p1_actions = input_manager.get_pressed_actions(0) # p1_actions is a set of Actions
-    p2_actions = input_manager.get_pressed_actions(1)
+    # Player 1
+    pressed_p1 = input_manager.get_pressed_actions(0)
+    just_pressed_p1 = input_manager.get_just_pressed_actions(0)
+
+    # Player 2
+    pressed_p2 = input_manager.get_pressed_actions(1)
+    just_pressed_p2 = input_manager.get_just_pressed_actions(1)
+
 
     # in player a new PlayerController is created by default
-    player.controller.update(p1_actions)
+    player.controller.update(pressed_p1)
 
     # --- Update ---
     player.update(dt)
