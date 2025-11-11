@@ -26,13 +26,6 @@ class Action(Enum):
     UP_RIGHT = auto()
     UP_LEFT = auto()
 
-# --- Specials ---
-class Special(Enum):
-    FIREBALL = auto()
-    SHORYUKEN = auto()
-    CHARGE = auto()
-    HOLD_A = auto()
-
 # --- InputStep dataclass ---
 @dataclass
 class InputStep:
@@ -181,7 +174,7 @@ class PlayerController:
         self.player_index = player_index
         self.input_manager = InputManager() # singleton instance, needed for querying input states
         # Current frame actions
-        self.actions: dict[Action, bool] = {action: False for action in Action}
+        self.actions: dict[Action, bool] = {action: False for action in Action} # create a dict with all actions set to False like {Action.RIGHT: False, Action.LEFT: False, ...}
         # Detected specials
         self.specials: list[Special] = []
         # Input buffer: deque of (timestamp, frozenset[Action])
@@ -199,7 +192,7 @@ class PlayerController:
 
         # --- Define patterns for specials ---
         self.specials_definitions = {
-            Special.FIREBALL: (
+            "Fireball": (
                 [
                     InputStep(actions={Action.DOWN}),
                     InputStep(actions={Action.DOWN_RIGHT}),
@@ -208,7 +201,7 @@ class PlayerController:
                 ],
                 0.7
             ),
-            Special.SHORYUKEN: (
+            "Shoryuken": (
                 [
                     InputStep(actions={Action.RIGHT}),
                     InputStep(actions={Action.DOWN}),
@@ -217,14 +210,14 @@ class PlayerController:
                 ],
                 0.7
             ),
-            Special.HOLD_A: (
+            "Hold A": (
                 [
                     InputStep(actions={Action.A}, min_duration=2.0),
                     InputStep(actions={Action.A}, release=True, min_duration=0)
                 ],
                 5.0
             ),
-            Special.CHARGE: (
+            "Charge": (
                 [
                     InputStep(actions={Action.LEFT}, min_duration=2.0),
                     InputStep(actions={Action.RIGHT, Action.A}, max_duration=0.3)
@@ -270,7 +263,7 @@ class PlayerController:
         for special, (pattern, max_total_time) in self.specials_definitions.items():
             if self.match_pattern(pattern, max_total_time):
                 self.specials.append(special)
-                print(f"🎯 {special.name} executed!")
+                print(f"🎯 {special} executed!")
                 self._input_buffer.clear()  # Clear buffer after detection
 
     # --- Match pattern ---

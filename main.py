@@ -4,7 +4,7 @@ from gameobject import GameObject
 from gameview import GameView
 from debugmanager import DebugManager
 from GameObjects.fighter import Fighter
-from inputmanager import InputManager, Action, Special #TODO: remove unused imports
+from inputmanager import InputManager, Action #TODO: remove unused imports
 
 import globals
 
@@ -31,7 +31,7 @@ debug_manager = DebugManager()
 
 
 # --- Create objects ---
-player = Fighter((100, 100), 0) # 0 = player index = player 1
+player = Fighter((100, 100), 0) # 0 = player index = player 1 TODO: refactor this
 player.get_anim("gbFighter")
 player.get_anim("nesFighter")
 player.set_anim("nesFighter")
