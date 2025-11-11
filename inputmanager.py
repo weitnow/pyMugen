@@ -176,7 +176,7 @@ class PlayerController:
         # Current frame actions
         self.actions: dict[Action, bool] = {action: False for action in Action} # create a dict with all actions set to False like {Action.RIGHT: False, Action.LEFT: False, ...}
         # Detected specials
-        self.specials: list[Special] = []
+        self.specials: list[any] = []
         # Input buffer: deque of (timestamp, frozenset[Action])
         self._input_buffer: deque[tuple[float, frozenset[Action]]] = deque()
         # How long to keep inputs in buffer
