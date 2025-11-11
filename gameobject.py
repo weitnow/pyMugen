@@ -28,7 +28,7 @@ class GameObject:
 
         self.origin_center_bottom: bool = False
 
-        # Rotation + flip cache
+        # Rotation handled centrally via ResourceManager shared cache
         self.rotation_cache: dict[int, pygame.Surface] = {}
         self.flip_x = False
         self.flip_y = False
@@ -41,8 +41,6 @@ class GameObject:
         rm = ResourceManager()
         if name not in self.animations:
             self.animations[name] = rm.get_animation_instance(name)
-            if self.rotatable:
-                self._build_rotation_cache(self.animations[name])
         return self.animations[name]
 
     def set_anim(self, name: str):
@@ -79,20 +77,16 @@ class GameObject:
     # Rotation + Flipping
     # -----------------------
     def _build_rotation_cache(self, anim: AnimationData):
-        """Precompute rotated frames for each animation frame in 45° steps."""
-        for frame_idx in range(len(anim.frames)):
-            frame = anim.frames[frame_idx]
-            for angle in range(0, 360, 45):
-                rotated = pygame.transform.rotate(frame, angle)
-                self.rotation_cache[(frame_idx, angle, False, False)] = rotated
-                self.rotation_cache[(frame_idx, angle, True, False)] = pygame.transform.flip(rotated, True, False)
-                self.rotation_cache[(frame_idx, angle, False, True)] = pygame.transform.flip(rotated, False, True)
-                self.rotation_cache[(frame_idx, angle, True, True)] = pygame.transform.flip(rotated, True, True)
+        # legacy per-object precompute kept for compatibility but not used by default.
+        # Prefer using ResourceManager.get_rotated_frame(shared cache) instead.
+        pass
 
     def set_rotation(self, angle: float):
         """Set the object’s rotation angle, snapped to nearest 45°."""
         if not self.rotatable:
             return
+        # check input angle, can only be in 45 degree increments
+        assert angle % 45 == 0, "Angle must be in 45 degree increments"
         self.current_angle = (round(angle / 45) * 45) % 360
 
     def set_flip(self, flip_x: bool = False, flip_y: bool = False):
@@ -125,8 +119,19 @@ class GameObject:
         # If rotatable, fetch from cache
         if self.rotatable:
             frame_idx = self.current_anim.current_frame_idx
-            key = (frame_idx, self.current_angle, self.flip_x, self.flip_y)
-            frame = self.rotation_cache.get(key, frame)
+            rm = ResourceManager()
+            base_name = getattr(self.current_anim, "base_name", None)
+            if base_name is not None:
+                frame = rm.get_rotated_frame(base_name, frame_idx, self.current_angle, self.flip_x, self.flip_y)
+            else:
+                # fallback: rotate on-the-fly (cached per-object) if we don't know anim name
+                key = (frame_idx, self.current_angle, self.flip_x, self.flip_y)
+                if key not in self.rotation_cache:
+                    rotated = pygame.transform.rotate(frame, self.current_angle)
+                    if self.flip_x or self.flip_y:
+                        rotated = pygame.transform.flip(rotated, self.flip_x, self.flip_y)
+                    self.rotation_cache[key] = rotated
+                frame = self.rotation_cache[key]
 
         elif self.flip_x or self.flip_y:
             frame = pygame.transform.flip(frame, self.flip_x, self.flip_y)

@@ -56,6 +56,8 @@ class ResourceManager:
         if cls._instance is None:
             cls._instance = super(ResourceManager, cls).__new__(cls)
             cls._instance.animations = {}
+            # shared cache for rotated/flipped frames across all gameobjects
+            cls._instance._rotation_cache = {}
         return cls._instance
 
     def load_spritesheet(self, name: str, image_path: str, json_path: str):
@@ -99,8 +101,31 @@ class ResourceManager:
     def get_animation_instance(self, name: str) -> AnimationData:
         """Returns a fresh AnimationData instance (unique state)"""
         base = self.animations[name]
-        return AnimationData(
+        anim = AnimationData(
             base["frames"],
             base["durations"],
             base["tags"]
         )
+        # attach base name so callers can request shared rotated frames
+        anim.base_name = name
+        return anim
+
+    def get_rotated_frame(self, anim_name: str, frame_idx: int, angle: int, flip_x: bool = False, flip_y: bool = False) -> pygame.Surface:
+        """Return a rotated+flipped Surface for a given animation frame.
+
+        This uses a shared cache so rotation is computed at most once per
+        (animation, frame_idx, angle, flip_x, flip_y) combination.
+        """
+        key = (anim_name, frame_idx, angle % 360, bool(flip_x), bool(flip_y))
+        cache = self._rotation_cache
+        if key in cache:
+            return cache[key]
+
+        base = self.animations[anim_name]
+        frame = base["frames"][frame_idx]
+        rotated = pygame.transform.rotate(frame, angle)
+        if flip_x or flip_y:
+            rotated = pygame.transform.flip(rotated, flip_x, flip_y)
+
+        cache[key] = rotated
+        return rotated

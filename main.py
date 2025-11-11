@@ -37,7 +37,6 @@ player.get_anim("nesFighter")
 player.set_anim("nesFighter")
 player.set_frame_tag("Idle")
 
-
 player.set_hurtbox(pygame.Rect(5, 10, 20, 30))
 player.set_hitbox(pygame.Rect(25, 10, 20, 15))
 
