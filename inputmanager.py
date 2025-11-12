@@ -19,9 +19,9 @@ class Action(Enum):
     RB = auto()
     LT = auto()
     RT = auto()
-
-    # Diagonal directions 
-    DOWN_RIGHT = auto()     # combination of DOWN + RIGHT, for easier input pattern matching, cannot be directly mapped to buttons
+    
+    # Diagonals
+    DOWN_RIGHT = auto()
     DOWN_LEFT = auto()
     UP_RIGHT = auto()
     UP_LEFT = auto()
@@ -29,13 +29,12 @@ class Action(Enum):
 # --- InputStep dataclass ---
 @dataclass
 class InputStep:
-    actions: Set[Action] = frozenset()       # Buttons/directions to hold
-    min_duration: float = 0                  # Minimum hold time (seconds)
-    max_duration: Optional[float] = None     # Optional maximum allowed time for this step
-    release: bool = False                    # True if step requires actions to be released
+    actions: Set[Action]
+    min_duration: float = 0.0
+    must_release: bool = False  # Simplified: just check if actions should be released
 
 
-# --- Input Manager ---
+# --- Input Manager (Singleton) ---
 class InputManager:
     _instance = None
 
@@ -46,7 +45,7 @@ class InputManager:
         return cls._instance
 
     def _init(self):
-        # --- Keyboard mappings for 2 players ---
+        # Keyboard mappings for 2 players
         self.key_maps = [
             {  # Player 1
                 pygame.K_d: Action.RIGHT,
@@ -78,11 +77,11 @@ class InputManager:
             },
         ]
 
-        # --- Controller setup ---
+        # Controller setup
         pygame.joystick.init()
         self.joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
 
-        # --- Controller button mapping (Xbox layout) ---
+        # Controller button mapping (Xbox layout)
         self.button_map = {
             0: Action.A,
             1: Action.B,
@@ -92,42 +91,27 @@ class InputManager:
             5: Action.RB,
         }
 
-        # --- State storage per player ---
-        self.pressed_actions = [set(), set()]       # current frame
-        self.prev_pressed_actions = [set(), set()]  # previous frame
-        self.just_pressed_actions = [set(), set()]  # newly pressed this frame
+        # State storage per player
+        self.pressed_actions = [set(), set()]
+        self.prev_pressed_actions = [set(), set()]
 
-    # -----------------------------------------------------
-    # --- Update all input states (call once per frame) ---
-    # -----------------------------------------------------
     def update(self):
-        """Call this once per frame to update all player inputs."""
+        """Call once per frame to update all player inputs."""
         for player_index in (0, 1):
-            # Save previous frame
             self.prev_pressed_actions[player_index] = self.pressed_actions[player_index].copy()
+            self.pressed_actions[player_index] = self._get_pressed_actions_now(player_index)
 
-            # Update current pressed actions
-            current = self._get_pressed_actions_now(player_index)
-            self.pressed_actions[player_index] = current
-
-            # Determine just pressed actions
-            just_pressed = current - self.prev_pressed_actions[player_index]
-            self.just_pressed_actions[player_index] = just_pressed
-
-    # -----------------------------------------------------
-    # --- Internal: get current pressed state immediately ---
-    # -----------------------------------------------------
     def _get_pressed_actions_now(self, player_index: int) -> set:
-        """Collect all currently pressed actions for a player."""
+        """Get currently pressed actions for a player."""
         actions = set()
 
-        # --- Keyboard ---
+        # Keyboard
         keys = pygame.key.get_pressed()
         for key, action in self.key_maps[player_index].items():
             if keys[key]:
                 actions.add(action)
 
-        # --- Controller ---
+        # Controller
         if player_index < len(self.joysticks):
             js = self.joysticks[player_index]
 
@@ -136,7 +120,7 @@ class InputManager:
                 if js.get_button(btn_id):
                     actions.add(action)
 
-            # Triggers (analog)
+            # Triggers
             lt = js.get_axis(2)
             rt = js.get_axis(5)
             if lt > 0.3:
@@ -144,7 +128,7 @@ class InputManager:
             if rt > 0.3:
                 actions.add(Action.RT)
 
-            # D-Pad (Hat)
+            # D-Pad
             hat_x, hat_y = js.get_hat(0)
             if hat_x == 1:
                 actions.add(Action.RIGHT)
@@ -157,30 +141,31 @@ class InputManager:
 
         return actions
 
-    # -----------------------------------------------------
-    # --- Public getters ---
-    # -----------------------------------------------------
     def get_pressed_actions(self, player_index: int) -> set:
-        """Returns all currently held actions."""
         return self.pressed_actions[player_index]
 
     def get_just_pressed_actions(self, player_index: int) -> set:
-        """Returns actions that were pressed this frame (transitioned from up → down)."""
-        return self.just_pressed_actions[player_index]
+        return self.pressed_actions[player_index] - self.prev_pressed_actions[player_index]
+
+    def get_just_released_actions(self, player_index: int) -> set:
+        return self.prev_pressed_actions[player_index] - self.pressed_actions[player_index]
+
 
 # --- PlayerController ---
 class PlayerController:
     def __init__(self, player_index: int):
         self.player_index = player_index
-        self.input_manager = InputManager() # singleton instance, needed for querying input states
+        self.input_manager = InputManager()
+        
         # Current frame actions
-        self.actions: dict[Action, bool] = {action: False for action in Action} # create a dict with all actions set to False like {Action.RIGHT: False, Action.LEFT: False, ...}
-        # Detected specials
-        self.specials: list[any] = []
-        # Input buffer: deque of (timestamp, frozenset[Action])
-        self._input_buffer: deque[tuple[float, frozenset[Action]]] = deque() 
-        # How long to keep inputs in buffer
-        self._buffer_time: float = 4.0  # seconds
+        self.actions: dict[Action, bool] = {action: False for action in Action}
+        
+        # Detected specials (cleared each frame, consumer should check and clear)
+        self.specials: list[str] = []
+        
+        # Input buffer: stores (timestamp, frozenset[Action]) for each frame
+        self._input_buffer: deque[tuple[float, frozenset[Action]]] = deque()
+        self._buffer_time: float = 1.5  # Max time to keep inputs
 
         # Diagonal mappings
         self.DIAGONALS = {
@@ -190,44 +175,44 @@ class PlayerController:
             frozenset({Action.UP, Action.LEFT}): Action.UP_LEFT,
         }
 
-        # --- Define patterns for specials ---
-        self.specials_definitions = {
-            "Fireball": (
-                [
+        # Define special move patterns
+        self.special_patterns = {
+            "Fireball": {
+                "pattern": [
                     InputStep(actions={Action.DOWN}),
                     InputStep(actions={Action.DOWN_RIGHT}),
                     InputStep(actions={Action.RIGHT}),
                     InputStep(actions={Action.A}),
                 ],
-                0.7
-            ),
-            "Shoryuken": (
-                [
+                "max_time": 0.5
+            },
+            "Shoryuken": {
+                "pattern": [
                     InputStep(actions={Action.RIGHT}),
                     InputStep(actions={Action.DOWN}),
                     InputStep(actions={Action.DOWN_RIGHT}),
                     InputStep(actions={Action.A}),
                 ],
-                0.7
-            ),
-            "Hold A": (
-                [
-                    InputStep(actions={Action.A}, min_duration=0.5),
-                    InputStep(actions={Action.A}, release=True, min_duration=0)
+                "max_time": 0.5
+            },
+            "Hold A": {
+                "pattern": [
+                    InputStep(actions={Action.A}, min_duration=1.0),
+                    InputStep(actions={Action.A}, must_release=True),
                 ],
-                2.5
-            ),
-            "Charge": (
-                [
-                    InputStep(actions={Action.LEFT}, min_duration=2.0),
-                    InputStep(actions={Action.RIGHT, Action.A}, max_duration=0.3)
+                "max_time": 4.0 
+            },
+            "Charge": {
+                "pattern": [
+                    InputStep(actions={Action.LEFT}, min_duration=1.0),
+                    InputStep(actions={Action.RIGHT, Action.A}),
                 ],
-                2.5
-            ),
+                "max_time": 4.0
+            },
         }
 
-    # --- Normalize diagonals ---
     def normalize_diagonals(self, actions: frozenset[Action]) -> frozenset[Action]:
+        """Convert cardinal direction combinations into diagonal actions."""
         new_actions = set(actions)
         for combo, diagonal_action in self.DIAGONALS.items():
             if combo.issubset(actions):
@@ -235,108 +220,108 @@ class PlayerController:
                 new_actions.add(diagonal_action)
         return frozenset(new_actions)
 
-    # --- Update per frame ---
     def update(self):
+        """Update controller state - call once per frame."""
         pressed_actions = self.input_manager.get_pressed_actions(self.player_index)
-        just_pressed = self.input_manager.get_just_pressed_actions(self.player_index) # TODO: use it accordingly
         current_time = time.time()
 
+        # Normalize diagonals
+        pressed_actions = self.normalize_diagonals(frozenset(pressed_actions))
+
         # Update current actions dict
-        for action in self.actions:
-            self.actions[action] = False
-        for action in pressed_actions:
-            self.actions[action] = True
+        for action in Action:
+            self.actions[action] = action in pressed_actions
 
-        # Only add to buffer if changed
-        if not self._input_buffer or pressed_actions != self._input_buffer[-1][1]:
-            self._input_buffer.append((current_time, frozenset(pressed_actions)))
+        # Always add to buffer (important for timing accuracy)
+        self._input_buffer.append((current_time, pressed_actions))
 
-        # Remove old inputs beyond buffer time
+        # Clean old inputs
         while self._input_buffer and current_time - self._input_buffer[0][0] > self._buffer_time:
             self._input_buffer.popleft()
 
-        # Check specials
+        # Clear previous specials
+        self.specials.clear()
+
+        # Check for special moves
         self.check_specials()
 
-
-    # --- Check all specials ---
     def check_specials(self):
-        for special, (pattern, max_total_time) in self.specials_definitions.items():
-            if self.match_pattern(pattern, max_total_time):
-                self.specials.append(special)
-                print(f"🎯 {special} executed!")
-                self._input_buffer.clear()  # Clear buffer after detection
+        """Check if any special move pattern matches the input buffer."""
+        for name, special_data in self.special_patterns.items():
+            pattern = special_data["pattern"]
+            max_time = special_data["max_time"]
+            
+            if self.match_pattern(pattern, max_time):
+                print(f"🎯 SPECIAL EXECUTED: {name}")
+                self.specials.append(name)
+                # Clear buffer to prevent re-triggering
+                self._input_buffer.clear()
+                break  # Only one special per frame
 
-    # --- Match pattern ---
-    def match_pattern(self, pattern: list[InputStep], max_total_time: float) -> bool:
-        # Early out if buffer is empty
-        if not self._input_buffer: 
+    def match_pattern(self, pattern: list[InputStep], max_time: float) -> bool:
+        """Check if the pattern matches the input buffer."""
+        if not self._input_buffer:
             return False
 
-        # Prepare buffer for iteration
-        buf_list = list(self._input_buffer) # convert to list to iterate over it multiple times -> contains tuples of (timestamp, frozenset[Action])
-        start_time = buf_list[0][0] # time of first input in buffer, used to ensure total time does not exceed max_total_time
-        pattern_index = 0 # keeps track of which step in the pattern we are currently tryting to match
-        step_start_time = None # Records when the current step started for checking min_duration
+        current_time = time.time()
+        
+        # Filter buffer to only include inputs within max_time window
+        valid_buffer = [
+            (t, actions) for t, actions in self._input_buffer
+            if current_time - t <= max_time
+        ]
+        
+        if not valid_buffer:
+            return False
 
-        # Iterate over the input buffer
-        for t, actions in buf_list:
-            normalized_actions = self.normalize_diagonals(actions) # converts diagonal inputs to single. this makes matching easier.
+        step_index = 0
+        step_start_time = None
+        i = 0
 
-            
+        while i < len(valid_buffer) and step_index < len(pattern):
+            timestamp, actions = valid_buffer[i]
+            step = pattern[step_index]
 
-            # Try to advance through as many steps as possible for this buffer entry
-            advanced = True
-            while advanced:
-                advanced = False
-                current_step = pattern[pattern_index] # the current InputStep we are trying to match
+            # Handle release step
+            if step.must_release:
+                # Check if the actions are NOT present (released)
+                if all(action not in actions for action in step.actions):
+                    step_index += 1
+                    step_start_time = None
+                i += 1
+                continue
 
-                # Handle release steps
-                if current_step.release: # if release is True, the player must release certain button(s)
-                    step_matched = current_step.actions.isdisjoint(normalized_actions)
-                    if step_matched:
-                        # Release step only needs one frame of release
-                        pattern_index += 1
-                        step_start_time = None
-                        advanced = True
-                        if pattern_index >= len(pattern):
-                            if t - start_time <= max_total_time:
-                                return True
-                            else:
-                                return False
-                    # Don't reset step_start_time for release steps
-                else:
-                    step_matched = current_step.actions.issubset(normalized_actions)
-                    if step_matched:
-                        if step_start_time is None:
-                            step_start_time = t
-                        # Check min_duration (we only advance when it's satisfied)
-                        if t - step_start_time >= current_step.min_duration:
-                            pattern_index += 1
-                            step_start_time = None
-                            advanced = True
-                            if pattern_index >= len(pattern):
-                                if t - start_time <= max_total_time:
-                                    return True
-                                else:
-                                    return False
-                    else:
-                        # If the required actions were previously held (step_start_time set)
-                        # and now the actions are different (e.g. a release entry), check
-                        # whether the hold lasted long enough up until this timestamp.
-                        if step_start_time is not None:
-                            if t - step_start_time >= current_step.min_duration:
-                                pattern_index += 1
-                                step_start_time = None
-                                advanced = True
-                                if pattern_index >= len(pattern):
-                                    if t - start_time <= max_total_time:
-                                        return True
-                                    else:
-                                        return False
-                                # continue the while loop to try matching the next step on same entry
-                                continue
-                        # Reset step timer if broken and cannot advance
-                        step_start_time = None
+            # Handle normal hold/press step
+            if step.actions.issubset(actions):
+                # Actions are being held
+                if step_start_time is None:
+                    step_start_time = timestamp
+                
+                hold_duration = timestamp - step_start_time
+                
+                # Check if minimum duration is met
+                if hold_duration >= step.min_duration:
+                    # Move to next step
+                    step_index += 1
+                    step_start_time = None
+            else:
+                # Actions not present - reset if we haven't satisfied min_duration
+                if step.min_duration > 0:
+                    step_start_time = None
+
+            i += 1
+
+        # Check if we completed all steps
+        if step_index == len(pattern):
+            total_duration = valid_buffer[-1][0] - valid_buffer[0][0]
+            return total_duration <= max_time
 
         return False
+
+    def is_action_pressed(self, action: Action) -> bool:
+        """Check if an action is currently pressed."""
+        return self.actions.get(action, False)
+
+    def get_special_executed(self) -> Optional[str]:
+        """Get the first special executed this frame (if any)."""
+        return self.specials[0] if self.specials else None
