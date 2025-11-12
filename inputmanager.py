@@ -20,8 +20,8 @@ class Action(Enum):
     LT = auto()
     RT = auto()
 
-    # Diagonal directions
-    DOWN_RIGHT = auto()
+    # Diagonal directions 
+    DOWN_RIGHT = auto()     # combination of DOWN + RIGHT, for easier input pattern matching, cannot be directly mapped to buttons
     DOWN_LEFT = auto()
     UP_RIGHT = auto()
     UP_LEFT = auto()
@@ -178,9 +178,9 @@ class PlayerController:
         # Detected specials
         self.specials: list[any] = []
         # Input buffer: deque of (timestamp, frozenset[Action])
-        self._input_buffer: deque[tuple[float, frozenset[Action]]] = deque()
+        self._input_buffer: deque[tuple[float, frozenset[Action]]] = deque() 
         # How long to keep inputs in buffer
-        self._buffer_time: float = 0.7
+        self._buffer_time: float = 4.0  # seconds
 
         # Diagonal mappings
         self.DIAGONALS = {
@@ -212,10 +212,10 @@ class PlayerController:
             ),
             "Hold A": (
                 [
-                    InputStep(actions={Action.A}, min_duration=2.0),
+                    InputStep(actions={Action.A}, min_duration=0.5),
                     InputStep(actions={Action.A}, release=True, min_duration=0)
                 ],
-                5.0
+                2.5
             ),
             "Charge": (
                 [
@@ -258,6 +258,7 @@ class PlayerController:
         # Check specials
         self.check_specials()
 
+
     # --- Check all specials ---
     def check_specials(self):
         for special, (pattern, max_total_time) in self.specials_definitions.items():
@@ -273,7 +274,7 @@ class PlayerController:
             return False
 
         # Prepare buffer for iteration
-        buf_list = list(self._input_buffer) # convert to list to iterate over it multiple times
+        buf_list = list(self._input_buffer) # convert to list to iterate over it multiple times -> contains tuples of (timestamp, frozenset[Action])
         start_time = buf_list[0][0] # time of first input in buffer, used to ensure total time does not exceed max_total_time
         pattern_index = 0 # keeps track of which step in the pattern we are currently tryting to match
         step_start_time = None # Records when the current step started for checking min_duration
@@ -281,37 +282,61 @@ class PlayerController:
         # Iterate over the input buffer
         for t, actions in buf_list:
             normalized_actions = self.normalize_diagonals(actions) # converts diagonal inputs to single. this makes matching easier.
-            current_step = pattern[pattern_index] # the current InputStep we are trying to match
 
-            # Handle release steps
-            if current_step.release: #if release is True, the player must relese certain button(s)
-                step_matched = current_step.actions.isdisjoint(normalized_actions) # isdijoint() checks if two sets have no elements in common. if so then it returns True otherwise False
-                if step_matched:
-                    # Release step only needs one frame of release
-                    pattern_index += 1
-                    step_start_time = None
-                    if pattern_index >= len(pattern):
-                        if t - start_time <= max_total_time:
-                            return True
-                        else:
-                            return False
-                # Don't reset step_start_time for release steps
-            else:
-                step_matched = current_step.actions.issubset(normalized_actions)
-                if step_matched:
-                    if step_start_time is None:
-                        step_start_time = t
-                    # Check min_duration
-                    if t - step_start_time >= current_step.min_duration:
+            
+
+            # Try to advance through as many steps as possible for this buffer entry
+            advanced = True
+            while advanced:
+                advanced = False
+                current_step = pattern[pattern_index] # the current InputStep we are trying to match
+
+                # Handle release steps
+                if current_step.release: # if release is True, the player must release certain button(s)
+                    step_matched = current_step.actions.isdisjoint(normalized_actions)
+                    if step_matched:
+                        # Release step only needs one frame of release
                         pattern_index += 1
                         step_start_time = None
+                        advanced = True
                         if pattern_index >= len(pattern):
                             if t - start_time <= max_total_time:
                                 return True
                             else:
                                 return False
+                    # Don't reset step_start_time for release steps
                 else:
-                    # Reset step timer if broken
-                    step_start_time = None
+                    step_matched = current_step.actions.issubset(normalized_actions)
+                    if step_matched:
+                        if step_start_time is None:
+                            step_start_time = t
+                        # Check min_duration (we only advance when it's satisfied)
+                        if t - step_start_time >= current_step.min_duration:
+                            pattern_index += 1
+                            step_start_time = None
+                            advanced = True
+                            if pattern_index >= len(pattern):
+                                if t - start_time <= max_total_time:
+                                    return True
+                                else:
+                                    return False
+                    else:
+                        # If the required actions were previously held (step_start_time set)
+                        # and now the actions are different (e.g. a release entry), check
+                        # whether the hold lasted long enough up until this timestamp.
+                        if step_start_time is not None:
+                            if t - step_start_time >= current_step.min_duration:
+                                pattern_index += 1
+                                step_start_time = None
+                                advanced = True
+                                if pattern_index >= len(pattern):
+                                    if t - start_time <= max_total_time:
+                                        return True
+                                    else:
+                                        return False
+                                # continue the while loop to try matching the next step on same entry
+                                continue
+                        # Reset step timer if broken and cannot advance
+                        step_start_time = None
 
         return False
