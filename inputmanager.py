@@ -1,6 +1,5 @@
 import time
 from collections import deque
-from dataclasses import dataclass
 from typing import Optional, Set
 from enum import Enum, auto
 import pygame
@@ -25,13 +24,6 @@ class Action(Enum):
     DOWN_LEFT = auto()
     UP_RIGHT = auto()
     UP_LEFT = auto()
-
-# --- InputStep dataclass ---
-@dataclass
-class InputStep:
-    actions: Set[Action]
-    min_duration: float = 0.0
-    must_release: bool = False  # Simplified: just check if actions should be released
 
 
 # --- Input Manager (Singleton) ---
@@ -147,9 +139,6 @@ class InputManager:
     def get_just_pressed_actions(self, player_index: int) -> set:
         return self.pressed_actions[player_index] - self.prev_pressed_actions[player_index]
 
-    def get_just_released_actions(self, player_index: int) -> set:
-        return self.prev_pressed_actions[player_index] - self.pressed_actions[player_index]
-
 
 # --- PlayerController ---
 class PlayerController:
@@ -160,12 +149,15 @@ class PlayerController:
         # Current frame actions
         self.actions: dict[Action, bool] = {action: False for action in Action}
         
-        # Detected specials (cleared each frame, consumer should check and clear)
-        self.specials: list[str] = []
+        # Detected special
+        self.special_executed: Optional[str] = None
         
-        # Input buffer: stores (timestamp, frozenset[Action]) for each frame
-        self._input_buffer: deque[tuple[float, frozenset[Action]]] = deque()
-        self._buffer_time: float = 1.5  # Max time to keep inputs
+        # Simple input buffer: stores only new inputs as they happen
+        self._input_sequence: deque[tuple[float, Action]] = deque()
+        self._buffer_time: float = 0.7
+        
+        # Track last input to avoid duplicates
+        self._last_input: Optional[Action] = None
 
         # Diagonal mappings
         self.DIAGONALS = {
@@ -175,40 +167,12 @@ class PlayerController:
             frozenset({Action.UP, Action.LEFT}): Action.UP_LEFT,
         }
 
-        # Define special move patterns
+        # Simplified special patterns - just a sequence of actions
         self.special_patterns = {
-            "Fireball": {
-                "pattern": [
-                    InputStep(actions={Action.DOWN}),
-                    InputStep(actions={Action.DOWN_RIGHT}),
-                    InputStep(actions={Action.RIGHT}),
-                    InputStep(actions={Action.A}),
-                ],
-                "max_time": 0.5
-            },
-            "Shoryuken": {
-                "pattern": [
-                    InputStep(actions={Action.RIGHT}),
-                    InputStep(actions={Action.DOWN}),
-                    InputStep(actions={Action.DOWN_RIGHT}),
-                    InputStep(actions={Action.A}),
-                ],
-                "max_time": 0.5
-            },
-            "Hold A": {
-                "pattern": [
-                    InputStep(actions={Action.A}, min_duration=1.0),
-                    InputStep(actions={Action.A}, must_release=True),
-                ],
-                "max_time": 4.0 
-            },
-            "Charge": {
-                "pattern": [
-                    InputStep(actions={Action.LEFT}, min_duration=1.0),
-                    InputStep(actions={Action.RIGHT, Action.A}),
-                ],
-                "max_time": 4.0
-            },
+            "Fireball": [Action.DOWN, Action.DOWN_RIGHT, Action.RIGHT, Action.A],
+            "Shoryuken": [Action.RIGHT, Action.DOWN, Action.DOWN_RIGHT, Action.A],
+            "Sonic Boom": [Action.LEFT, Action.RIGHT, Action.A],
+            "Super Kick": [Action.DOWN, Action.UP, Action.UP, Action.A],
         }
 
     def normalize_diagonals(self, actions: frozenset[Action]) -> frozenset[Action]:
@@ -232,96 +196,53 @@ class PlayerController:
         for action in Action:
             self.actions[action] = action in pressed_actions
 
-        # Always add to buffer (important for timing accuracy)
-        self._input_buffer.append((current_time, pressed_actions))
+        # Add new inputs to sequence (only when they change)
+        for action in pressed_actions:
+            if action != self._last_input:
+                self._input_sequence.append((current_time, action))
+                self._last_input = action
+                break  # Only track one new input per frame
+        
+        # If nothing pressed, reset last input
+        if not pressed_actions:
+            self._last_input = None
 
-        # Clean old inputs
-        while self._input_buffer and current_time - self._input_buffer[0][0] > self._buffer_time:
-            self._input_buffer.popleft()
+        # Clean old inputs from buffer
+        while self._input_sequence and current_time - self._input_sequence[0][0] > self._buffer_time:
+            self._input_sequence.popleft()
 
-        # Clear previous specials
-        self.specials.clear()
+        # Clear previous special
+        self.special_executed = None
 
         # Check for special moves
         self.check_specials()
 
     def check_specials(self):
-        """Check if any special move pattern matches the input buffer."""
-        for name, special_data in self.special_patterns.items():
-            pattern = special_data["pattern"]
-            max_time = special_data["max_time"]
+        """Check if any special move pattern matches the input sequence."""
+        if len(self._input_sequence) < 2:
+            return
+        
+        # Extract just the actions from the sequence
+        sequence = [action for _, action in self._input_sequence]
+        
+        # Check each special pattern
+        for name, pattern in self.special_patterns.items():
+            pattern_len = len(pattern)
             
-            if self.match_pattern(pattern, max_time):
-                print(f"🎯 SPECIAL EXECUTED: {name}")
-                self.specials.append(name)
-                # Clear buffer to prevent re-triggering
-                self._input_buffer.clear()
-                break  # Only one special per frame
-
-    def match_pattern(self, pattern: list[InputStep], max_time: float) -> bool:
-        """Check if the pattern matches the input buffer."""
-        if not self._input_buffer:
-            return False
-
-        current_time = time.time()
-        
-        # Filter buffer to only include inputs within max_time window
-        valid_buffer = [
-            (t, actions) for t, actions in self._input_buffer
-            if current_time - t <= max_time
-        ]
-        
-        if not valid_buffer:
-            return False
-
-        step_index = 0
-        step_start_time = None
-        i = 0
-
-        while i < len(valid_buffer) and step_index < len(pattern):
-            timestamp, actions = valid_buffer[i]
-            step = pattern[step_index]
-
-            # Handle release step
-            if step.must_release:
-                # Check if the actions are NOT present (released)
-                if all(action not in actions for action in step.actions):
-                    step_index += 1
-                    step_start_time = None
-                i += 1
-                continue
-
-            # Handle normal hold/press step
-            if step.actions.issubset(actions):
-                # Actions are being held
-                if step_start_time is None:
-                    step_start_time = timestamp
-                
-                hold_duration = timestamp - step_start_time
-                
-                # Check if minimum duration is met
-                if hold_duration >= step.min_duration:
-                    # Move to next step
-                    step_index += 1
-                    step_start_time = None
-            else:
-                # Actions not present - reset if we haven't satisfied min_duration
-                if step.min_duration > 0:
-                    step_start_time = None
-
-            i += 1
-
-        # Check if we completed all steps
-        if step_index == len(pattern):
-            total_duration = valid_buffer[-1][0] - valid_buffer[0][0]
-            return total_duration <= max_time
-
-        return False
+            # Check if the end of our sequence matches the pattern
+            if len(sequence) >= pattern_len:
+                if sequence[-pattern_len:] == pattern:
+                    print(f"🎯 SPECIAL EXECUTED: {name}")
+                    self.special_executed = name
+                    # Clear buffer to prevent re-triggering
+                    self._input_sequence.clear()
+                    self._last_input = None
+                    return  # Only one special per frame
 
     def is_action_pressed(self, action: Action) -> bool:
         """Check if an action is currently pressed."""
         return self.actions.get(action, False)
 
     def get_special_executed(self) -> Optional[str]:
-        """Get the first special executed this frame (if any)."""
-        return self.specials[0] if self.specials else None
+        """Get the special executed this frame (if any)."""
+        return self.special_executed
