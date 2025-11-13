@@ -8,7 +8,7 @@ from inputmanager import InputManager
 import globals
 
 # --- Initialize ---
-#globals.fullscreen_enabled = True
+globals.fullscreen_enabled = True
 pygame.init()
 display_info = pygame.display.Info()
 clock = pygame.time.Clock()
@@ -27,7 +27,7 @@ resources.load_png("debug32x32", "Assets/Graphics/Aseprite/debug32x32.png")
 
 # --- Create many fighters ---
 fighters = []
-for i in range(800):  # stress test count
+for i in range(1000):  # stress test count
     f = Fighter((100 + i * 10, 100), 0)
     f.get_anim("gbFighter")
     f.get_anim("nesFighter")
