@@ -27,13 +27,12 @@ class Action(Enum):
     UP_LEFT = auto()
 
 
-# --- Input Manager (Singleton) ---
+# --- Input Manager  ---
 @singleton
 class InputManager:
 
     def __init__(self):
-        # Only executed once thanks to the decorator
-
+  
         # Keyboard mappings for 2 players
         self.key_maps = [
             {  # Player 1
@@ -84,15 +83,23 @@ class InputManager:
         }
 
         # State storage per player
-        self.pressed_actions = [set(), set()]
-        self.prev_pressed_actions = [set(), set()]
+        self._pressed_actions = [set(), set()]
+        self._prev_pressed_actions = [set(), set()]
 
     def update(self):
         for i in (0, 1):
-            self.prev_pressed_actions[i] = self.pressed_actions[i].copy()
-            self.pressed_actions[i] = self._get_pressed_actions_now(i)
+            # Store previous state by copying current
+            self._prev_pressed_actions[i] = self._pressed_actions[i].copy()
+            # Update current state
+            self._pressed_actions[i] = self._quering_pressed_actions(i)
 
-    def _get_pressed_actions_now(self, player_index: int) -> set:
+    def get_pressed_actions(self, player_index: int) -> set:
+        return self._pressed_actions[player_index]
+
+    def get_just_pressed_actions(self, player_index: int) -> set:
+        return self._pressed_actions[player_index] - self._prev_pressed_actions[player_index]
+
+    def _quering_pressed_actions(self, player_index: int) -> set:
         actions = set()
 
         keys = pygame.key.get_pressed()
@@ -129,17 +136,15 @@ class InputManager:
 
         return actions
 
-    def get_pressed_actions(self, player_index: int) -> set:
-        return self.pressed_actions[player_index]
-
-    def get_just_pressed_actions(self, player_index: int) -> set:
-        return self.pressed_actions[player_index] - self.prev_pressed_actions[player_index]
+   
 
 # --- PlayerController ---
 class PlayerController:
-    def __init__(self, player_index: int):
+    def __init__(self, player_index: int, owner: 'Fighter'):
         self.player_index = player_index
         self.input_manager = InputManager()
+        self.owner = owner
+        self.specialmovelist = owner.special_movelist
         
         # Current frame actions
         self.actions: dict[Action, bool] = {action: False for action in Action}
@@ -160,14 +165,6 @@ class PlayerController:
             frozenset({Action.DOWN, Action.LEFT}): Action.DOWN_LEFT,
             frozenset({Action.UP, Action.RIGHT}): Action.UP_RIGHT,
             frozenset({Action.UP, Action.LEFT}): Action.UP_LEFT,
-        }
-
-        # Simplified special patterns - just a sequence of actions
-        self.special_patterns = {
-            "Fireball": [Action.DOWN, Action.DOWN_RIGHT, Action.RIGHT, Action.A],
-            "Shoryuken": [Action.RIGHT, Action.DOWN, Action.DOWN_RIGHT, Action.A],
-            "Sonic Boom": [Action.LEFT, Action.RIGHT, Action.A],
-            "Super Kick": [Action.DOWN, Action.UP, Action.UP, Action.A],
         }
 
     def normalize_diagonals(self, actions: frozenset[Action]) -> frozenset[Action]:
@@ -221,7 +218,7 @@ class PlayerController:
         sequence = [action for _, action in self._input_sequence]
         
         # Check each special pattern
-        for name, pattern in self.special_patterns.items():
+        for name, pattern in self.specialmovelist.items():
             pattern_len = len(pattern)
             
             # Check if the end of our sequence matches the pattern

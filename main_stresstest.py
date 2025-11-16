@@ -1,10 +1,10 @@
 import pygame
-from ressourcemanager import ResourceManager
-from gameobject import GameObject
+from ressource_manager import ResourceManager
+from game_object import GameObject
 from gameview import GameView
-from debugmanager import DebugManager
+from debug_manager import DebugManager
 from GameObjects.fighter import Fighter
-from inputmanager import InputManager
+from input_manager import InputManager
 import globals
 
 # --- Initialize ---

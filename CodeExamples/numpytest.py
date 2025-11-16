@@ -7,8 +7,8 @@ screen = pygame.display.set_mode((800, 600))
 clock = pygame.time.Clock()
 
 # --- Object parameters ---
-num_objects = 1000
-player_size = np.array([30, 50])
+num_objects = 3000
+player_size = np.array([2, 2])
 
 positions = np.zeros((num_objects, 2))
 positions[:, 0] = np.random.uniform(0, screen.get_width() - player_size[0], num_objects)

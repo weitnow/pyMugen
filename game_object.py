@@ -1,8 +1,8 @@
 import pygame
 import globals
-from ressourcemanager import ResourceManager
-from ressourcemanager import AnimationData
-from debugmanager import DebugManager
+from ressource_manager import ResourceManager
+from ressource_manager import AnimationData
+from debug_manager import DebugManager
 
 
 class GameObject:

@@ -1,11 +1,24 @@
-from gameobject import GameObject
-from inputmanager import PlayerController, Action
+from game_object import GameObject
+from input_manager import PlayerController, Action
 
 class Fighter(GameObject):
     def __init__(self, pos: tuple[float, float], player_index: int = 0):
         super().__init__(pos, rotatable=True)
         self.origin_center_bottom = True
-        self.controller = PlayerController(player_index)
+
+        # attributes
+        self.facing_right: bool = True
+
+        # Specialmovelist
+        self.special_movelist: dict[str, list[Action]] = {
+            "Fireball": [Action.DOWN, Action.DOWN_RIGHT, Action.RIGHT, Action.A],
+            "Shoryuken": [Action.RIGHT, Action.DOWN, Action.DOWN_RIGHT, Action.A],
+            "Sonic Boom": [Action.LEFT, Action.RIGHT, Action.A],
+            "Super Kick": [Action.DOWN, Action.UP, Action.A],
+        }
+
+
+        self.controller = PlayerController(player_index, self)
 
     def update(self, dt):
 
