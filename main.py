@@ -29,9 +29,6 @@ resources.load_png("debug32x32", "Assets/Graphics/Aseprite/debug32x32.png") # ex
 # --- Create DebugManager ---
 debug_manager = DebugManager()
 
-
-
-
 # --- Create objects ---
 player = Fighter((100, 100), 0) # 0 = player index = player 1 TODO: refactor this
 player.get_anim("gbFighter")
