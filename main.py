@@ -3,7 +3,7 @@ from ressource_manager import ResourceManager
 from game_object import GameObject
 from game_view import GameView
 from debug_manager import DebugManager
-from GameObjects.fighter import Fighter
+from gameobjects.fighter import Fighter
 from input_manager import InputManager
 
 import globals
@@ -21,10 +21,10 @@ view = GameView()
 
 # --- Load resources ---
 resources = ResourceManager()
-resources.load_spritesheet("gbFighter", "Assets/Graphics/Aseprite/gbFighter.png", "Assets/Graphics/Aseprite/gbFighter.json") # example spritesheet with tags
-resources.load_spritesheet("nesFighter", "Assets/Graphics/Aseprite/nesFighter.png", "Assets/Graphics/Aseprite/nesFighter.json") 
-resources.load_spritesheet("debug32", "Assets/Graphics/Aseprite/debug32.png", "Assets/Graphics/Aseprite/debug32.json") # example spritesheet without tags
-resources.load_png("debug32x32", "Assets/Graphics/Aseprite/debug32x32.png") # example single PNG
+resources.load_spritesheet("gbFighter", "assets/Graphics/Aseprite/gbFighter.png", "assets/Graphics/Aseprite/gbFighter.json") # example spritesheet with tags
+resources.load_spritesheet("nesFighter", "assets/Graphics/Aseprite/nesFighter.png", "assets/Graphics/Aseprite/nesFighter.json") 
+resources.load_spritesheet("debug32", "assets/Graphics/Aseprite/debug32.png", "assets/Graphics/Aseprite/debug32.json") # example spritesheet without tags
+resources.load_png("debug32x32", "assets/Graphics/Aseprite/debug32x32.png") # example single PNG
 
 # --- Create DebugManager ---
 debug_manager = DebugManager()

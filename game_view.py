@@ -23,7 +23,7 @@ class GameView:
         self._apply_display_mode()
 
         # overlay
-        self.overlay_image = pygame.image.load("Assets/Graphics/Aseprite/overlay.png").convert_alpha()
+        self.overlay_image = pygame.image.load("assets/Graphics/Aseprite/overlay.png").convert_alpha()
         self.overlay_screen_rect = pygame.Rect(*globals.OVERLAY_VIEWPORT)
         
         # Cache for scaled surfaces and calculations

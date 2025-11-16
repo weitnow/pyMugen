@@ -1,9 +1,9 @@
 import pygame
 from ressource_manager import ResourceManager
 from game_object import GameObject
-from gameview import GameView
+from game_view import GameView
 from debug_manager import DebugManager
-from GameObjects.fighter import Fighter
+from gameobjects.fighter import Fighter
 from input_manager import InputManager
 import globals
 
@@ -20,10 +20,10 @@ resources = ResourceManager()
 debug_manager = DebugManager()
 
 # --- Load resources ---
-resources.load_spritesheet("gbFighter", "Assets/Graphics/Aseprite/gbFighter.png", "Assets/Graphics/Aseprite/gbFighter.json")
-resources.load_spritesheet("nesFighter", "Assets/Graphics/Aseprite/nesFighter.png", "Assets/Graphics/Aseprite/nesFighter.json")
-resources.load_spritesheet("debug32", "Assets/Graphics/Aseprite/debug32.png", "Assets/Graphics/Aseprite/debug32.json")
-resources.load_png("debug32x32", "Assets/Graphics/Aseprite/debug32x32.png")
+resources.load_spritesheet("gbFighter", "assets/Graphics/Aseprite/gbFighter.png", "assets/Graphics/Aseprite/gbFighter.json")
+resources.load_spritesheet("nesFighter", "assets/Graphics/Aseprite/nesFighter.png", "assets/Graphics/Aseprite/nesFighter.json")
+resources.load_spritesheet("debug32", "assets/Graphics/Aseprite/debug32.png", "assets/Graphics/Aseprite/debug32.json")
+resources.load_png("debug32x32", "assets/Graphics/Aseprite/debug32x32.png")
 
 # --- Create many fighters ---
 fighters = []
