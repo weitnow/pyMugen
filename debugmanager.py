@@ -2,18 +2,12 @@ import pygame
 import time
 import globals
 import psutil
-import time
+from decorators import singleton
 
+
+@singleton
 class DebugManager:
-    _instance = None
-
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(DebugManager, cls).__new__(cls)
-            cls._instance._init()
-        return cls._instance
-
-    def _init(self):
+    def __init__(self):
         self.font = pygame.font.Font(None, 20)
         self.last_time = time.time()
         self.fps = 0
@@ -56,15 +50,12 @@ class DebugManager:
         text = f"FPS: {self.fps:.1f} | CPU: {self.cpu_percent:.1f}% | RAM: {mem_used_mb:.1f} MB"
         img = self.font.render(text, True, (255, 255, 255))
         surface.blit(img, (4, 4))
-        
-    # Call this every frame
+
     def update_system_info(self):
         now = time.time()
         if now - self.last_cpu_update_time > 5:  # update every 5 seconds
             self.cpu_percent = psutil.cpu_percent(interval=None)
-            self.last_cpu_update_time = now   
-        
-        
+            self.last_cpu_update_time = now
 
     # --- Drawing ---
     def draw_hitbox(self, surface, rect: pygame.Rect, color, to_debug_coords, scale, pos):
@@ -73,12 +64,10 @@ class DebugManager:
         pygame.draw.rect(surface, color, (x, y, w, h), 2)
 
     def draw_bounding_box(self, surface, sprite_rect, to_debug_coords, scale, origin_center_bottom=False):
-        # Draw the rectangle as before
         x, y = to_debug_coords(sprite_rect.x, sprite_rect.y)
         w, h = sprite_rect.width * scale, sprite_rect.height * scale
         pygame.draw.rect(surface, (255, 255, 0, 120), (x, y, w, h), 1)
 
-        # Draw the origin
         if origin_center_bottom:
             origin_x = sprite_rect.x + sprite_rect.width / 2
             origin_y = sprite_rect.y + sprite_rect.height
@@ -92,6 +81,3 @@ class DebugManager:
     def draw_text(self, surface, text, x, y):
         img = self.font.render(text, True, (255, 255, 255))
         surface.blit(img, (x, y))
-
-
-

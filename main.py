@@ -4,7 +4,7 @@ from gameobject import GameObject
 from gameview import GameView
 from debugmanager import DebugManager
 from GameObjects.fighter import Fighter
-from inputmanager import InputManager, Action #TODO: remove unused imports
+from inputmanager import InputManager
 
 import globals
 

@@ -1,8 +1,9 @@
 import time
+import pygame
 from collections import deque
 from typing import Optional, Set
 from enum import Enum, auto
-import pygame
+from decorators  import singleton
 
 # --- Actions ---
 class Action(Enum):
@@ -27,16 +28,12 @@ class Action(Enum):
 
 
 # --- Input Manager (Singleton) ---
+@singleton
 class InputManager:
-    _instance = None
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(InputManager, cls).__new__(cls)
-            cls._instance._init()
-        return cls._instance
+    def __init__(self):
+        # Only executed once thanks to the decorator
 
-    def _init(self):
         # Keyboard mappings for 2 players
         self.key_maps = [
             {  # Player 1
@@ -71,7 +68,10 @@ class InputManager:
 
         # Controller setup
         pygame.joystick.init()
-        self.joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
+        self.joysticks = [
+            pygame.joystick.Joystick(i)
+            for i in range(pygame.joystick.get_count())
+        ]
 
         # Controller button mapping (Xbox layout)
         self.button_map = {
@@ -88,22 +88,18 @@ class InputManager:
         self.prev_pressed_actions = [set(), set()]
 
     def update(self):
-        """Call once per frame to update all player inputs."""
-        for player_index in (0, 1):
-            self.prev_pressed_actions[player_index] = self.pressed_actions[player_index].copy()
-            self.pressed_actions[player_index] = self._get_pressed_actions_now(player_index)
+        for i in (0, 1):
+            self.prev_pressed_actions[i] = self.pressed_actions[i].copy()
+            self.pressed_actions[i] = self._get_pressed_actions_now(i)
 
     def _get_pressed_actions_now(self, player_index: int) -> set:
-        """Get currently pressed actions for a player."""
         actions = set()
 
-        # Keyboard
         keys = pygame.key.get_pressed()
         for key, action in self.key_maps[player_index].items():
             if keys[key]:
                 actions.add(action)
 
-        # Controller
         if player_index < len(self.joysticks):
             js = self.joysticks[player_index]
 
@@ -138,7 +134,6 @@ class InputManager:
 
     def get_just_pressed_actions(self, player_index: int) -> set:
         return self.pressed_actions[player_index] - self.prev_pressed_actions[player_index]
-
 
 # --- PlayerController ---
 class PlayerController:

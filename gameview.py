@@ -1,6 +1,8 @@
 import pygame
 import globals
+from decorators import singleton
 
+@singleton
 class GameView:
     def __init__(self):
         self.base_width = globals.GAME_RES[0]
