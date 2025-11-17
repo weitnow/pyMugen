@@ -1,3 +1,7 @@
+from decorators import singleton
+from gamestates.gamestate import GameState
+
+@singleton
 class GameStateManager:
     def __init__(self):
         self.states = {}         # map name → GameState

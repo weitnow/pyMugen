@@ -140,7 +140,7 @@ class InputManager:
 
 # --- PlayerController ---
 class PlayerController:
-    def __init__(self, player_index: int, owner: 'Fighter'):
+    def __init__(self, player_index: int, owner: any): # owner is the GameObject this controller is attached to
         self.player_index = player_index
         self.input_manager = InputManager()
         self.owner = owner

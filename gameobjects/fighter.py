@@ -1,4 +1,4 @@
-from game_object import GameObject
+from gameobjects.game_object import GameObject
 from input_manager import PlayerController, Action
 
 class Fighter(GameObject):

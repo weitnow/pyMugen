@@ -1,6 +1,6 @@
 import pygame
 from ressource_manager import ResourceManager
-from game_object import GameObject
+from gameobjects.game_object import GameObject
 from game_view import GameView
 from debug_manager import DebugManager
 from gameobjects.fighter import Fighter
