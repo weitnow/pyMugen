@@ -1,67 +1,55 @@
 import pygame
-from ressource_manager import ResourceManager
+from resource_manager import ResourceManager
 from gameobjects.game_object import GameObject
 from game_view import GameView
 from debug_manager import DebugManager
 from gameobjects.fighter import Fighter
 from input_manager import InputManager
+from gamestate_manager import GameStateManager
 
 import globals
+
+# --- Import all States ---
+from gamestates.menustate import MenuState
+from gamestates.playingstate import PlayingState
 
 # --- Initialize ---
 pygame.init()
 display_info = pygame.display.Info()
 clock = pygame.time.Clock() 
 
-# --- Create InputManager ---
+# --- Create Managers ---
+game_state_manager = GameStateManager()
 input_manager = InputManager()
+debug_manager = DebugManager()
+resource_manager = ResourceManager()
 
 # --- Create GameView and DebugView ---
 view = GameView()
 
 # --- Load resources ---
-resources = ResourceManager()
-resources.load_spritesheet("gbFighter", "assets/Graphics/Aseprite/gbFighter.png", "assets/Graphics/Aseprite/gbFighter.json") # example spritesheet with tags
-resources.load_spritesheet("nesFighter", "assets/Graphics/Aseprite/nesFighter.png", "assets/Graphics/Aseprite/nesFighter.json") 
-resources.load_spritesheet("debug32", "assets/Graphics/Aseprite/debug32.png", "assets/Graphics/Aseprite/debug32.json") # example spritesheet without tags
-resources.load_png("debug32x32", "assets/Graphics/Aseprite/debug32x32.png") # example single PNG
+resource_manager.load_spritesheet("gbFighter", "assets/Graphics/Aseprite/gbFighter.png", "assets/Graphics/Aseprite/gbFighter.json") # example spritesheet with tags
+resource_manager.load_spritesheet("nesFighter", "assets/Graphics/Aseprite/nesFighter.png", "assets/Graphics/Aseprite/nesFighter.json") 
+resource_manager.load_spritesheet("debug32", "assets/Graphics/Aseprite/debug32.png", "assets/Graphics/Aseprite/debug32.json") # example spritesheet without tags
+resource_manager.load_png("debug32x32", "assets/Graphics/Aseprite/debug32x32.png") # example single PNG
 
-# --- Create DebugManager ---
-debug_manager = DebugManager()
+# --- Register Game States ---
+game_state_manager.add_state("menu", MenuState())
+game_state_manager.add_state("playing", PlayingState())
 
-# --- Create objects ---
-player = Fighter((100, 100), 0) # 0 = player index = player 1 TODO: refactor this
-player.get_anim("gbFighter")
-player.get_anim("nesFighter")
-player.set_anim("nesFighter")
-player.set_frame_tag("Idle")
+game_state_manager.change_state("playing")
 
-player.set_hurtbox(pygame.Rect(5, 10, 20, 30))
-player.set_hitbox(pygame.Rect(25, 10, 20, 15))
 
-enemy = GameObject((150, 10))
-enemy.origin_center_bottom = True
-enemy.get_anim("gbFighter")
-enemy.set_anim("gbFighter")
-enemy.set_frame_tag("Idle")
-enemy.set_hurtbox(pygame.Rect(6, 8, 20, 28))
-enemy.set_hitbox(pygame.Rect(22, 8, 20, 14))
 
-debugbox_asprite = GameObject((10, 10))
-debugbox_asprite.get_anim("debug32")
-debugbox_asprite.set_anim("debug32")
-debugbox_asprite.set_frame(1) # second frame of spritesheet
 
-debugbox = GameObject((50, 50))
-debugbox.get_anim("debug32x32")
-debugbox.set_anim("debug32x32")
+
 
 
 
 # --- Main loop ---
 running = True
 while running:
-    dt = clock.tick(60)
+    dt = clock.tick(60) # dt in milliseconds as integer (16ms at 60fps)
     # --- Update CORE-Systems ---
     debug_manager.update_timing(dt)
     input_manager.update() 
@@ -71,30 +59,18 @@ while running:
             running = False
         debug_manager.handle_input(event)
 
-    # --- Input Handling ---
-    # Player 1
-    #pressed_p1 = input_manager.get_pressed_actions(0)
-    #just_pressed_p1 = input_manager.get_just_pressed_actions(0)
 
-    # Player 2
-    #pressed_p2 = input_manager.get_pressed_actions(1)
-    #just_pressed_p2 = input_manager.get_just_pressed_actions(1)
-
-
-    # in player a new PlayerController is created by default
-    player.controller.update()
-
-    # --- Update ---
-    player.update(dt)
+    game_state_manager.update(dt)
 
 
     view.clear()
-    player.draw(view.game_surface)
+
+    game_state_manager.draw()
 
 
     # Draw debug overlay
     if globals.show_hitboxes or globals.show_hurtboxes or globals.show_bounding_boxes or globals.show_fps_info:
-        player.draw_debug(view.debug_surface, view.to_debug_coords)
+        game_state_manager.debug_draw()
   
         globals.debug_draw = True
         globals.show_overlay = False
@@ -102,7 +78,7 @@ while running:
         globals.debug_draw = False
         globals.show_overlay = True
 
-    debug_manager.draw_fps(view.debug_surface) # draw directly to final screen
+    debug_manager.draw_fps(view.debug_surface) # draw FPS to debug surface
 
     view.draw_to_screen()
 

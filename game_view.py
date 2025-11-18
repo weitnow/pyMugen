@@ -67,7 +67,7 @@ class GameView:
         return x * self.debug_scale, y * self.debug_scale
     
     def clear(self):
-        self.game_surface.fill((30, 30, 30))
+        self.game_surface.fill((30, 30, 30))    #TODO: make bg color configurable
         self.debug_surface.fill((0, 0, 0, 0))
 
     # --- Draw everything ---

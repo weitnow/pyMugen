@@ -1,25 +1,47 @@
-class GameState:
+from abc import ABC, abstractmethod
+from input_manager import InputManager
+from gamestate_manager import GameStateManager
+from game_view import GameView
+from debug_manager import DebugManager
+
+
+
+
+class GameState(ABC): #ABC is Abstract Base Class
     """Base class for all game states."""
 
-    def __init__(self, manager):
-        self.manager = manager  # reference to the state manager
+    def __init__(self):
+        
+        self.game_state_manager: GameStateManager = GameStateManager()
+        self.input_manager: InputManager = InputManager()
+        self.view: GameView = GameView()
+        self.debug_manager: DebugManager = DebugManager()
 
+    @abstractmethod
     def enter(self):
         """Called when the state is entered."""
         pass
-
+        
+    @abstractmethod
     def exit(self):
         """Called when the state is exited."""
         pass
 
+    @abstractmethod
     def handle_event(self, event):
         """Handle pygame events."""
         pass
 
+    @abstractmethod
     def update(self, dt):
         """Update the state logic."""
         pass
 
-    def draw(self, surface):
-        """Draw the state to the given surface."""
+    @abstractmethod
+    def draw(self):
+        """Draw the state. """
+        pass
+
+    def debug_draw(self):
+        """Draw debug information."""
         pass

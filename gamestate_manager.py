@@ -1,5 +1,4 @@
 from decorators import singleton
-from gamestates.gamestate import GameState
 
 @singleton
 class GameStateManager:
@@ -7,7 +6,7 @@ class GameStateManager:
         self.states = {}         # map name → GameState
         self.current_state = None
 
-    def add_state(self, name: str, state: GameState):
+    def add_state(self, name: str, state):
         self.states[name] = state
 
     def change_state(self, name: str):
@@ -27,6 +26,10 @@ class GameStateManager:
         if self.current_state:
             self.current_state.update(dt)
 
-    def draw(self, surface):
+    def draw(self):
         if self.current_state:
-            self.current_state.draw(surface)
+            self.current_state.draw()
+
+    def debug_draw(self):
+        if self.current_state:
+            self.current_state.debug_draw()
