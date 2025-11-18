@@ -12,6 +12,7 @@ import globals
 # --- Import all States ---
 from gamestates.menustate import MenuState
 from gamestates.playingstate import PlayingState
+from gamestates.playingstate_stresstest import PlayingStateStressTest
 
 # --- Initialize ---
 pygame.init()
@@ -36,8 +37,9 @@ resource_manager.load_png("debug32x32", "assets/Graphics/Aseprite/debug32x32.png
 # --- Register Game States ---
 game_state_manager.add_state("menu", MenuState())
 game_state_manager.add_state("playing", PlayingState())
+game_state_manager.add_state("playing_stresstest", PlayingStateStressTest())
 
-game_state_manager.change_state("playing")
+game_state_manager.change_state("playing_stresstest") # start in playing state
 
 
 
