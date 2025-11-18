@@ -1,13 +1,11 @@
 import pygame
 from resource_manager import ResourceManager
-from gameobjects.game_object import GameObject
-from game_view import GameView
+from view_manager import ViewManager
 from debug_manager import DebugManager
-from gameobjects.fighter import Fighter
 from input_manager import InputManager
 from gamestate_manager import GameStateManager
 
-import globals
+
 
 # --- Import all States ---
 from gamestates.menustate import MenuState
@@ -20,13 +18,13 @@ display_info = pygame.display.Info()
 clock = pygame.time.Clock() 
 
 # --- Create Managers ---
-game_state_manager = GameStateManager()
+gamestate_manager = GameStateManager()
 input_manager = InputManager()
 debug_manager = DebugManager()
 resource_manager = ResourceManager()
 
 # --- Create GameView and DebugView ---
-view = GameView()
+view_manager = ViewManager()
 
 # --- Load resources ---
 resource_manager.load_spritesheet("gbFighter", "assets/Graphics/Aseprite/gbFighter.png", "assets/Graphics/Aseprite/gbFighter.json") # example spritesheet with tags
@@ -35,11 +33,11 @@ resource_manager.load_spritesheet("debug32", "assets/Graphics/Aseprite/debug32.p
 resource_manager.load_png("debug32x32", "assets/Graphics/Aseprite/debug32x32.png") # example single PNG
 
 # --- Register Game States ---
-game_state_manager.add_state("menu", MenuState())
-game_state_manager.add_state("playing", PlayingState())
-game_state_manager.add_state("playing_stresstest", PlayingStateStressTest())
+gamestate_manager.add_state("menu", MenuState())
+gamestate_manager.add_state("playing", PlayingState())
+gamestate_manager.add_state("playing_stresstest", PlayingStateStressTest())
 
-game_state_manager.change_state("menu") # start in playing state
+gamestate_manager.change_state("menu") # start in playing state
 
 # --- Block certain events from pygame event queue to optimize ---
 pygame.event.set_blocked(None) # block all events
@@ -50,40 +48,31 @@ running = True
 while running:
     dt = clock.tick(60) # dt in milliseconds as integer (16ms at 60fps)
 
-    # --- Update CORE-Systems ---
-    debug_manager.update_timing(dt)
-    input_manager.update() 
-
     # --- Global Event Handling for all States --- 
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
             running = False
         debug_manager.handle_input(event)
 
-    # --- Update current Game State and handle its events ---
-    game_state_manager.update(dt)
+    # --- Update current Game State and handle input ---
+    gamestate_manager.update(dt)
+
+    # --- Update CORE-Systems ---
+    debug_manager.update(dt)
+    input_manager.update(dt)
+    view_manager.update(dt) 
 
     # --- Draw ---
-    view.clear() # clear both game and debug surfaces
-    game_state_manager.draw() # draw current game state
+    view_manager.clear() # clear both game and debug surfaces
+    gamestate_manager.draw() # draw current game state
 
-
-    # Draw debug overlay
-    if debug_manager.show_hitboxes or debug_manager.show_hurtboxes or debug_manager.show_bounding_boxes or debug_manager.show_fps_info:
-        game_state_manager.debug_draw()
-  
-        debug_manager.debug_draw = True
-        debug_manager.show_overlay = False
-    else:
-        debug_manager.debug_draw = False
-        debug_manager.show_overlay = True
-
-    debug_manager.draw_fps(view.debug_surface) # draw FPS to debug surface
-
-    view.draw_to_screen()
-
-
-
-  
+    # --- Debug Draw ---    
+    if debug_manager.debug_on:
+        #global debug draw
+        debug_manager.debug_draw()
+        #gamestate specific debug draw
+        gamestate_manager.debug_draw()
+        
+    view_manager.draw_to_screen()
 
 pygame.quit()

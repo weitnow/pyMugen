@@ -39,8 +39,8 @@ class PlayingStateStressTest(GameState):
 
     def draw(self):
         for p in self.players:
-            p.draw(self.view.game_surface)
+            p.draw(self.view_manager.game_surface)
 
     def debug_draw(self):
         for p in self.players:
-            p.draw_debug(self.view.debug_surface, self.view.to_debug_coords)
+            p.draw_debug(self.view_manager.debug_surface, self.view_manager.to_debug_coords)

@@ -34,7 +34,7 @@ class PlayingState(GameState):
         #just_pressed_p2 = input_manager.get_just_pressed_actions(1)
 
     def draw(self):
-        self.player.draw(self.view.game_surface)
+        self.player.draw(self.view_manager.game_surface)
 
     def debug_draw(self): #optional
-        self.player.draw_debug(self.view.debug_surface, self.view.to_debug_coords)
+        self.player.draw_debug(self.view_manager.debug_surface, self.view_manager.to_debug_coords)

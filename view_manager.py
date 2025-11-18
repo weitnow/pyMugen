@@ -4,7 +4,7 @@ from decorators import singleton
 from debug_manager import DebugManager
 
 @singleton
-class GameView:
+class ViewManager:
     def __init__(self):
         self.base_width = globals.GAME_RES[0]
         self.base_height = globals.GAME_RES[1]
@@ -39,6 +39,10 @@ class GameView:
         self.render_rect = pygame.Rect(0, 0, 0, 0)
 
         self.debug_manager = DebugManager() # get singleton instance an access debug toggles
+        self.debug_manager.set_view_manager(self) # inform debug manager about view manager
+
+    def update(self, dt):
+        pass
 
     # --- Internal helper ---
     def _apply_display_mode(self):
@@ -143,7 +147,7 @@ class GameView:
         self.fullscreen.fill((0, 0, 0))
         self.fullscreen.blit(scaled_game, (offset_x, offset_y))
 
-        if self.debug_manager.debug_draw:
+        if self.debug_manager.debug_on:
             # Scale debug surface (content changes when debug is active)
             debug_scaled = pygame.transform.scale(self.debug_surface, (new_width, new_height))
             debug_scaled.set_alpha(160)

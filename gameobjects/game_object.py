@@ -164,15 +164,15 @@ class GameObject:
         frame = self.current_anim.get_current_frame() if self.current_anim else None
         offset = self._compute_origin_offset(frame) if frame else pygame.Vector2(0, 0)
 
-        if self.hurtbox and debug_manager.show_hurtboxes:
+        if self.hurtbox and debug_manager.SHOW_HURTBOXES:
             debug_manager.draw_hitbox(debug_surface, self.hurtbox.move(offset),
                               (0, 0, 255, 180), to_debug_coords, scale, self.pos)
 
-        if self.hitbox and debug_manager.show_hitboxes:
+        if self.hitbox and debug_manager.SHOW_HITBOXES:
             debug_manager.draw_hitbox(debug_surface, self.hitbox.move(offset),
                               (255, 0, 0, 180), to_debug_coords, scale, self.pos)
 
-        if frame and debug_manager.show_bounding_boxes:
+        if frame and debug_manager.SHOW_BOUNDING_BOXES:
             frame_rect = pygame.Rect(
                 self.pos.x + offset.x,
                 self.pos.y + offset.y,

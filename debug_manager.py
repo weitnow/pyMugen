@@ -1,6 +1,5 @@
 import pygame
 import time
-import globals
 import psutil
 from decorators import singleton
 
@@ -12,38 +11,39 @@ class DebugManager:
         self.last_time = time.time()
         self.fps = 0
         self.frame_time_ms = 0
+        self.view_manager = None  # to be set externally
 
         # settings
         self.BOX_THICKNESS = 2
 
         # --- Debug Toggles ---
         self.show_overlay = True
-        self.debug_draw = True  # enable or disable debug features globally
-        self.show_hitboxes = False
-        self.show_hurtboxes = False
-        self.show_bounding_boxes = False
-        self.show_fps_info = False
+        self.debug_on = False  # enable or disable debug features globally
         self.stop_game_for_debugging = False
+        self.SHOW_HITBOXES = True
+        self.SHOW_HURTBOXES = True
+        self.SHOW_BOUNDING_BOXES = True
+        self.SHOW_FPS_INFO = True
 
         # For CPU updates
         self.last_cpu_update_time = 0
         self.cpu_percent = 0
 
+    def set_view_manager(self, view_manager):
+        """Called by ViewManager after initialization"""
+        self.view_manager = view_manager
+
     # --- Toggles ---
     def handle_input(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_F1:
-                self.show_hitboxes = not self.show_hitboxes
+                self.debug_on = not self.debug_on
             elif event.key == pygame.K_F2:
-                self.show_hurtboxes = not self.show_hurtboxes
-            elif event.key == pygame.K_F3:
-                self.show_bounding_boxes = not self.show_bounding_boxes
-            elif event.key == pygame.K_F4:
-                self.show_fps_info = not self.show_fps_info
-            elif event.key == pygame.K_F5:
                 self.stop_game_for_debugging = not self.stop_game_for_debugging
+            elif event.key == pygame.K_F3:
+                self.show_overlay = not self.show_overlay
 
-    def update_timing(self, dt):
+    def update(self, dt):
         now = time.time()
         self.frame_time_ms = dt
         if now - self.last_time > 0:
@@ -51,8 +51,11 @@ class DebugManager:
         self.last_time = now
         self.update_system_info()
 
-    def draw_fps(self, surface):
-        if not self.show_fps_info:
+    def debug_draw(self):
+        self._draw_fps(self.view_manager.debug_surface)
+
+    def _draw_fps(self, surface):
+        if not self.SHOW_FPS_INFO:
             return
 
         process = psutil.Process()

@@ -71,7 +71,7 @@ class InputManager:
         self._pressed_actions = [set(), set()]
         self._prev_pressed_actions = [set(), set()]
 
-    def update(self):
+    def update(self, dt):
         for i in (0, 1):
             # Store previous state by copying current
             self._prev_pressed_actions[i] = self._pressed_actions[i].copy()

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from input_manager import InputManager
 from gamestate_manager import GameStateManager
-from game_view import GameView
+from view_manager import ViewManager
 from debug_manager import DebugManager
 
 
@@ -12,9 +12,9 @@ class GameState(ABC): #ABC is Abstract Base Class
 
     def __init__(self):
         
-        self.game_state_manager: GameStateManager = GameStateManager()
+        self.gamestate_manager: GameStateManager = GameStateManager()
         self.input_manager: InputManager = InputManager()
-        self.view: GameView = GameView()
+        self.view_manager: ViewManager = ViewManager()
         self.debug_manager: DebugManager = DebugManager()
 
     @abstractmethod
