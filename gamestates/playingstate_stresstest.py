@@ -11,7 +11,7 @@ class PlayingStateStressTest(GameState):
         base_x = 50
         base_y = 100
         spacing = 20
-        count = 1000
+        count = 1200
 
         for i in range(count):
             x = base_x + i * spacing

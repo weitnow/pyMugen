@@ -53,14 +53,16 @@ while running:
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
             running = False
         debug_manager.handle_input(event)
-
-    # --- Update current Game State and handle input ---
-    gamestate_manager.update(dt)
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_F4:
+            view_manager.toggle_fullscreen()
 
     # --- Update CORE-Systems ---
     debug_manager.update(dt)
     input_manager.update(dt)
     view_manager.update(dt) 
+
+    # --- Update current Game State and handle input ---
+    gamestate_manager.update(dt)
 
     # --- Draw ---
     view_manager.clear() # clear both game and debug surfaces
