@@ -39,46 +39,44 @@ game_state_manager.add_state("menu", MenuState())
 game_state_manager.add_state("playing", PlayingState())
 game_state_manager.add_state("playing_stresstest", PlayingStateStressTest())
 
-game_state_manager.change_state("playing_stresstest") # start in playing state
+game_state_manager.change_state("menu") # start in playing state
 
-
-
-
-
-
-
+# --- Block certain events from pygame event queue to optimize ---
+pygame.event.set_blocked(None) # block all events
+pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN]) # allow only these events
 
 # --- Main loop ---
 running = True
 while running:
     dt = clock.tick(60) # dt in milliseconds as integer (16ms at 60fps)
+
     # --- Update CORE-Systems ---
     debug_manager.update_timing(dt)
     input_manager.update() 
-    # --- Event Handling ---
+
+    # --- Global Event Handling for all States --- 
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
             running = False
         debug_manager.handle_input(event)
 
-
+    # --- Update current Game State and handle its events ---
     game_state_manager.update(dt)
 
-
-    view.clear()
-
-    game_state_manager.draw()
+    # --- Draw ---
+    view.clear() # clear both game and debug surfaces
+    game_state_manager.draw() # draw current game state
 
 
     # Draw debug overlay
-    if globals.show_hitboxes or globals.show_hurtboxes or globals.show_bounding_boxes or globals.show_fps_info:
+    if debug_manager.show_hitboxes or debug_manager.show_hurtboxes or debug_manager.show_bounding_boxes or debug_manager.show_fps_info:
         game_state_manager.debug_draw()
   
-        globals.debug_draw = True
-        globals.show_overlay = False
+        debug_manager.debug_draw = True
+        debug_manager.show_overlay = False
     else:
-        globals.debug_draw = False
-        globals.show_overlay = True
+        debug_manager.debug_draw = False
+        debug_manager.show_overlay = True
 
     debug_manager.draw_fps(view.debug_surface) # draw FPS to debug surface
 

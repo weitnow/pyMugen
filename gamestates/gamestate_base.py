@@ -28,11 +28,6 @@ class GameState(ABC): #ABC is Abstract Base Class
         pass
 
     @abstractmethod
-    def handle_event(self, event):
-        """Handle pygame events."""
-        pass
-
-    @abstractmethod
     def update(self, dt):
         """Update the state logic."""
         pass

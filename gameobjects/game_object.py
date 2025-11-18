@@ -158,24 +158,24 @@ class GameObject:
     # Debug drawing
     # -----------------------
     def draw_debug(self, debug_surface, to_debug_coords):
-        debug = DebugManager()
+        debug_manager = DebugManager()
         scale = globals.DEBUG_SCALE
 
         frame = self.current_anim.get_current_frame() if self.current_anim else None
         offset = self._compute_origin_offset(frame) if frame else pygame.Vector2(0, 0)
 
-        if self.hurtbox and globals.show_hurtboxes:
-            debug.draw_hitbox(debug_surface, self.hurtbox.move(offset),
+        if self.hurtbox and debug_manager.show_hurtboxes:
+            debug_manager.draw_hitbox(debug_surface, self.hurtbox.move(offset),
                               (0, 0, 255, 180), to_debug_coords, scale, self.pos)
 
-        if self.hitbox and globals.show_hitboxes:
-            debug.draw_hitbox(debug_surface, self.hitbox.move(offset),
+        if self.hitbox and debug_manager.show_hitboxes:
+            debug_manager.draw_hitbox(debug_surface, self.hitbox.move(offset),
                               (255, 0, 0, 180), to_debug_coords, scale, self.pos)
 
-        if frame and globals.show_bounding_boxes:
+        if frame and debug_manager.show_bounding_boxes:
             frame_rect = pygame.Rect(
                 self.pos.x + offset.x,
                 self.pos.y + offset.y,
                 *frame.get_size()
             )
-            debug.draw_bounding_box(debug_surface, frame_rect, to_debug_coords, scale, self.origin_center_bottom)
+            debug_manager.draw_bounding_box(debug_surface, frame_rect, to_debug_coords, scale, self.origin_center_bottom)

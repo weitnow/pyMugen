@@ -14,13 +14,3 @@ available_resolutions = [
 ]
 current_resolution_index = 3  # start with 1920x1080
 fullscreen_enabled = False
-
-# --- Debug Settings ---
-show_overlay = True
-debug_draw = True  # enable or disable debug features globally
-show_hitboxes = False
-show_hurtboxes = False
-show_bounding_boxes = False
-show_fps_info = False
-stop_game_for_debugging = False
-# 

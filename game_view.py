@@ -1,6 +1,7 @@
 import pygame
 import globals
 from decorators import singleton
+from debug_manager import DebugManager
 
 @singleton
 class GameView:
@@ -36,6 +37,8 @@ class GameView:
         
         # Reusable rect to avoid recreating
         self.render_rect = pygame.Rect(0, 0, 0, 0)
+
+        self.debug_manager = DebugManager() # get singleton instance an access debug toggles
 
     # --- Internal helper ---
     def _apply_display_mode(self):
@@ -74,7 +77,7 @@ class GameView:
     def draw_to_screen(self):
         window_w, window_h = self.fullscreen.get_size()
         current_window_size = (window_w, window_h)
-        current_overlay_state = globals.show_overlay
+        current_overlay_state = self.debug_manager.show_overlay
         
         # Check if we need to recalculate scaling/positioning
         needs_recalc = (
@@ -87,7 +90,7 @@ class GameView:
             self._last_overlay_state = current_overlay_state
             
             # --- calculate rendering area depending on overlay ---
-            if globals.show_overlay:
+            if self.debug_manager.show_overlay:
                 ow, oh = self.overlay_image.get_size()
                 overlay_scale = window_h / oh
                 overlay_scaled_w = int(ow * overlay_scale)
@@ -140,13 +143,13 @@ class GameView:
         self.fullscreen.fill((0, 0, 0))
         self.fullscreen.blit(scaled_game, (offset_x, offset_y))
 
-        if globals.debug_draw:
+        if self.debug_manager.debug_draw:
             # Scale debug surface (content changes when debug is active)
             debug_scaled = pygame.transform.scale(self.debug_surface, (new_width, new_height))
             debug_scaled.set_alpha(160)
             self.fullscreen.blit(debug_scaled, (offset_x, offset_y))
 
-        if globals.show_overlay:
+        if self.debug_manager.show_overlay:
             # Use cached scaled overlay
             self.fullscreen.blit(self._cached_overlay_scaled, (self._overlay_x, 0))
 

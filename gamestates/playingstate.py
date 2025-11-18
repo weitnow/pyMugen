@@ -1,5 +1,5 @@
 import pygame
-from gamestates.gamestate import GameState
+from gamestates.gamestate_base import GameState
 from gameobjects.fighter import Fighter
 
 class PlayingState(GameState):
@@ -19,11 +19,6 @@ class PlayingState(GameState):
 
     def exit(self):
         pass
-
-
-    def handle_event(self, event):
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            self.manager.change_state("menu")
 
     def update(self, dt):
         self.player.controller.update()

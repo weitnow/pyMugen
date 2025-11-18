@@ -13,6 +13,18 @@ class DebugManager:
         self.fps = 0
         self.frame_time_ms = 0
 
+        # settings
+        self.BOX_THICKNESS = 2
+
+        # --- Debug Toggles ---
+        self.show_overlay = True
+        self.debug_draw = True  # enable or disable debug features globally
+        self.show_hitboxes = False
+        self.show_hurtboxes = False
+        self.show_bounding_boxes = False
+        self.show_fps_info = False
+        self.stop_game_for_debugging = False
+
         # For CPU updates
         self.last_cpu_update_time = 0
         self.cpu_percent = 0
@@ -21,15 +33,15 @@ class DebugManager:
     def handle_input(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_F1:
-                globals.show_hitboxes = not globals.show_hitboxes
+                self.show_hitboxes = not self.show_hitboxes
             elif event.key == pygame.K_F2:
-                globals.show_hurtboxes = not globals.show_hurtboxes
+                self.show_hurtboxes = not self.show_hurtboxes
             elif event.key == pygame.K_F3:
-                globals.show_bounding_boxes = not globals.show_bounding_boxes
+                self.show_bounding_boxes = not self.show_bounding_boxes
             elif event.key == pygame.K_F4:
-                globals.show_fps_info = not globals.show_fps_info
+                self.show_fps_info = not self.show_fps_info
             elif event.key == pygame.K_F5:
-                globals.stop_game_for_debugging = not globals.stop_game_for_debugging
+                self.stop_game_for_debugging = not self.stop_game_for_debugging
 
     def update_timing(self, dt):
         now = time.time()
@@ -40,7 +52,7 @@ class DebugManager:
         self.update_system_info()
 
     def draw_fps(self, surface):
-        if not globals.show_fps_info:
+        if not self.show_fps_info:
             return
 
         process = psutil.Process()
@@ -61,12 +73,12 @@ class DebugManager:
     def draw_hitbox(self, surface, rect: pygame.Rect, color, to_debug_coords, scale, pos):
         x, y = to_debug_coords(rect.x + pos.x, rect.y + pos.y)
         w, h = rect.width * scale, rect.height * scale
-        pygame.draw.rect(surface, color, (x, y, w, h), 2)
+        pygame.draw.rect(surface, color, (x, y, w, h), self.BOX_THICKNESS)
 
     def draw_bounding_box(self, surface, sprite_rect, to_debug_coords, scale, origin_center_bottom=False):
         x, y = to_debug_coords(sprite_rect.x, sprite_rect.y)
         w, h = sprite_rect.width * scale, sprite_rect.height * scale
-        pygame.draw.rect(surface, (255, 255, 0, 120), (x, y, w, h), 1)
+        pygame.draw.rect(surface, (255, 255, 0, 120), (x, y, w, h), self.BOX_THICKNESS)
 
         if origin_center_bottom:
             origin_x = sprite_rect.x + sprite_rect.width / 2

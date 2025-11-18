@@ -1,5 +1,5 @@
 import pygame
-from gamestates.gamestate import GameState
+from gamestates.gamestate_base import GameState
 from gameobjects.fighter import Fighter
 
 
@@ -11,7 +11,7 @@ class PlayingStateStressTest(GameState):
         base_x = 50
         base_y = 100
         spacing = 20
-        count = 800
+        count = 200
 
         for i in range(count):
             x = base_x + i * spacing
@@ -24,10 +24,6 @@ class PlayingStateStressTest(GameState):
 
     def exit(self):
         self.players.clear()
-
-    def handle_event(self, event):
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            self.manager.change_state("menu")
 
     def update(self, dt):
         # update controllers (if any) and physics/animations

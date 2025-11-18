@@ -13,6 +13,7 @@ class Action(Enum):
     UP = auto()
     A = auto()
     B = auto()
+    START = auto()
     
     # Diagonals
     DOWN_RIGHT = auto()
@@ -36,6 +37,7 @@ class InputManager:
                 pygame.K_w: Action.UP,
                 pygame.K_z: Action.A,
                 pygame.K_u: Action.B,
+                pygame.K_RETURN: Action.START,
            
             },
             {  # Player 2
@@ -45,6 +47,7 @@ class InputManager:
                 pygame.K_UP: Action.UP,
                 pygame.K_KP1: Action.A,
                 pygame.K_KP2: Action.B,
+                pygame.K_KP_ENTER: Action.START,
         
             },
         ]
@@ -60,6 +63,7 @@ class InputManager:
         self.button_map = {
             0: Action.A,
             1: Action.B,
+            7: Action.START,
     
         }
 
