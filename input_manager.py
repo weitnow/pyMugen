@@ -13,12 +13,6 @@ class Action(Enum):
     UP = auto()
     A = auto()
     B = auto()
-    X = auto()
-    Y = auto()
-    LB = auto()
-    RB = auto()
-    LT = auto()
-    RT = auto()
     
     # Diagonals
     DOWN_RIGHT = auto()
@@ -42,12 +36,7 @@ class InputManager:
                 pygame.K_w: Action.UP,
                 pygame.K_z: Action.A,
                 pygame.K_u: Action.B,
-                pygame.K_j: Action.X,
-                pygame.K_i: Action.Y,
-                pygame.K_q: Action.LB,
-                pygame.K_e: Action.RB,
-                pygame.K_1: Action.LT,
-                pygame.K_2: Action.RT,
+           
             },
             {  # Player 2
                 pygame.K_RIGHT: Action.RIGHT,
@@ -56,12 +45,7 @@ class InputManager:
                 pygame.K_UP: Action.UP,
                 pygame.K_KP1: Action.A,
                 pygame.K_KP2: Action.B,
-                pygame.K_KP3: Action.X,
-                pygame.K_KP4: Action.Y,
-                pygame.K_KP5: Action.LB,
-                pygame.K_KP6: Action.RB,
-                pygame.K_KP7: Action.LT,
-                pygame.K_KP8: Action.RT,
+        
             },
         ]
 
@@ -76,10 +60,7 @@ class InputManager:
         self.button_map = {
             0: Action.A,
             1: Action.B,
-            2: Action.X,
-            3: Action.Y,
-            4: Action.LB,
-            5: Action.RB,
+    
         }
 
         # State storage per player
@@ -115,13 +96,7 @@ class InputManager:
                 if js.get_button(btn_id):
                     actions.add(action)
 
-            # Triggers
-            lt = js.get_axis(2)
-            rt = js.get_axis(5)
-            if lt > 0.3:
-                actions.add(Action.LT)
-            if rt > 0.3:
-                actions.add(Action.RT)
+           
 
             # D-Pad
             hat_x, hat_y = js.get_hat(0)
