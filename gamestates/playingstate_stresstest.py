@@ -11,7 +11,7 @@ class PlayingStateStressTest(GameState):
         base_x = 50
         base_y = 100
         spacing = 20
-        count = 200
+        count = 1000
 
         for i in range(count):
             x = base_x + i * spacing
@@ -20,6 +20,8 @@ class PlayingStateStressTest(GameState):
             p.get_anim("nesFighter")
             p.set_anim("nesFighter")
             p.set_frame_tag("Idle")
+            p.set_hurtbox(pygame.Rect(5, 10, 20, 30))
+            p.set_hitbox(pygame.Rect(25, 10, 20, 15))
             self.players.append(p)
 
     def exit(self):
