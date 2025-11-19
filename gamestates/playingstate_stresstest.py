@@ -1,6 +1,6 @@
 import pygame
 from gamestates.gamestate_base import GameState
-from gameobjects.fighter import Fighter
+from gameobjects.fighter import Fighter, GameObject
 
 
 class PlayingStateStressTest(GameState):
@@ -11,7 +11,7 @@ class PlayingStateStressTest(GameState):
         base_x = 50
         base_y = 100
         spacing = 20
-        count = 1200
+        count = 1000
 
         for i in range(count):
             x = base_x + i * spacing
@@ -23,6 +23,14 @@ class PlayingStateStressTest(GameState):
             p.set_hurtbox(pygame.Rect(5, 10, 20, 30))
             p.set_hitbox(pygame.Rect(25, 10, 20, 15))
             self.players.append(p)
+
+        # stage
+        stage = GameObject((0, 0))
+        stage.get_anim("stages")
+        stage.set_anim("stages")
+        stage.set_frame_tag("Level")
+
+        self.stage = stage
 
     def exit(self):
         self.players.clear()
@@ -38,6 +46,8 @@ class PlayingStateStressTest(GameState):
             p.update(dt)
 
     def draw(self):
+        self.stage.draw(self.view_manager.game_surface)
+
         for p in self.players:
             p.draw(self.view_manager.game_surface)
 

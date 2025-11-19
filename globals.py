@@ -13,4 +13,4 @@ available_resolutions = [
     (1920, 1080)
 ]
 current_resolution_index = 3  # start with 1920x1080
-fullscreen_enabled = False
+fullscreen_enabled = True

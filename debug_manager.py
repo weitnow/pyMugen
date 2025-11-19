@@ -14,8 +14,8 @@ class DebugManager:
         self.BOX_THICKNESS = 2
         
         # --- Debug Toggles ---
-        self.show_overlay = True
-        self.debug_on = False
+        self.show_overlay = False
+        self.debug_on = True
         self.stop_game_for_debugging = False
         self.SHOW_HITBOXES = True
         self.SHOW_HURTBOXES = True

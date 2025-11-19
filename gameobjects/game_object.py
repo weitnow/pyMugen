@@ -7,59 +7,81 @@ from debug_manager import DebugManager
 
 class GameObject:
     def __init__(self, pos: tuple[float, float], rotatable: bool = False):
+        # Transform
         self.pos = pygame.Vector2(pos)
+        self.vel = pygame.Vector2(0, 0)
+        self.current_angle = 0
+        self.flip_x = False
+        self.flip_y = False
+        
+        # State
         self.visible = True
         self.active = True
         self.rotatable = rotatable
-
-        # Physics
-        self.vel = pygame.Vector2(0, 0)
         self.on_ground = True
+        self.origin_center_bottom = False
+
+        # Physics constants
         self.speed = 0.1
         self.jump_velocity = -0.4
-        self.gravity =0.001 # TODO: move to globals or physics manager
-        self.ground_y = 140  # TODO: move to globals or physics manager
+        self.gravity = 0.001  # TODO: move to globals or physics manager
+        self.ground_y = 140   # TODO: move to globals or physics manager
         
+        # Animation
         self.animations: dict[str, AnimationData] = {}
         self.current_anim: AnimationData | None = None
 
+        # Collision
         self.hurtbox: pygame.Rect | None = None
         self.hitbox: pygame.Rect | None = None
 
-        self.origin_center_bottom: bool = False
-
-        # Rotation handled centrally via ResourceManager shared cache
-        self.rotation_cache: dict[int, pygame.Surface] = {}
-        self.flip_x = False
-        self.flip_y = False
-        self.current_angle = 0  # in degrees
+        # Cache for fallback rotation (rarely used)
+        self.rotation_cache: dict[tuple, pygame.Surface] = {}
+        
+        # Cached resource manager reference
+        self._rm = ResourceManager()
+        self._debug_manager = DebugManager()
 
     # -----------------------
     # Animation Management
     # -----------------------
-    def get_anim(self, name: str):
-        rm = ResourceManager()
+    def get_anim(self, name: str) -> AnimationData:
+        """Get or create animation instance."""
         if name not in self.animations:
-            self.animations[name] = rm.get_animation_instance(name)
+            self.animations[name] = self._rm.get_animation_instance(name)
         return self.animations[name]
 
-    def set_anim(self, name: str):
+    def set_anim(self, name: str) -> bool:
+        """Set current animation. Returns True if successful."""
         if name in self.animations:
             self.current_anim = self.animations[name]
+            return True
+        return False
 
     def set_frame_tag(self, tag_name: str):
+        """Set animation to specific tag."""
         if self.current_anim:
             self.current_anim.set_tag(tag_name)
 
     def set_frame(self, frame_index: int):
+        """Set animation to specific frame."""
         if self.current_anim:
             self.current_anim.set_frame(frame_index)
 
+    # -----------------------
+    # Update
+    # -----------------------
     def update(self, dt: int):
+        """Update physics and animation."""
         if not self.active:
             return
         
-        # Gravity
+        self._update_physics(dt)
+        self._update_animation(dt)
+
+    def _update_physics(self, dt: int):
+        """Handle gravity and ground collision."""
+        # Apply gravity
         self.vel.y += self.gravity * dt
         self.pos.y += self.vel.y * dt
 
@@ -69,27 +91,27 @@ class GameObject:
             self.vel.y = 0
             self.on_ground = True
 
-        
+    def _update_animation(self, dt: int):
+        """Update current animation frame."""
         if self.current_anim:
             self.current_anim.update(dt)
 
     # -----------------------
     # Rotation + Flipping
     # -----------------------
-    def _build_rotation_cache(self, anim: AnimationData):
-        # legacy per-object precompute kept for compatibility but not used by default.
-        # Prefer using ResourceManager.get_rotated_frame(shared cache) instead.
-        pass
-
     def set_rotation(self, angle: float):
-        """Set the object’s rotation angle, snapped to nearest 45°."""
+        """Set rotation angle in 45° increments."""
         if not self.rotatable:
             return
-        # check input angle, can only be in 45 degree increments
-        assert angle % 45 == 0, "Angle must be in 45 degree increments"
+        
+        # Validate angle is in 45° increments
+        if angle % 45 != 0:
+            raise ValueError("Angle must be in 45 degree increments")
+        
         self.current_angle = (round(angle / 45) * 45) % 360
 
     def set_flip(self, flip_x: bool = False, flip_y: bool = False):
+        """Set horizontal and/or vertical flip."""
         self.flip_x = flip_x
         self.flip_y = flip_y
 
@@ -97,85 +119,133 @@ class GameObject:
     # Origin / Positioning
     # -----------------------
     def _compute_origin_offset(self, image: pygame.Surface) -> pygame.Vector2:
-        offset = pygame.Vector2(0, 0)
-        if self.origin_center_bottom:
-            w, h = image.get_size()
-            offset.x = -w / 2
-            offset.y = -h
-        return offset
+        """Calculate offset based on origin mode."""
+        if not self.origin_center_bottom:
+            return pygame.Vector2(0, 0)
+        
+        w, h = image.get_size()
+        return pygame.Vector2(-w / 2, -h)
 
     def get_draw_position(self, image: pygame.Surface) -> pygame.Vector2:
+        """Get final draw position with origin offset applied."""
         return self.pos + self._compute_origin_offset(image)
 
     # -----------------------
     # Drawing
     # -----------------------
     def draw(self, surface: pygame.Surface):
-        if not self.visible or not self.current_anim or not self.active:
+        """Draw the game object."""
+        if not self._should_draw():
             return
 
+        frame = self._get_transformed_frame()
+        if frame:
+            surface.blit(frame, self.get_draw_position(frame))
+
+    def _should_draw(self) -> bool:
+        """Check if object should be drawn."""
+        return self.visible and self.active and self.current_anim is not None
+
+    def _get_transformed_frame(self) -> pygame.Surface | None:
+        """Get current frame with rotation/flip applied."""
+        if not self.current_anim:
+            return None
+
         frame = self.current_anim.get_current_frame()
-
-        # If rotatable, fetch from cache
+        
+        # Handle rotation (uses shared cache via ResourceManager)
         if self.rotatable:
-            frame_idx = self.current_anim.current_frame_idx
-            rm = ResourceManager()
-            base_name = getattr(self.current_anim, "base_name", None)
-            if base_name is not None:
-                frame = rm.get_rotated_frame(base_name, frame_idx, self.current_angle, self.flip_x, self.flip_y)
-            else:
-                # fallback: rotate on-the-fly (cached per-object) if we don't know anim name
-                key = (frame_idx, self.current_angle, self.flip_x, self.flip_y)
-                if key not in self.rotation_cache:
-                    rotated = pygame.transform.rotate(frame, self.current_angle)
-                    if self.flip_x or self.flip_y:
-                        rotated = pygame.transform.flip(rotated, self.flip_x, self.flip_y)
-                    self.rotation_cache[key] = rotated
-                frame = self.rotation_cache[key]
-
+            frame = self._get_rotated_frame(frame)
+        # Handle flipping
         elif self.flip_x or self.flip_y:
             frame = pygame.transform.flip(frame, self.flip_x, self.flip_y)
 
-        surface.blit(frame, self.get_draw_position(frame))
+        return frame
+
+    def _get_rotated_frame(self, base_frame: pygame.Surface) -> pygame.Surface:
+        """Get rotated frame from cache or generate it."""
+        frame_idx = self.current_anim.current_frame_idx
+        base_name = getattr(self.current_anim, "base_name", None)
+        
+        # Try to use shared ResourceManager cache
+        if base_name is not None:
+            return self._rm.get_rotated_frame(
+                base_name, frame_idx, self.current_angle, self.flip_x, self.flip_y
+            )
+        
+        # Fallback: use per-object cache
+        return self._get_rotated_frame_fallback(base_frame, frame_idx)
+
+    def _get_rotated_frame_fallback(self, frame: pygame.Surface, frame_idx: int) -> pygame.Surface:
+        """Fallback rotation using per-object cache."""
+        cache_key = (frame_idx, self.current_angle, self.flip_x, self.flip_y)
+        
+        if cache_key not in self.rotation_cache:
+            rotated = pygame.transform.rotate(frame, self.current_angle)
+            if self.flip_x or self.flip_y:
+                rotated = pygame.transform.flip(rotated, self.flip_x, self.flip_y)
+            self.rotation_cache[cache_key] = rotated
+        
+        return self.rotation_cache[cache_key]
 
     # -----------------------
     # Hitbox / Hurtbox
     # -----------------------
     def set_hitbox(self, rect: pygame.Rect, relative_to_origin: bool = True):
+        """Set hitbox rectangle."""
         self.hitbox = self._store_relative_rect(rect, relative_to_origin)
 
     def set_hurtbox(self, rect: pygame.Rect, relative_to_origin: bool = True):
+        """Set hurtbox rectangle."""
         self.hurtbox = self._store_relative_rect(rect, relative_to_origin)
 
     def _store_relative_rect(self, rect: pygame.Rect, relative_to_origin: bool) -> pygame.Rect:
+        """Store rect relative to origin if needed."""
         if relative_to_origin:
             return rect.copy()
-        else:
-            offset = self._compute_origin_offset(self.current_anim.get_current_frame())
-            return rect.move(-offset)
+        
+        if not self.current_anim:
+            return rect.copy()
+        
+        offset = self._compute_origin_offset(self.current_anim.get_current_frame())
+        return rect.move(-int(offset.x), -int(offset.y))
 
     # -----------------------
-    # Debug drawing
+    # Debug Drawing
     # -----------------------
-    def draw_debug(self, debug_surface, to_debug_coords):
-        debug_manager = DebugManager()
-        scale = globals.DEBUG_SCALE
+    def draw_debug(self, debug_surface: pygame.Surface, to_debug_coords):
+        """Draw debug overlays for hitboxes and bounding boxes."""
+        if not self._debug_manager.debug_on:
+            return
 
         frame = self.current_anim.get_current_frame() if self.current_anim else None
         offset = self._compute_origin_offset(frame) if frame else pygame.Vector2(0, 0)
+        scale = globals.DEBUG_SCALE
 
-        if self.hurtbox and debug_manager.SHOW_HURTBOXES:
-            debug_manager.draw_hitbox(debug_surface, self.hurtbox.move(offset),
-                              (0, 0, 255, 180), to_debug_coords, scale, self.pos)
-
-        if self.hitbox and debug_manager.SHOW_HITBOXES:
-            debug_manager.draw_hitbox(debug_surface, self.hitbox.move(offset),
-                              (255, 0, 0, 180), to_debug_coords, scale, self.pos)
-
-        if frame and debug_manager.SHOW_BOUNDING_BOXES:
+        # Draw bounding box
+        if frame and self._debug_manager.SHOW_BOUNDING_BOXES:
             frame_rect = pygame.Rect(
                 self.pos.x + offset.x,
                 self.pos.y + offset.y,
                 *frame.get_size()
             )
-            debug_manager.draw_bounding_box(debug_surface, frame_rect, to_debug_coords, scale, self.origin_center_bottom)
+            self._debug_manager.draw_bounding_box(
+                debug_surface, frame_rect, to_debug_coords,
+                scale, self.origin_center_bottom
+            )
+
+        # Draw hurtbox
+        if self.hurtbox and self._debug_manager.SHOW_HURTBOXES:
+            adjusted_rect = self.hurtbox.move(int(offset.x), int(offset.y))
+            self._debug_manager.draw_hitbox(
+                debug_surface, adjusted_rect, (0, 0, 255, 180),
+                to_debug_coords, scale, self.pos
+            )
+
+        # Draw hitbox
+        if self.hitbox and self._debug_manager.SHOW_HITBOXES:
+            adjusted_rect = self.hitbox.move(int(offset.x), int(offset.y))
+            self._debug_manager.draw_hitbox(
+                debug_surface, adjusted_rect, (255, 0, 0, 180),
+                to_debug_coords, scale, self.pos
+            )

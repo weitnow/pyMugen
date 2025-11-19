@@ -1,6 +1,6 @@
 import pygame
 from gamestates.gamestate_base import GameState
-from gameobjects.fighter import Fighter
+from gameobjects.fighter import Fighter, GameObject
 
 class PlayingState(GameState):
 
@@ -12,10 +12,18 @@ class PlayingState(GameState):
         player.set_anim("nesFighter")
         player.set_frame_tag("Idle")
 
-        player.set_hurtbox(pygame.Rect(5, 10, 20, 30))
-        player.set_hitbox(pygame.Rect(25, 10, 20, 15))
+        player.set_hurtbox(pygame.Rect(0, 0, 24, 32))
+        player.set_hitbox(pygame.Rect(27, 10, 5, 5))
 
         self.player = player
+
+        # stage
+        stage = GameObject((0, 0))
+        stage.get_anim("stages")
+        stage.set_anim("stages")
+        stage.set_frame_tag("Level")
+
+        self.stage = stage
 
     def exit(self):
         pass
@@ -23,6 +31,7 @@ class PlayingState(GameState):
     def update(self, dt):
         self.player.controller.update()
         self.player.update(dt)
+        self.stage.update(dt)
 
         # --- Input Handling ---
         # Player 1
@@ -34,6 +43,7 @@ class PlayingState(GameState):
         #just_pressed_p2 = input_manager.get_just_pressed_actions(1)
 
     def draw(self):
+        self.stage.draw(self.view_manager.game_surface)
         self.player.draw(self.view_manager.game_surface)
 
     def debug_draw(self): #optional
