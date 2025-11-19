@@ -5,7 +5,7 @@ from resource_manager import ResourceManager, AnimationData
 
 class Sprite:
     def __init__(self, pos=(0, 0), rotatable=False):
-        self.pos = pygame.Vector2(pos)
+        self.position = pygame.Vector2(pos) 
         self.flip_x = False
         self.flip_y = False
         self.rotatable = rotatable
@@ -84,7 +84,7 @@ class Sprite:
 
         frame = self._get_transformed_frame()
         if frame:
-            surface.blit(frame, self.pos)
+            surface.blit(frame, self.position)
 
     def _get_transformed_frame(self) -> pygame.Surface | None:
         """Get current frame with rotation/flip applied."""
