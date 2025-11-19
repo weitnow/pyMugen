@@ -9,8 +9,8 @@ class PlayingState(GameState):
         player = Fighter((100, 100), 0) # 0 = player index = player 1 TODO: refactor this
         player.get_anim("gbFighter")
         player.get_anim("nesFighter")
-        player.set_anim("nesFighter")
-        player.set_frame_tag("Idle")
+        player.set_anim("gbFighter")
+        player.set_frame_tag("Walk")
 
         player.set_hurtbox(pygame.Rect(0, 0, 24, 32))
         player.set_hitbox(pygame.Rect(27, 10, 5, 5))

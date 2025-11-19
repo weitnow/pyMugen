@@ -4,7 +4,7 @@ from typing import Dict, List
 from decorators import singleton
 
 class AnimationData:
-    def __init__(self, frames: Dict[int, pygame.Surface], durations: Dict[int, int] = None, tags: List[dict] = None):
+    def __init__(self, frames: Dict[int, pygame.Surface], durations: Dict[int, int] = None, tags: Dict[str, dict] = None):
 
         # self.frames is a dict mapping frame index to Surface
         self.frames = frames                # int -> Surface
@@ -17,14 +17,16 @@ class AnimationData:
         self.playing = False
 
     # --- TAG-BASED ANIMATION ---
-    def set_tag(self, tag_name: str):
-        for tag in self.tags:
-            if tag["name"] == tag_name:
-                self.current_tag = tag
-                self.current_frame_idx = tag["from"]
-                self.timer = 0
-                self.playing = True
-                return
+    def set_tag(self, tag_name):
+        try:
+            self.current_tag = self.tags[tag_name]
+        except KeyError:
+            return
+
+        self.current_frame_idx = self.current_tag["from"]
+        self.timer = 0
+        self.playing = True
+
 
     # --- FRAME-BASED ANIMATION (for spritesheets without tags) ---
     def set_frame(self, frame_idx: int):
@@ -81,7 +83,19 @@ class ResourceManager:
             frames[idx] = spritesheet.subsurface(rect).copy()
             durations[idx] = v.get("duration", 100)
 
-        tags = data.get("meta", {}).get("frameTags", [])
+        #load frameTags
+        tags_list = data.get("meta", {}).get("frameTags", [])
+
+        # --- enforce unique tag names and convert them to a dict ---
+        seen = set()
+        tags = {}
+
+        for tag in tags_list:
+            tag_name = tag["name"]   # <--- use a different variable
+            if tag_name in seen:
+                raise ValueError(f"Duplicate tag name '{tag_name}' in spritesheet '{name}'")
+            seen.add(tag_name)
+            tags[tag_name] = tag
 
         self.animations[name] = {
             "frames": frames,
@@ -99,7 +113,7 @@ class ResourceManager:
         self.animations[name] = {
             "frames": {0: image},
             "durations": {0: 0},
-            "tags": []
+            "tags": {}
         }
 
     def get_animation_instance(self, name: str) -> "AnimationData":
