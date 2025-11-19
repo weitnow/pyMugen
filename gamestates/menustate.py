@@ -7,11 +7,11 @@ class MenuState(GameState):
 
     def enter(self):
         #create a sprite
-        mySprite = Sprite((50,50))
+        mySprite = Sprite()
         mySprite.get_anim("nesFighter")
         mySprite.set_anim("nesFighter")
         mySprite.set_frame_tag("Idle")
-        mySprite.set_frame(1)
+
 
 
         self.mySprite = mySprite
@@ -31,7 +31,7 @@ class MenuState(GameState):
         text = font.render("MENU - Press Enter", True, (255, 255, 255))
         self.view_manager.game_surface.blit(text, (0, 0))
 
-        self.mySprite.draw(self.view_manager.game_surface)
+        self.mySprite.draw(self.view_manager.game_surface, world_pos=(50, 50))
 
 
     def _input_handling(self):

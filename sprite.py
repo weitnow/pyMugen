@@ -4,18 +4,17 @@ from resource_manager import ResourceManager, AnimationData
 
 
 class Sprite:
-    def __init__(self, pos=(0, 0), rotatable=False):
-        self.position = pygame.Vector2(pos) 
+    def __init__(self, rotatable=False):
+        self.rotatable = rotatable
+        self.current_angle = 0
         self.flip_x = False
         self.flip_y = False
-        self.rotatable = rotatable
-        self.rotation = 0
+
+        self.offset = pygame.Vector2(0, 0)
 
         self._rm = ResourceManager()
-
-        # Animation
-        self.animations: dict[str, AnimationData] = {}
-        self.current_anim: AnimationData | None = None
+        self.animations = {}
+        self.current_anim = None
 
 
     # ---------------------
@@ -78,13 +77,13 @@ class Sprite:
     # ---------------------
     # Drawing
     # ---------------------
-    def draw(self, surface: pygame.Surface):
+    def draw(self, surface, world_pos):
         if not self.current_anim:
             return
 
         frame = self._get_transformed_frame()
         if frame:
-            surface.blit(frame, self.position)
+            surface.blit(frame, world_pos)
 
     def _get_transformed_frame(self) -> pygame.Surface | None:
         """Get current frame with rotation/flip applied."""
