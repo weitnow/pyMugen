@@ -6,23 +6,27 @@ from gameobjects.fighter import Fighter, GameObject
 class PlayingStateStressTest(GameState):
 
     def enter(self):
-        # Create 200 fighter instances spaced by 20px in X
+       
         self.players = []
         base_x = 50
         base_y = 100
         spacing = 20
-        count = 1000
+        count = 1200
 
         for i in range(count):
             x = base_x + i * spacing
             p = Fighter((x, base_y), 0)
             p.get_anim("gbFighter")
             p.get_anim("nesFighter")
-            p.set_anim("nesFighter")
+            p.set_anim("gbFighter")
             p.set_frame_tag("Idle")
             p.set_hurtbox(pygame.Rect(5, 10, 20, 30))
             p.set_hitbox(pygame.Rect(25, 10, 20, 15))
             self.players.append(p)
+
+        #rotate some players for testing
+        for i in range(0, count, 20):
+            self.players[i].set_rotation(90)
 
         # stage
         stage = GameObject((0, 0))

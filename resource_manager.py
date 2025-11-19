@@ -5,9 +5,11 @@ from decorators import singleton
 
 class AnimationData:
     def __init__(self, frames: Dict[int, pygame.Surface], durations: Dict[int, int] = None, tags: List[dict] = None):
-        self.frames = frames                     # int -> Surface
-        self.durations = durations or {i: 100 for i in frames}   # fallback 100ms
-        self.tags = tags or []                   # list of {"name": str, "from": int, "to": int}
+
+        # self.frames is a dict mapping frame index to Surface
+        self.frames = frames                # int -> Surface
+        self.durations = durations              # int -> duration in ms
+        self.tags = tags                            # list of {"name": str, "from": int, "to": int}
 
         self.current_tag = None
         self.current_frame_idx = 0
@@ -33,8 +35,7 @@ class AnimationData:
         self.current_tag = None
         self.timer = 0
         self.playing = False
-
-            
+   
 
     def update(self, dt: int):
         if self.current_tag and self.playing:
@@ -59,7 +60,7 @@ class ResourceManager:
 
     def load_spritesheet(self, name: str, image_path: str, json_path: str):
         if name in self.animations:
-            return
+            raise ValueError(f"Spritesheet with name '{name}' already loaded.")
 
         with open(json_path, "r") as f:
             data = json.load(f)
@@ -91,7 +92,7 @@ class ResourceManager:
     # --- SINGLE PNG ---
     def load_png(self, name: str, image_path: str):
         if name in self.animations:
-            return
+            raise ValueError(f"Spritesheet with name '{name}' already loaded.")
 
         image = pygame.image.load(image_path).convert_alpha()
 

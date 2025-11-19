@@ -10,14 +10,14 @@ class GameObject:
         # Transform
         self.pos = pygame.Vector2(pos)
         self.vel = pygame.Vector2(0, 0)
-        self.current_angle = 0
+        self.current_angle = 0  # use set_rotation() to change
         self.flip_x = False
         self.flip_y = False
         
         # State
-        self.visible = True
-        self.active = True
-        self.rotatable = rotatable
+        self.visible = True     # call draw() or not
+        self.active = True      # call update() or not
+        self.rotatable = rotatable 
         self.on_ground = True
         self.origin_center_bottom = False
 
@@ -28,15 +28,12 @@ class GameObject:
         self.ground_y = 140   # TODO: move to globals or physics manager
         
         # Animation
-        self.animations: dict[str, AnimationData] = {}
-        self.current_anim: AnimationData | None = None
+        self.animations: dict[str, AnimationData] = {}      # holds AniationDate for example gbFighter, nesFighter, etc.
+        self.current_anim: AnimationData | None = None      # current AnimationData being used
 
         # Collision
         self.hurtbox: pygame.Rect | None = None
         self.hitbox: pygame.Rect | None = None
-
-        # Cache for fallback rotation (rarely used)
-        self.rotation_cache: dict[tuple, pygame.Surface] = {}
         
         # Cached resource manager reference
         self._rm = ResourceManager()
@@ -56,6 +53,8 @@ class GameObject:
         if name in self.animations:
             self.current_anim = self.animations[name]
             return True
+        #log a warning here
+        print(f"Warning: Animation '{name}' not found in GameObject.")
         return False
 
     def set_frame_tag(self, tag_name: str):
@@ -102,7 +101,7 @@ class GameObject:
     def set_rotation(self, angle: float):
         """Set rotation angle in 45° increments."""
         if not self.rotatable:
-            return
+            raise ValueError("This GameObject is not rotatable.")
         
         # Validate angle is in 45° increments
         if angle % 45 != 0:
@@ -167,26 +166,9 @@ class GameObject:
         frame_idx = self.current_anim.current_frame_idx
         base_name = getattr(self.current_anim, "base_name", None)
         
-        # Try to use shared ResourceManager cache
-        if base_name is not None:
-            return self._rm.get_rotated_frame(
-                base_name, frame_idx, self.current_angle, self.flip_x, self.flip_y
-            )
-        
-        # Fallback: use per-object cache
-        return self._get_rotated_frame_fallback(base_frame, frame_idx)
-
-    def _get_rotated_frame_fallback(self, frame: pygame.Surface, frame_idx: int) -> pygame.Surface:
-        """Fallback rotation using per-object cache."""
-        cache_key = (frame_idx, self.current_angle, self.flip_x, self.flip_y)
-        
-        if cache_key not in self.rotation_cache:
-            rotated = pygame.transform.rotate(frame, self.current_angle)
-            if self.flip_x or self.flip_y:
-                rotated = pygame.transform.flip(rotated, self.flip_x, self.flip_y)
-            self.rotation_cache[cache_key] = rotated
-        
-        return self.rotation_cache[cache_key]
+        # Use shared ResourceManager cache
+        return self._rm.get_rotated_frame(base_name, frame_idx, self.current_angle, self.flip_x, self.flip_y)
+            
 
     # -----------------------
     # Hitbox / Hurtbox
