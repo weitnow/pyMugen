@@ -10,7 +10,6 @@ from gamestate_manager import GameStateManager
 # --- Import all States ---
 from gamestates.menustate import MenuState
 from gamestates.playingstate import PlayingState
-from gamestates.playingstate_stresstest import PlayingStateStressTest
 
 # --- Initialize ---
 pygame.init()
@@ -37,7 +36,6 @@ resource_manager.load_spritesheet("stages", "assets/Graphics/Aseprite/stages.png
 # --- Register Game States ---
 gamestate_manager.add_state("menu", MenuState())
 gamestate_manager.add_state("playing", PlayingState())
-gamestate_manager.add_state("playing_stresstest", PlayingStateStressTest())
 
 gamestate_manager.change_state("menu") # start in playing state
 
@@ -57,6 +55,8 @@ while running:
         debug_manager.handle_input(event)
         if event.type == pygame.KEYDOWN and event.key == pygame.K_F4:
             view_manager.toggle_fullscreen()
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_F5:
+            view_manager.cycle_resolution()                         
 
     # --- Update CORE-Systems ---
     debug_manager.update(dt)

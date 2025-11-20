@@ -14,21 +14,23 @@ class PlayingState(GameState):
 
     def enter(self):
         # --- Create Fighter ---
-        player = Fighter((100, 100), player_index=0)
+        player = GameObject((100, 100))
 
         # Create Sprite for the fighter
-        sprite = Sprite(rotatable=True)
+        sprite = Sprite()
         # load the animation
-        sprite.get_anim("gbFighter")
+        sprite.load_anim("gbFighter")
         sprite.set_anim("gbFighter")
-        sprite.set_frame_tag("Walk")
+        sprite.set_frame_tag("Idle")
 
         # Attach sprite to the player GameObject
         player.add_sprite(sprite)
 
+
+
         # Setup hitbox / hurtbox
-        player.set_hurtbox(pygame.Rect(0, 0, 24, 32))
-        player.set_hitbox(pygame.Rect(27, 10, 5, 5))
+        player.set_hurtbox(pygame.Rect(0, 0, 32, 32))
+        player.set_hitbox(pygame.Rect(10, 10, 5, 5))
 
         self.player = player
 
@@ -36,7 +38,6 @@ class PlayingState(GameState):
         pass
 
     def update(self, dt):
-        self.player.controller.update()
         self.player.update(dt)
 
     def draw(self):

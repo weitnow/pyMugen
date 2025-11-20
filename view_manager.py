@@ -6,26 +6,36 @@ from debug_manager import DebugManager
 @singleton
 class ViewManager:
     def __init__(self):
-        self.base_width = globals.GAME_RES[0]
-        self.base_height = globals.GAME_RES[1]
-        self.debug_scale = globals.DEBUG_SCALE
-        
-        # Pre-calculate aspect ratio
-        self.game_aspect = self.base_width / self.base_height
+        self.GAME_VIEW_WIDTH = 209      
+        self.GAME_VIEW_HEIGHT = 155
+        self.OVERLAY_VIEWPORT = (145, 25, 209, 155)       # overlay transparent area (x, y, width, height)
+        self.DEBUG_SCALE = 8            # scale factor for debug view
+        self.AVAILABLE_RESOLUTIONS = [
+            (640, 360),
+            (960, 540),
+            (1280, 720),
+            (1920, 1080)
+        ]
+        self.current_resolution_index = 3  # start with 1920x1080
+        self.fullscreen_enabled = True
 
-        # create base surfaces
-        self.game_surface = pygame.Surface((self.base_width, self.base_height))
+
+        # Game and Debug surfaces, open for public access
+        self.game_surface = pygame.Surface((self.GAME_VIEW_WIDTH, self.GAME_VIEW_HEIGHT))
         self.debug_surface = pygame.Surface(
-            (self.base_width * self.debug_scale, self.base_height * self.debug_scale), 
+            (self.GAME_VIEW_WIDTH * self.DEBUG_SCALE, self.GAME_VIEW_HEIGHT * self.DEBUG_SCALE), 
             pygame.SRCALPHA
         )
+
+        # Pre-calculate aspect ratio
+        self._game_aspect = self.GAME_VIEW_WIDTH / self.GAME_VIEW_HEIGHT
 
         # create initial window
         self._apply_display_mode()
 
         # overlay
         self.overlay_image = pygame.image.load("assets/Graphics/Aseprite/overlay.png").convert_alpha()
-        self.overlay_screen_rect = pygame.Rect(*globals.OVERLAY_VIEWPORT)
+        self.overlay_screen_rect = pygame.Rect(*self.OVERLAY_VIEWPORT)
         
         # Cache for scaled surfaces and calculations
         self._cached_overlay_scaled = None
@@ -46,13 +56,13 @@ class ViewManager:
 
     # --- Internal helper ---
     def _apply_display_mode(self):
-        if globals.fullscreen_enabled:
+        if self.fullscreen_enabled:
             self.fullscreen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         else:
-            width, height = globals.available_resolutions[globals.current_resolution_index]
+            width, height = self.AVAILABLE_RESOLUTIONS[self.current_resolution_index]
             self.fullscreen = pygame.display.set_mode((width, height))
         self.screen_rect = self.fullscreen.get_rect()
-        pygame.display.set_caption(f"Game View - {'Fullscreen' if globals.fullscreen_enabled else f'{self.fullscreen.get_width()}x{self.fullscreen.get_height()}'}")
+        pygame.display.set_caption(f"Game View - {'Fullscreen' if self.fullscreen_enabled else f'{self.fullscreen.get_width()}x{self.fullscreen.get_height()}'}")
         
         # Invalidate cache on mode change
         self._last_window_size = None
@@ -60,18 +70,18 @@ class ViewManager:
 
     # --- Toggle fullscreen/windowed ---
     def toggle_fullscreen(self):
-        globals.fullscreen_enabled = not globals.fullscreen_enabled
+        self.fullscreen_enabled = not self.fullscreen_enabled
         self._apply_display_mode()
 
     # --- Cycle through resolutions ---
     def cycle_resolution(self):
-        if not globals.fullscreen_enabled:
-            globals.current_resolution_index = (globals.current_resolution_index + 1) % len(globals.available_resolutions)
+        if not self.fullscreen_enabled:
+            self.current_resolution_index = (self.current_resolution_index + 1) % len(self.AVAILABLE_RESOLUTIONS)
             self._apply_display_mode()
 
     # --- Convert GameView coordinates to DebugView ---
     def to_debug_coords(self, x: float, y: float):
-        return x * self.debug_scale, y * self.debug_scale
+        return x * self.DEBUG_SCALE, y * self.DEBUG_SCALE
     
     def clear(self):
         self.game_surface.fill((30, 30, 30))    #TODO: make bg color configurable
@@ -119,16 +129,16 @@ class ViewManager:
             # --- scaling calculations ---
             target_aspect = self.render_rect.w / self.render_rect.h
 
-            if target_aspect > self.game_aspect:
-                scale = self.render_rect.h / self.base_height
-                new_width = int(self.base_width * scale)
+            if target_aspect > self._game_aspect:
+                scale = self.render_rect.h / self.GAME_VIEW_HEIGHT
+                new_width = int(self.GAME_VIEW_WIDTH * scale)
                 new_height = self.render_rect.h
                 offset_x = self.render_rect.x + (self.render_rect.w - new_width) // 2
                 offset_y = self.render_rect.y
             else:
-                scale = self.render_rect.w / self.base_width
+                scale = self.render_rect.w / self.GAME_VIEW_WIDTH
                 new_width = self.render_rect.w
-                new_height = int(self.base_height * scale)
+                new_height = int(self.GAME_VIEW_HEIGHT * scale)
                 offset_x = self.render_rect.x
                 offset_y = self.render_rect.y + (self.render_rect.h - new_height) // 2
             

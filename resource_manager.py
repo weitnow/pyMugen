@@ -4,12 +4,13 @@ from typing import Dict, List
 from decorators import singleton
 
 class AnimationData:
-    def __init__(self, frames: Dict[int, pygame.Surface], durations: Dict[int, int] = None, tags: Dict[str, dict] = None):
+    def __init__(self, frames: Dict[int, pygame.Surface], durations: Dict[int, int] = None, tags: Dict[str, dict] = None, sprite_size: tuple = (0,0)):
 
         # self.frames is a dict mapping frame index to Surface
         self.frames = frames                # int -> Surface
         self.durations = durations              # int -> duration in ms
-        self.tags = tags                            # list of {"name": str, "from": int, "to": int}
+        self.tags = tags                       # list of {"name": str, "from": int, "to": int}
+        self.sprite_size = sprite_size                   # (width, height)
 
         self.current_tag = None
         self.current_frame_idx = 0
@@ -83,6 +84,10 @@ class ResourceManager:
             frames[idx] = spritesheet.subsurface(rect).copy()
             durations[idx] = v.get("duration", 100)
 
+        #getting sprite size of first frame, because all frames should be the same size
+        sprite_w = data["frames"]["0"]["frame"]["w"]
+        sprite_h = data["frames"]["0"]["frame"]["h"]
+
         #load frameTags
         tags_list = data.get("meta", {}).get("frameTags", [])
 
@@ -100,7 +105,8 @@ class ResourceManager:
         self.animations[name] = {
             "frames": frames,
             "durations": durations,
-            "tags": tags
+            "tags": tags,
+            "sprite_size": (sprite_w, sprite_h)
         }
 
     # --- SINGLE PNG ---
@@ -113,7 +119,8 @@ class ResourceManager:
         self.animations[name] = {
             "frames": {0: image},
             "durations": {0: 0},
-            "tags": {}
+            "tags": {},
+            "sprite_size": image.get_size()
         }
 
     def get_animation_instance(self, name: str) -> "AnimationData":
@@ -121,7 +128,8 @@ class ResourceManager:
         anim = AnimationData(
             base["frames"],
             base["durations"],
-            base["tags"]
+            base["tags"],
+            base["sprite_size"]
         )
         anim.base_name = name
         return anim
@@ -129,7 +137,7 @@ class ResourceManager:
     def get_rotated_frame(self, anim_name: str, frame_idx: int,
                           angle: int, flip_x: bool = False, flip_y: bool = False):
 
-        key = (anim_name, frame_idx, angle % 360, flip_x, flip_y)
+        key = (anim_name, frame_idx, angle, flip_x, flip_y)
 
         if key in self._rotation_cache:
             return self._rotation_cache[key]
@@ -137,10 +145,17 @@ class ResourceManager:
         base = self.animations[anim_name]
         frame = base["frames"][frame_idx]
 
+        # Rotate around center
         rotated = pygame.transform.rotate(frame, angle)
+        rect = rotated.get_rect(center=frame.get_rect().center)
 
+        # Create a new surface to hold the rotated image
+        final_surf = pygame.Surface(rect.size, pygame.SRCALPHA)
+        final_surf.blit(rotated, rect.topleft)
+
+        # Apply flipping if needed
         if flip_x or flip_y:
-            rotated = pygame.transform.flip(rotated, flip_x, flip_y)
+            final_surf = pygame.transform.flip(final_surf, flip_x, flip_y)
 
-        self._rotation_cache[key] = rotated
-        return rotated
+        self._rotation_cache[key] = final_surf
+        return final_surf

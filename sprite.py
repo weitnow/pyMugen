@@ -1,110 +1,150 @@
-# sprite.py
 import pygame
 from resource_manager import ResourceManager, AnimationData
-
+from debug_manager import DebugManager
 
 class Sprite:
-    def __init__(self, rotatable=False):
-        self.rotatable = rotatable
-        self.current_angle = 0
-        self.flip_x = False
-        self.flip_y = False
 
-        self.offset = pygame.Vector2(0, 0)
+    def __init__(self):
+        # PUBLIC attributes (with property access)
+        self._flip_x: bool = False
+        self._flip_y: bool = False
+        self._offset: pygame.Vector2 = pygame.Vector2(0, 0)
+        self._rotation: int = 0
+        
+        # PUBLIC read-only attributes
+        self.sprite_size = (0, 0)  # (width, height)
 
-        self._rm = ResourceManager()
-        self.animations = {}
-        self.current_anim = None
 
+        # Private attributes
+        self._rm: ResourceManager = ResourceManager()
+        self._dm: DebugManager = DebugManager()
+        self._animations: dict[str, AnimationData] = {}
+        self._current_anim: AnimationData | None = None
+        
+    # ---------------------
+    # Properties
+    # ---------------------
+    @property
+    def flip_x(self) -> bool:
+        """Flip sprite horizontally."""
+        return self._flip_x
+
+    @flip_x.setter
+    def flip_x(self, value: bool):
+        self._flip_x = bool(value)
+
+    @property
+    def flip_y(self) -> bool:
+        """Flip sprite vertically."""
+        return self._flip_y
+
+    @flip_y.setter
+    def flip_y(self, value: bool):
+        self._flip_y = bool(value)
+
+    @property
+    def offset(self) -> pygame.Vector2:
+        """Offset applied when drawing sprite."""
+        return self._offset
+
+    @offset.setter
+    def offset(self, value: pygame.Vector2):
+        if not isinstance(value, pygame.Vector2):
+            raise TypeError("offset must be a pygame.Vector2")
+        self._offset = value
+
+    @property
+    def rotation(self) -> int:
+        """Current rotation in 45° increments."""
+        return self._rotation
+
+    @rotation.setter
+    def rotation(self, angle: int):
+        self._rotation = int(angle) % 360
 
     # ---------------------
-    # Getters / Setters
+    # Animation methods
     # ---------------------
-    
+    def load_anim(self, name: str) -> AnimationData:
+        """Retrieve an animation instance by name."""
+        if name not in self._animations:
+            self._animations[name] = self._rm.get_animation_instance(name)
+        
+       
 
-    # ---------------------
-    # Animation
-    # ---------------------
-    def get_anim(self, name):
-        if name not in self.animations:
-            self.animations[name] = self._rm.get_animation_instance(name)
-        return self.animations[name]
+    def set_anim(self, name: str):
+        """Set the current animation."""
+        if name in self._animations:
+            self._current_anim = self._animations[name]
+        #update sprite size
+        anim = self._animations[name]
+        self.sprite_size = anim.sprite_size
 
-    def set_anim(self, name):
-        if name in self.animations:
-            self.current_anim = self.animations[name]
 
     def set_frame_tag(self, tag_name: str):
         """Set animation to specific tag."""
-        if self.current_anim:
-            self.current_anim.set_tag(tag_name)
+        if self._current_anim:
+            self._current_anim.set_tag(tag_name)
 
     def set_frame(self, frame_index: int):
         """Set animation to specific frame."""
-        if self.current_anim:
-            self.current_anim.set_frame(frame_index)
+        if self._current_anim:
+            self._current_anim.set_frame(frame_index)
 
-
-    # -----------------------
-    # Rotation + Flipping
-    # -----------------------
-    def set_rotation(self, angle: float):
-        """Set rotation angle in 45° increments."""
-        if not self.rotatable:
-            raise ValueError("This GameObject is not rotatable.")
-        
-        # Validate angle is in 45° increments
-        if angle % 45 != 0:
-            raise ValueError("Angle must be in 45 degree increments")
-        
-        self.current_angle = (round(angle / 45) * 45) % 360
-
-    def set_flip(self, flip_x: bool = False, flip_y: bool = False):
-        """Set horizontal and/or vertical flip."""
-        self.flip_x = flip_x
-        self.flip_y = flip_y
-
-
-    # -----------------------
-    # Update
-    # -----------------------
+    # ---------------------
+    # Update / Draw
+    # ---------------------
     def update(self, dt: int):
         """Update current animation frame."""
-        if self.current_anim:
-            self.current_anim.update(dt)
+        if self._current_anim:
+            self._current_anim.update(dt)
 
-
-    # ---------------------
-    # Drawing
-    # ---------------------
-    def draw(self, surface, world_pos):
-        if not self.current_anim:
+    def draw(self, surface: pygame.Surface, world_pos: pygame.Vector2 | tuple[int, int]):
+        """Draw the sprite to a surface with current transforms."""
+        if not self._current_anim:
             return
 
         frame = self._get_transformed_frame()
         if frame:
             surface.blit(frame, world_pos)
 
+    # ---------------------
+    # Debug Draw
+    # ---------------------
+
+    def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2 | tuple[int, int]):
+        """Draw debug info for the sprite."""
+        if self._dm.draw_sprite_bounds:
+            rect = pygame.Rect(world_pos, self.sprite_size)
+            pygame.draw.rect(surface, (0, 255, 0), rect, 1)
+
+    
+
+    # ---------------------
+    # Private helpers
+    # ---------------------
     def _get_transformed_frame(self) -> pygame.Surface | None:
-        """Get current frame with rotation/flip applied."""
-        if not self.current_anim:
+        """Get current animation frame with rotation/flip applied."""
+        if not self._current_anim:
             return None
 
-        frame = self.current_anim.get_current_frame()
-        
-        # Handle rotation (uses shared cache via ResourceManager)
-        if self.rotatable:
+        frame = self._current_anim.get_current_frame()
+
+        # Handle rotation
+        if self._rotation != 0:
             frame = self._get_rotated_frame(frame)
         # Handle flipping
-        elif self.flip_x or self.flip_y:
-            frame = pygame.transform.flip(frame, self.flip_x, self.flip_y)
+        elif self._flip_x or self._flip_y:
+            frame = pygame.transform.flip(frame, self._flip_x, self._flip_y)
 
         return frame
 
     def _get_rotated_frame(self, base_frame: pygame.Surface) -> pygame.Surface:
-        """Get rotated frame from cache or generate it."""
-        frame_idx = self.current_anim.current_frame_idx
-        base_name = getattr(self.current_anim, "base_name", None)
+        """Get rotated frame from cache or generate it, snapping to 45° increments."""
+        frame_idx = self._current_anim.current_frame_idx
+        base_name = getattr(self._current_anim, "base_name", None)
         
-        # Use shared ResourceManager cache
-        return self._rm.get_rotated_frame(base_name, frame_idx, self.current_angle, self.flip_x, self.flip_y)
+        # Snap rotation for caching/drawing
+        snapped_angle = round(self._rotation / 45) * 45 % 360
+        
+        return self._rm.get_rotated_frame(base_name, frame_idx, snapped_angle, self._flip_x, self._flip_y)
