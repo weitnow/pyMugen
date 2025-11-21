@@ -4,12 +4,11 @@ from debug_manager import DebugManager
 import globals
 
 class Sprite:
-
     def __init__(self):
         # PUBLIC attributes (with property access)
         self._flip_x: bool = False
         self._flip_y: bool = False
-        self._offset: pygame.Vector2 = pygame.Vector2(0, 0) # TODO: do something with this or remove
+        self._offset: pygame.Vector2 = pygame.Vector2(0, 0) # this is only used if sprite is attached to a GameObject!
         self._rotation: int = 0
         
         # PUBLIC read-only attributes
@@ -100,13 +99,21 @@ class Sprite:
             self._current_anim.update(dt)
 
     def draw(self, surface: pygame.Surface, world_pos: pygame.Vector2 | tuple[int, int]):
-        """Draw the sprite to a surface with current transforms."""
+        """Draw the sprite to a surface with current transforms and offsets applied."""
         if not self._current_anim:
             return
 
+        # Ensure world_pos is a Vector2
+        pos = pygame.Vector2(world_pos)
+
+        # Apply additive offset from animation
+        offset = self._current_anim.get_current_offset()
+        draw_pos = pos + pygame.Vector2(offset)
+
+        # Get transformed frame (rotation + flip applied)
         frame = self._get_transformed_frame()
         if frame:
-            surface.blit(frame, world_pos)
+            surface.blit(frame, draw_pos)
 
     # ---------------------
     # Debug Draw
@@ -117,8 +124,16 @@ class Sprite:
         if not self._current_anim:
             return
 
-        # Draw bounding box
-        self._dm.draw_rect_game(world_pos, self.sprite_size[0], self.sprite_size[1], globals.COLOR_LIGHT_GRAY)
+        # Ensure world_pos is a Vector2
+        pos = pygame.Vector2(world_pos)
+
+        # --- Draw bounding box without offset ---
+        self._dm.draw_rect_game(pos, self.sprite_size[0], self.sprite_size[1], globals.COLOR_LIGHT_GRAY)
+
+        # --- Draw bounding box with additive offsets applied ---
+        offset = self._current_anim.get_current_offset()
+        offset_pos = pos + pygame.Vector2(offset)
+        self._dm.draw_rect_game(offset_pos, self.sprite_size[0], self.sprite_size[1], globals.COLOR_DARK_GRAY)
 
 
 

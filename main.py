@@ -33,11 +33,17 @@ resource_manager.load_png("debug32x32", "assets/Graphics/Aseprite/debug32x32.png
 
 resource_manager.load_spritesheet("stages", "assets/Graphics/Aseprite/stages.png", "assets/Graphics/Aseprite/stages.json")
 
+# --- Set Offsets for spritesheets ---
+#resource_manager.set_offset(base_name="nesFighter", global_offset=True, x=20, y=30)
+#resource_manager.set_offset(base_name="nesFighter", tag="Idle", x=30)
+#resource_manager.set_offset(base_name="nesFighter", frame=2, y=40)
+
+
 # --- Register Game States ---
 gamestate_manager.add_state("menu", MenuState())
 gamestate_manager.add_state("playing", PlayingState())
 
-gamestate_manager.change_state("playing") # start in playing state
+gamestate_manager.change_state("menu") # start in playing state
 
 # --- Block certain events from pygame event queue to optimize ---
 pygame.event.set_blocked(None) # block all events
