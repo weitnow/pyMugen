@@ -14,7 +14,6 @@ class DebugManager:
         self.BOX_THICKNESS = 2
         
         # --- Debug Toggles ---
-        self.show_overlay = False
         self.debug_on = True
         self.stop_game_for_debugging = False
         self.SHOW_HITBOXES = True
@@ -33,15 +32,6 @@ class DebugManager:
 
     def set_view_manager(self, view_manager):
         self.view_manager = view_manager
-
-    def handle_input(self, event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_F1:
-                self.debug_on = not self.debug_on
-            elif event.key == pygame.K_F2:
-                self.stop_game_for_debugging = not self.stop_game_for_debugging
-            elif event.key == pygame.K_F3:
-                self.show_overlay = not self.show_overlay
 
     def update(self, dt):
         if not self.debug_on:

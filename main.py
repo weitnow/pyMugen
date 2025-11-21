@@ -52,7 +52,13 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
             running = False
-        debug_manager.handle_input(event)
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_F1:
+                debug_manager.debug_on = not debug_manager.debug_on
+            elif event.key == pygame.K_F2:
+                debug_manager.stop_game_for_debugging = not debug_manager.stop_game_for_debugging
+            elif event.key == pygame.K_F3:
+                debug_manager.view_manager.toggle_overlay()
         if event.type == pygame.KEYDOWN and event.key == pygame.K_F4:
             view_manager.toggle_fullscreen()
         if event.type == pygame.KEYDOWN and event.key == pygame.K_F5:

@@ -14,10 +14,12 @@ class ViewManager:
             (640, 360),
             (960, 540),
             (1280, 720),
-            (1920, 1080)
+            (1920, 1080),
+            (2560, 1440),
         ]
-        self.current_resolution_index = 3  # start with 1920x1080
-        self.fullscreen_enabled = True
+        self.current_resolution_index = 4  # start with 1920x1080
+        self.fullscreen_enabled = False
+        self.show_overlay = True
 
 
         # Game and Debug surfaces, open for public access
@@ -73,6 +75,10 @@ class ViewManager:
         self.fullscreen_enabled = not self.fullscreen_enabled
         self._apply_display_mode()
 
+    # --- Toggle overlay ---
+    def toggle_overlay(self):
+        self.show_overlay = not self.show_overlay
+
     # --- Cycle through resolutions ---
     def cycle_resolution(self):
         if not self.fullscreen_enabled:
@@ -91,7 +97,7 @@ class ViewManager:
     def draw_to_screen(self):
         window_w, window_h = self.fullscreen.get_size()
         current_window_size = (window_w, window_h)
-        current_overlay_state = self.debug_manager.show_overlay
+        current_overlay_state = self.show_overlay
         
         # Check if we need to recalculate scaling/positioning
         needs_recalc = (
@@ -104,7 +110,7 @@ class ViewManager:
             self._last_overlay_state = current_overlay_state
             
             # --- calculate rendering area depending on overlay ---
-            if self.debug_manager.show_overlay:
+            if self.show_overlay:
                 ow, oh = self.overlay_image.get_size()
                 overlay_scale = window_h / oh
                 overlay_scaled_w = int(ow * overlay_scale)
@@ -163,7 +169,7 @@ class ViewManager:
             debug_scaled.set_alpha(160)
             self.fullscreen.blit(debug_scaled, (offset_x, offset_y))
 
-        if self.debug_manager.show_overlay:
+        if self.show_overlay:
             # Use cached scaled overlay
             self.fullscreen.blit(self._cached_overlay_scaled, (self._overlay_x, 0))
 
