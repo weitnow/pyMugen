@@ -153,9 +153,10 @@ class ResourceManager:
         self.animations = {}
         self._rotation_cache = {}   # shared cache across all objects
 
-    def load_spritesheet(self, name: str, image_path: str, json_path: str):
+    def load_spritesheet(self, name: str, image_path: str, json_path: str,
+                     global_offset=None, tag_offsets=None, frame_offsets=None):
         if name in self.animations:
-            raise ValueError(f"Spritesheet with name '{name}' already loaded.")
+            raise ValueError(f"Animation '{name}' already loaded.")
 
         with open(json_path, "r") as f:
             data = json.load(f)
@@ -167,28 +168,18 @@ class ResourceManager:
 
         for k, v in data["frames"].items():
             idx = int(k)
-            rect = pygame.Rect(
-                v["frame"]["x"],
-                v["frame"]["y"],
-                v["frame"]["w"],
-                v["frame"]["h"]
-            )
+            rect = pygame.Rect(v["frame"]["x"], v["frame"]["y"], v["frame"]["w"], v["frame"]["h"])
             frames[idx] = spritesheet.subsurface(rect).copy()
             durations[idx] = v.get("duration", 100)
 
-        #getting sprite size of first frame, because all frames should be the same size
         sprite_w = data["frames"]["0"]["frame"]["w"]
         sprite_h = data["frames"]["0"]["frame"]["h"]
 
-        #load frameTags
         tags_list = data.get("meta", {}).get("frameTags", [])
-
-        # --- enforce unique tag names and convert them to a dict ---
         seen = set()
         tags = {}
-
         for tag in tags_list:
-            tag_name = tag["name"]   # <--- use a different variable
+            tag_name = tag["name"]
             if tag_name in seen:
                 raise ValueError(f"Duplicate tag name '{tag_name}' in spritesheet '{name}'")
             seen.add(tag_name)
@@ -196,10 +187,21 @@ class ResourceManager:
 
         # --- Create AnimationData instance ---
         anim = AnimationData(frames, durations, tags, (sprite_w, sprite_h))
-        #anim.base_name = name #TODO: needed?
+        anim.base_name = name
 
-        # --- Store the instance in self.animations ---
+        # --- Apply optional offsets immediately ---
+        if global_offset:
+            anim.set_offset(global_offset=True, x=global_offset[0], y=global_offset[1])
+        if tag_offsets:
+            for tname, (x, y) in tag_offsets.items():
+                anim.set_offset(tag=tname, x=x, y=y)
+        if frame_offsets:
+            for fidx, (x, y) in frame_offsets.items():
+                anim.set_offset(frame=fidx, x=x, y=y)
+
+        # --- Store the AnimationData instance ---
         self.animations[name] = anim
+
         
 
     # --- SINGLE PNG ---
