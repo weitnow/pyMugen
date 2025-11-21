@@ -69,19 +69,22 @@ while running:
     input_manager.update(dt)
     view_manager.update(dt) 
 
-    # --- Update current Game State and handle input ---
+    # --- Handle Input ---
+    gamestate_manager.handle_input()
+
+    # --- Update current Game State ---
     gamestate_manager.update(dt)
 
     # --- Draw ---
     view_manager.clear() # clear both game and debug surfaces
-    gamestate_manager.draw() # draw current game state
+    gamestate_manager.draw() # draw to game surface
 
     # --- Debug Draw ---    
     if debug_manager.debug_on:
         #global debug draw
-        debug_manager.debug_draw()
+        debug_manager.debug_draw()      #draw to debug surface
         #gamestate specific debug draw
-        gamestate_manager.debug_draw()
+        gamestate_manager.debug_draw()  # draw to debug surface
         
     view_manager.draw_to_screen()
 

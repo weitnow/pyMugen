@@ -18,9 +18,9 @@ class GameStateManager:
         else:
             raise ValueError(f"State '{name}' does not exist!")
 
-    def handle_event(self, event):
+    def handle_input(self):
         if self.current_state:
-            self.current_state.handle_event(event)
+            self.current_state.handle_input()
 
     def update(self, dt):
         if self.current_state:

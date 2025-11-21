@@ -1,5 +1,5 @@
 import pygame
-import globals  # for DEBUG_SCALE if you use debug drawing
+import globals  
 from debug_manager import DebugManager
 
 class GameObject:
@@ -20,8 +20,8 @@ class GameObject:
         self.active = True
         self.visible = True
 
-        # Debug
-        self._debug_manager = DebugManager()
+        # Private attributes
+        self._dm = DebugManager()
 
 
     # ------------------------
@@ -100,10 +100,8 @@ class GameObject:
     # ------------------------
     def draw_debug(self, surface: pygame.Surface):
         """Draw hurtbox / hitbox for debugging."""
-        if not self._debug_manager.debug_on:
-            return
-
-        scale = globals.DEBUG_SCALE
+        
+ 
 
         if self.hurtbox:
             pygame.draw.rect(surface, (0, 0, 255), self.get_world_hurtbox(), 1)
@@ -112,42 +110,4 @@ class GameObject:
             pygame.draw.rect(surface, (255, 0, 0), self.get_world_hitbox(), 1)
 
 
-    # -----------------------
-    # Debug Drawing old
-    # -----------------------
-    def draw_debug2(self, debug_surface: pygame.Surface, to_debug_coords):
-        """Draw debug overlays for hitboxes and bounding boxes."""
-        if not self._debug_manager.debug_on:
-            return
-
-        frame = self.current_anim.get_current_frame() if self.current_anim else None
-        offset = self._compute_origin_offset(frame) if frame else pygame.Vector2(0, 0)
-        scale = globals.DEBUG_SCALE
-
-        # Draw bounding box
-        if frame and self._debug_manager.SHOW_BOUNDING_BOXES:
-            frame_rect = pygame.Rect(
-                self.pos.x + offset.x,
-                self.pos.y + offset.y,
-                *frame.get_size()
-            )
-            self._debug_manager.draw_bounding_box(
-                debug_surface, frame_rect, to_debug_coords,
-                scale, self.origin_center_bottom
-            )
-
-        # Draw hurtbox
-        if self.hurtbox and self._debug_manager.SHOW_HURTBOXES:
-            adjusted_rect = self.hurtbox.move(int(offset.x), int(offset.y))
-            self._debug_manager.draw_hitbox(
-                debug_surface, adjusted_rect, (0, 0, 255, 180),
-                to_debug_coords, scale, self.pos
-            )
-
-        # Draw hitbox
-        if self.hitbox and self._debug_manager.SHOW_HITBOXES:
-            adjusted_rect = self.hitbox.move(int(offset.x), int(offset.y))
-            self._debug_manager.draw_hitbox(
-                debug_surface, adjusted_rect, (255, 0, 0, 180),
-                to_debug_coords, scale, self.pos
-            )
+   

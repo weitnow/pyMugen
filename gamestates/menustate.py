@@ -11,19 +11,21 @@ class MenuState(GameState):
         mySprite.load_anim("nesFighter")
         mySprite.set_anim("nesFighter")
         mySprite.set_frame_tag("Idle")
-
+        mySprite.offset = pygame.Vector2(50, 0)
 
         self.mySprite = mySprite
-
-
-
-
 
     def exit(self):
         pass
 
+    def handle_input(self):
+        actions = self.input_manager.get_just_pressed_actions(0)
+        if Action.START in actions: # if any action was pressed
+            self.gamestate_manager.change_state("playing")
+        elif Action.A in actions:
+            self.gamestate_manager.change_state("playing")
+
     def update(self, dt):
-        self._input_handling()
         self.mySprite.update(dt)
         
 
@@ -32,16 +34,8 @@ class MenuState(GameState):
         text = font.render("MENU - Press Enter", True, (255, 255, 255))
         self.view_manager.game_surface.blit(text, (0, 0))
 
-        self.mySprite.draw(self.view_manager.game_surface, world_pos=(50, 50))
+        self.mySprite.draw(self.view_manager.game_surface, world_pos=(0, 0))
 
-    #def debug_draw(self):
-    #    self.mySprite.debug_draw(self.view_manager.debug_surface, world_pos=(50, 50))
+    def debug_draw(self):
+        self.mySprite.debug_draw(self.view_manager.debug_surface, world_pos=(0, 0))
 
-
-    def _input_handling(self):
-        actions = self.input_manager.get_just_pressed_actions(0)
-        if Action.START in actions: # if any action was pressed
-            self.gamestate_manager.change_state("playing")
-        elif Action.A in actions:
-            self.gamestate_manager.change_state("playing")
-        

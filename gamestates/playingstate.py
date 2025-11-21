@@ -37,6 +37,19 @@ class PlayingState(GameState):
     def exit(self):
         pass
 
+    def handle_input(self):
+        actions = self.input_manager.get_pressed_actions(0)
+        movement = pygame.Vector2(0, 0)
+        if Action.MOVE_LEFT in actions:
+            movement.x -= 1
+        if Action.MOVE_RIGHT in actions:
+            movement.x += 1
+        if Action.MOVE_UP in actions:
+            movement.y -= 1
+        if Action.MOVE_DOWN in actions:
+            movement.y += 1
+        self.player.velocity = movement * 0.2 # set speed
+
     def update(self, dt):
         self.player.update(dt)
 

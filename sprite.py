@@ -1,6 +1,7 @@
 import pygame
 from resource_manager import ResourceManager, AnimationData
 from debug_manager import DebugManager
+import globals
 
 class Sprite:
 
@@ -8,7 +9,7 @@ class Sprite:
         # PUBLIC attributes (with property access)
         self._flip_x: bool = False
         self._flip_y: bool = False
-        self._offset: pygame.Vector2 = pygame.Vector2(0, 0)
+        self._offset: pygame.Vector2 = pygame.Vector2(0, 0) # TODO: do something with this or remove
         self._rotation: int = 0
         
         # PUBLIC read-only attributes
@@ -65,12 +66,11 @@ class Sprite:
     # ---------------------
     # Animation methods
     # ---------------------
-    def load_anim(self, name: str) -> AnimationData:
+    def load_anim(self, name: str):
         """Retrieve an animation instance by name."""
         if name not in self._animations:
             self._animations[name] = self._rm.get_animation_instance(name)
         
-       
 
     def set_anim(self, name: str):
         """Set the current animation."""
@@ -114,9 +114,13 @@ class Sprite:
 
     def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2 | tuple[int, int]):
         """Draw debug info for the sprite."""
-        if self._dm.draw_sprite_bounds:
-            rect = pygame.Rect(world_pos, self.sprite_size)
-            pygame.draw.rect(surface, (0, 255, 0), rect, 1)
+        if not self._current_anim:
+            return
+
+        # Draw bounding box
+        self._dm.draw_rect_game(world_pos, self.sprite_size[0], self.sprite_size[1], globals.COLOR_LIGHT_GRAY)
+
+
 
     
 

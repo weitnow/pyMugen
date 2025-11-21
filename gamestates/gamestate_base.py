@@ -28,6 +28,11 @@ class GameState(ABC): #ABC is Abstract Base Class
         pass
 
     @abstractmethod
+    def handle_input(self):
+        """Handle input for the state."""
+        pass
+
+    @abstractmethod
     def update(self, dt):
         """Update the state logic."""
         pass

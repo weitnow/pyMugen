@@ -1,5 +1,4 @@
 import pygame
-import globals
 from decorators import singleton
 from debug_manager import DebugManager
 
@@ -17,6 +16,7 @@ class ViewManager:
             (1920, 1080),
             (2560, 1440),
         ]
+        self.CLEAR_COLOR = (30, 30, 30) # background color for game view
         self.current_resolution_index = 4  # start with 1920x1080
         self.fullscreen_enabled = False
         self.show_overlay = True
@@ -50,7 +50,7 @@ class ViewManager:
         # Reusable rect to avoid recreating
         self.render_rect = pygame.Rect(0, 0, 0, 0)
 
-        self.debug_manager = DebugManager() # get singleton instance an access debug toggles
+        self.debug_manager = DebugManager() # get singleton instance 
         self.debug_manager.set_view_manager(self) # inform debug manager about view manager
 
     def update(self, dt):
@@ -90,7 +90,7 @@ class ViewManager:
         return x * self.DEBUG_SCALE, y * self.DEBUG_SCALE
     
     def clear(self):
-        self.game_surface.fill((30, 30, 30))    #TODO: make bg color configurable
+        self.game_surface.fill(self.CLEAR_COLOR)    
         self.debug_surface.fill((0, 0, 0, 0))
 
     # --- Draw everything ---
