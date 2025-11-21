@@ -11,7 +11,6 @@ class MenuState(GameState):
         mySprite.load_anim("nesFighter")
         mySprite.set_anim("nesFighter")
         mySprite.set_frame_tag("Idle")
-        #mySprite.offset = pygame.Vector2(50, 0) #TODO: check what to do with that
 
         self.mySprite = mySprite
 

@@ -8,7 +8,6 @@ class Sprite:
         # PUBLIC attributes (with property access)
         self._flip_x: bool = False
         self._flip_y: bool = False
-        self._offset: pygame.Vector2 = pygame.Vector2(0, 0) # this is only used if sprite is attached to a GameObject!
         self._rotation: int = 0
         
         # PUBLIC read-only attributes
@@ -41,17 +40,6 @@ class Sprite:
     @flip_y.setter
     def flip_y(self, value: bool):
         self._flip_y = bool(value)
-
-    @property
-    def offset(self) -> pygame.Vector2:
-        """Offset applied when drawing sprite."""
-        return self._offset
-
-    @offset.setter
-    def offset(self, value: pygame.Vector2):
-        if not isinstance(value, pygame.Vector2):
-            raise TypeError("offset must be a pygame.Vector2")
-        self._offset = value
 
     @property
     def rotation(self) -> int:
@@ -135,9 +123,6 @@ class Sprite:
         offset_pos = pos + pygame.Vector2(offset)
         self._dm.draw_rect_game(offset_pos, self.sprite_size[0], self.sprite_size[1], globals.COLOR_DARK_GRAY)
 
-
-
-    
 
     # ---------------------
     # Private helpers
