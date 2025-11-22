@@ -46,7 +46,7 @@ resource_manager.load_spritesheet("stages", "assets/Graphics/Aseprite/stages.png
 gamestate_manager.add_state("menu", MenuState())
 gamestate_manager.add_state("playing", PlayingState())
 
-gamestate_manager.change_state("playing") # start in playing state
+gamestate_manager.change_state("menu") # start in playing state
 
 # --- Block certain events from pygame event queue to optimize ---
 pygame.event.set_blocked(None) # block all events
