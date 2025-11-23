@@ -1,16 +1,16 @@
 import pygame
 from gamestates.gamestate_base import GameState
 from input_manager import Action
-from sprite import Sprite
+from better_sprite import Sprite
 
 class MenuState(GameState):
 
     def enter(self):
         #create a sprite
         mySprite = Sprite()
-        mySprite.load_anim("nesFighter")
-        mySprite.set_anim("nesFighter")
+        mySprite.set_anim_name("nesFighter")
         mySprite.set_frame_tag("Idle")
+
 
         self.mySprite = mySprite
 

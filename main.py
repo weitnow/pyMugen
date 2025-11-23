@@ -28,8 +28,6 @@ view_manager = ViewManager()
 # --- Load resources ---
 resource_manager.load_spritesheet("gbFighter", "assets/Graphics/Aseprite/gbFighter.png", "assets/Graphics/Aseprite/gbFighter.json") # example spritesheet with tags
 resource_manager.load_spritesheet("nesFighter", "assets/Graphics/Aseprite/nesFighter.png", "assets/Graphics/Aseprite/nesFighter.json")
-#resource_manager.load_spritesheet("nesFighter", "assets/Graphics/Aseprite/nesFighter.png", "assets/Graphics/Aseprite/nesFighter.json", 
-#                                  global_offset=(5,0), tag_offsets={"Idle": (0, -2)}, frame_offsets={3: (2,0)}) # example with offset data
 resource_manager.load_spritesheet("debug32", "assets/Graphics/Aseprite/debug32.png", "assets/Graphics/Aseprite/debug32.json") # example spritesheet without tags
 resource_manager.load_png("debug32x32", "assets/Graphics/Aseprite/debug32x32.png") # example single PNG
 
@@ -37,9 +35,9 @@ resource_manager.load_spritesheet("stages", "assets/Graphics/Aseprite/stages.png
 
 
 # --- Set Offsets for spritesheets ---
-#resource_manager.set_offset(base_name="nesFighter", global_offset=True, x=20, y=30)
-#resource_manager.set_offset(base_name="nesFighter", tag="Idle", x=30)
-#resource_manager.set_offset(base_name="nesFighter", frame=2, y=40)
+#resource_manager.set_global_offset("nesFighter", x=10, y=5)
+resource_manager.set_tag_offset("nesFighter", "Idle", x=20)
+#resource_manager.set_frame_offset("nesFighter", 1, x=6, y=-2)
 
 
 # --- Register Game States ---

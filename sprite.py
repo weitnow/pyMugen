@@ -53,15 +53,13 @@ class Sprite:
     # ---------------------
     # Animation methods
     # ---------------------
-    def load_anim(self, name: str):
-        """Retrieve an animation instance by name."""
-        if name not in self._animations:
-            self._animations[name] = self._rm.get_animation_instance(name)
         
-
     def set_anim(self, name: str):
         """Set the current animation."""
         if name in self._animations:
+            self._current_anim = self._animations[name]
+        else:
+            self._animations[name] = self._rm.get_animation_instance(name)
             self._current_anim = self._animations[name]
         #update sprite size
         anim = self._animations[name]

@@ -4,157 +4,91 @@ import copy
 from typing import Dict
 from decorators import singleton
 
-class AnimationData:
-    def __init__(self, frames: Dict[int, pygame.Surface], durations: Dict[int, int] = None, tags: Dict[str, dict] = None, sprite_size: tuple = (0,0)):
 
-        # self.frames is a dict mapping frame index to Surface
+class AnimationData:
+    def __init__(self, frames: Dict[int, pygame.Surface], durations: Dict[int, int], tags: Dict[str, dict], sprite_size: tuple, base_name: str, png: bool):
+
+        self.base_name = base_name                         # name of the spritesheet this animation belongs to
         self.frames = frames                # int -> Surface
         self.durations = durations              # int -> duration in ms
         self.tags = tags                       # str -> {"from": int, "to": int}
-        # --- Offset system --- # offsets are additive                      
-        self.global_offset = None                               # (x, y)
-        self.tag_offsets = {}                             # tag_name -> (x, y)
-        self.frame_offsets = {}                           # frame_idx -> (x, y)    
-        # ---------------------        
         self.sprite_size = sprite_size                   # (width, height)
-
-        self.current_tag = None
-        self.current_frame_idx = 0
-        self.timer = 0
-        self.playing = False
-
-
-    # ---------------------------------------------------------
-    # OFFSET SETTER
-    # ---------------------------------------------------------
-    def set_offset(self, *, global_offset=False, tag=None, frame=None, x=None, y=None):
-        """
-        Add offset to global / tag / frame.
-        additive: final = global + tag + frame.
-        Missing coordinates default to 0.
-        Overwriting is forbidden -> raises Exception.
-        Examples:
-            set_offset(global_offset=True, x=5, y=10)
-            set_offset(tag="Idle", x=-3)
-            set_offset(frame=2, y=4)
-        """
-
-        # ---------- Validate mode ----------
-        modes_selected = sum([
-            1 if global_offset else 0,
-            1 if tag is not None else 0,
-            1 if frame is not None else 0
-        ])
-        if modes_selected != 1:
-            raise ValueError("set_offset() requires exactly one of: global_offset=True, tag=..., frame=...")
-
-        # Missing coordinates default to zero
-        ox = 0 if x is None else x
-        oy = 0 if y is None else y
-        new_offset = (ox, oy)
-
-        # ---------- Global offset ----------
-        if global_offset:
-            if self.global_offset is not None:
-                raise ValueError("Global offset already exists and cannot be overwritten.")
-            self.global_offset = new_offset
-            return
-
-        # ---------- Tag offset ----------
-        if tag is not None:
-            if tag not in self.tags:
-                raise ValueError(f"Tag '{tag}' not found in animation.")
-            
-            if tag in self.tag_offsets:
-                raise ValueError(f"Offset for tag '{tag}' already exists and cannot be overwritten.")
-            
-            self.tag_offsets[tag] = new_offset
-            return
-
-        # ---------- Frame offset ----------
-        if frame is not None:
-            if frame not in self.frames:
-                raise ValueError(f"Frame '{frame}' does not exist in animation frames.")
-            
-            if frame in self.frame_offsets:
-                raise ValueError(f"Offset for frame '{frame}' already exists and cannot be overwritten.")
-
-            self.frame_offsets[frame] = new_offset
-            return
-
-    # ---------------------------------------------------------
-    # OFFSET GETTERS
-    # ---------------------------------------------------------
-    def get_global_offset(self):
-        return self.global_offset if self.global_offset is not None else (0, 0)
-
-    def get_tag_offset(self):
-        if self.current_tag is None:
-            return (0, 0)
-        tag_name = self.current_tag["name"]
-        return self.tag_offsets.get(tag_name, (0, 0))
-
-    def get_frame_offset(self):
-        return self.frame_offsets.get(self.current_frame_idx, (0, 0))
-
-    # ---------------------------------------------------------
-    # FINAL OFFSET
-    # ---------------------------------------------------------
-    def get_current_offset(self):
-        gx, gy = self.get_global_offset()
-        tx, ty = self.get_tag_offset()
-        fx, fy = self.get_frame_offset()
-        return (gx + tx + fx, gy + ty + fy)
-
-    # ---------------------------------------------------------
-    # TAG SYSTEM
-    # --------------------------------------------------------
-
-    def set_tag(self, tag_name):
-        try:
-            self.current_tag = self.tags[tag_name]
-        except KeyError:
-            return
-
-        self.current_frame_idx = self.current_tag["from"]
-        self.timer = 0
-        self.playing = True
-
-
-    # --- FRAME-BASED ANIMATION (for spritesheets without tags) ---
-    def set_frame(self, frame_idx: int):
-        if frame_idx not in self.frames:
-            raise ValueError(f"Frame index {frame_idx} not in animation frames.")
+        self.png = png                                    # True if this is a single PNG, False if it is an animation
         
-        self.current_frame_idx = frame_idx
-        self.current_tag = None
-        self.timer = 0
-        self.playing = False
-   
+        # Offset storage
+        self._global_offset = (0, 0)   
+        self._tag_offsets = {}         # tag → (x, y)
+        self._frame_offsets = {}       # frame_idx → (x, y)
+        self.final_offsets = {}       # frame_idx → (x, y)      this is passed as reference to sprite objects
 
-    def update(self, dt: int):
-        if self.current_tag and self.playing:
-            self.timer += dt
-            idx = self.current_frame_idx
-            if self.timer >= self.durations[idx]:
-                self.timer -= self.durations[idx]
-                self.current_frame_idx += 1
-                if self.current_frame_idx > self.current_tag["to"]:
-                    self.current_frame_idx = self.current_tag["from"]
+    # ------------------------------------------------------------------
+    # OFFSET SETTERS (clean and simple)
+    # ------------------------------------------------------------------
+    def set_global_offset(self, x=0, y=0):
+        self._global_offset = (x, y)
+        self._rebuild_offsets()
 
-    def get_current_frame(self) -> pygame.Surface:
-        return self.frames[self.current_frame_idx]
-    
+    def set_tag_offset(self, tag_name: str, x=0, y=0):
+        if tag_name not in self.tags:
+            raise ValueError(f"Tag '{tag_name}' does not exist in animation.")
+        self._tag_offsets[tag_name] = (x, y)
+        self._rebuild_offsets()
+
+    def set_frame_offset(self, frame_idx: int, x=0, y=0):
+        if frame_idx not in self.frames:
+            raise ValueError(f"Frame {frame_idx} does not exist.")
+        self._frame_offsets[frame_idx] = (x, y)
+        self._rebuild_offsets()
+
+    # ------------------------------------------------------------------
+    # INTERNAL: Build final offset lookup table
+    # ------------------------------------------------------------------
+    def _rebuild_offsets(self):
+        
+        gx, gy = self._global_offset
+
+        # Create reverse tag lookup: frame_idx → tag_name
+        frame_to_tag = {}
+        for tag_name, info in self.tags.items():
+            for idx in range(info["from"], info["to"] + 1):
+                if idx not in frame_to_tag:  # <---- DO NOT OVERWRITE
+                    frame_to_tag[idx] = tag_name
+
+
+        result = {}
+
+        for frame_idx in self.frames.keys():
+
+            # Tag offset
+            tag_name = frame_to_tag.get(frame_idx)
+            if tag_name:
+                tx, ty = self._tag_offsets.get(tag_name, (0, 0))
+            else:
+                tx, ty = (0, 0)
+
+            # Frame offset
+            fx, fy = self._frame_offsets.get(frame_idx, (0, 0))
+
+            # Sum all
+            result[frame_idx] = (gx + tx + fx, gy + ty + fy)
+
+        self.final_offsets = result
+
+    # ------------------------------------------------------------------
+    # RUNTIME QUERY (very fast)
+    # ------------------------------------------------------------------
+    def get_offset(self, frame_idx: int):
+        return self.final_offsets.get(frame_idx, (0, 0))
+
 
 
 @singleton
 class ResourceManager:
     def __init__(self):
-        self.animations = {}
+        self.animations = {}        # name -> AnimationData
         self._rotation_cache = {}   # shared cache across all objects
 
-    def load_spritesheet(self, name: str, image_path: str, json_path: str,
-                     global_offset=None, tag_offsets=None, frame_offsets=None):
+    def load_spritesheet(self, name: str, image_path: str, json_path: str):
         if name in self.animations:
             raise ValueError(f"Animation '{name}' already loaded.")
 
@@ -171,9 +105,9 @@ class ResourceManager:
             rect = pygame.Rect(v["frame"]["x"], v["frame"]["y"], v["frame"]["w"], v["frame"]["h"])
             frames[idx] = spritesheet.subsurface(rect).copy()
             durations[idx] = v.get("duration", 100)
-
-        sprite_w = data["frames"]["0"]["frame"]["w"]
-        sprite_h = data["frames"]["0"]["frame"]["h"]
+        
+        # Get sprite size from first frame
+        sprite_size = (data["frames"]["0"]["frame"]["w"], data["frames"]["0"]["frame"]["h"])
 
         tags_list = data.get("meta", {}).get("frameTags", [])
         seen = set()
@@ -186,18 +120,7 @@ class ResourceManager:
             tags[tag_name] = tag
 
         # --- Create AnimationData instance ---
-        anim = AnimationData(frames, durations, tags, (sprite_w, sprite_h))
-        anim.base_name = name
-
-        # --- Apply optional offsets immediately ---
-        if global_offset:
-            anim.set_offset(global_offset=True, x=global_offset[0], y=global_offset[1])
-        if tag_offsets:
-            for tname, (x, y) in tag_offsets.items():
-                anim.set_offset(tag=tname, x=x, y=y)
-        if frame_offsets:
-            for fidx, (x, y) in frame_offsets.items():
-                anim.set_offset(frame=fidx, x=x, y=y)
+        anim = AnimationData(frames, durations, tags, sprite_size, name, png=False)
 
         # --- Store the AnimationData instance ---
         self.animations[name] = anim
@@ -211,48 +134,49 @@ class ResourceManager:
 
         image = pygame.image.load(image_path).convert_alpha()
 
-        self.animations[name] = {
-            "frames": {0: image},
-            "durations": {0: 0},
-            "tags": {},
-            "sprite_size": image.get_size()
-        }
+        # fill in data
+        frames = {0: image}
+        durations = {0: 0}
+        tags = {}
+        sprite_size= image.get_size()
 
-    # --- SET OFFSET of ANIMATION, do this immidiatly after loading a spritesheet or a png---
-    def set_offset(self, *, base_name: str, global_offset=False, tag=None, frame=None, x=None, y=None):
-        """
-        Set an offset on an animation by base_name.
-        Mirrors AnimationData.set_offset().
-        """
-        if base_name not in self.animations:
-            raise ValueError(f"Animation '{base_name}' not loaded.")
+        # --- Create AnimationData instance ---
+        anim = AnimationData(frames, durations, tags, sprite_size, name, png=True)
 
-        # Modify the stored AnimationData instance directly. Previously this
-        # used get_animation_instance() which returned a deepcopy, so changes
-        # were applied to the copy and lost.
-        anim = self.animations[base_name]
-        # If stored entry is a dict (legacy), try to normalize it first.
-        if not isinstance(anim, AnimationData):
-            # convert legacy dict to AnimationData
-            frames = anim.get("frames", {})
-            durations = anim.get("durations", {})
-            tags = anim.get("tags", {})
-            sprite_size = anim.get("sprite_size", (0, 0))
-            anim = AnimationData(frames, durations, tags, sprite_size)
-            self.animations[base_name] = anim
+        # --- Store the AnimationData instance ---
+        self.animations[name] = anim
 
-        anim.set_offset(global_offset=global_offset, tag=tag, frame=frame, x=x, y=y)
+    # ------------------------------------------------------------------
+    # CLEAN OFFSET API (delegates to AnimationData)
+    # ------------------------------------------------------------------
+    def set_global_offset(self, base_name: str, x: int = 0, y: int = 0):
+        """Set a global (x,y) offset for the animation."""
+        anim = self._require_anim(base_name)
+        anim.set_global_offset(x, y)
 
+    def set_tag_offset(self, base_name: str, tag_name: str, x: int = 0, y: int = 0):
+        """Set a tag-specific (x,y) offset."""
+        anim = self._require_anim(base_name)
+        anim.set_tag_offset(tag_name, x, y)
 
-    def get_animation_instance(self, name: str) -> "AnimationData":
-        """Return a copy of the existing AnimationData instance."""
+    def set_frame_offset(self, base_name: str, frame_idx: int, x: int = 0, y: int = 0):
+        """Set a frame-specific (x,y) offset."""
+        anim = self._require_anim(base_name)
+        anim.set_frame_offset(frame_idx, x, y)
+
+    def _require_anim(self, name: str):
+        """Internal helper to validate animation existence."""
         if name not in self.animations:
             raise ValueError(f"Animation '{name}' not loaded.")
-        # Return a deep copy so callers can mutate the returned instance safely
-        # without affecting the canonical stored animation.
-        return copy.deepcopy(self.animations[name])
+        return self.animations[name]
+
     
-  
+    def get_animationdata_reference(self, name: str) -> "AnimationData":
+        """Return a reference to the existing AnimationData instance."""
+        if name not in self.animations:
+            raise ValueError(f"Animation '{name}' doesn't exisit.")
+        return self.animations[name]
+    
 
     def get_rotated_frame(self, anim_name: str, frame_idx: int,
                           angle: int, flip_x: bool = False, flip_y: bool = False):
@@ -264,10 +188,8 @@ class ResourceManager:
 
         base = self.animations[anim_name]
         # support both AnimationData instances and legacy dict storage
-        if isinstance(base, AnimationData):
-            frame = base.frames[frame_idx]
-        else:
-            frame = base["frames"][frame_idx]
+    
+        frame = base["frames"][frame_idx]
 
         # Rotate around center
         rotated = pygame.transform.rotate(frame, angle)
