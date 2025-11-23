@@ -45,40 +45,47 @@ class AnimationData:
     # ------------------------------------------------------------------
     def _rebuild_offsets(self):
         
-        gx, gy = self._global_offset
+        """
+        Computes final per-frame offsets: global + tag + frame.
+        Prints warnings if a frame belongs to multiple tags.
+        """
+        self.final_offsets = {}
+        frame_to_tag: dict[int, str] = {}
 
-        # Create reverse tag lookup: frame_idx → tag_name
-        frame_to_tag = {}
+        # Map frames to first tag, warn on overlap
         for tag_name, info in self.tags.items():
             for idx in range(info["from"], info["to"] + 1):
-                if idx not in frame_to_tag:  # <---- DO NOT OVERWRITE
-                    frame_to_tag[idx] = tag_name
+                if idx in frame_to_tag:
+                    existing_tag = frame_to_tag[idx]
+                    print(
+                        f"⚠️ Warning: Frame {idx} in '{self.base_name}' belongs to multiple tags: "
+                        f"'{existing_tag}' and '{tag_name}'. Using '{existing_tag}' for offset calculation."
+                    )
+                    continue  # preserve first tag
+                frame_to_tag[idx] = tag_name
 
+        gx, gy = self._global_offset
 
-        result = {}
+        # Compute combined offsets
+        for idx in self.frames:
+            # Global
+            fx, fy = gx, gy
 
-        for frame_idx in self.frames.keys():
-
-            # Tag offset
-            tag_name = frame_to_tag.get(frame_idx)
+            # Tag
+            tag_name = frame_to_tag.get(idx)
             if tag_name:
                 tx, ty = self._tag_offsets.get(tag_name, (0, 0))
-            else:
-                tx, ty = (0, 0)
+                fx += tx
+                fy += ty
 
-            # Frame offset
-            fx, fy = self._frame_offsets.get(frame_idx, (0, 0))
+            # Frame
+            frame_offset = self._frame_offsets.get(idx, (0, 0))
+            fx += frame_offset[0]
+            fy += frame_offset[1]
 
-            # Sum all
-            result[frame_idx] = (gx + tx + fx, gy + ty + fy)
+            self.final_offsets[idx] = (fx, fy)
 
-        self.final_offsets = result
 
-    # ------------------------------------------------------------------
-    # RUNTIME QUERY (very fast)
-    # ------------------------------------------------------------------
-    def get_offset(self, frame_idx: int):
-        return self.final_offsets.get(frame_idx, (0, 0))
 
 
 

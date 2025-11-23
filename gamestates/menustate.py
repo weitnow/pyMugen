@@ -33,8 +33,8 @@ class MenuState(GameState):
         text = font.render("MENU - Press Enter", True, (255, 255, 255))
         self.view_manager.game_surface.blit(text, (0, 0))
 
-        self.mySprite.draw(self.view_manager.game_surface, world_pos=(50, 50))
+        self.mySprite.draw(self.view_manager.game_surface, world_pos=(0, 0))
 
     def debug_draw(self):
-        self.mySprite.debug_draw(self.view_manager.debug_surface, world_pos=(50, 50))
+        self.mySprite.debug_draw(self.view_manager.debug_surface, world_pos=(0, 0))
 
