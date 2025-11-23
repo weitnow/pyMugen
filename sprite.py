@@ -131,7 +131,6 @@ class Sprite:
         
         world_pos = world_pos + pygame.Vector2(self.final_offsets.get(self.current_frame_idx, (0, 0)))
         
-        frame = None
         if self._rotation == 0 and not self._flip_x and not self._flip_y:
             #no rotation or flip, use original frame
             frame = self.frames[self.current_frame_idx]
