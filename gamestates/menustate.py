@@ -10,8 +10,7 @@ class MenuState(GameState):
         mySprite = Sprite()
         mySprite.set_anim_name("nesFighter")
         mySprite.set_frame_tag("Idle")
-        mySprite.rotation = 30
-        mySprite.flip_x = True
+
         self.mySprite = mySprite
         
 
@@ -33,6 +32,8 @@ class MenuState(GameState):
     def update(self, dt):
         self.mySprite.update(dt)
         self.mySprite2.update(dt)
+
+        self.mySprite.rotation += 1
         
 
     def draw(self):

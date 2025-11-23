@@ -179,29 +179,52 @@ class ResourceManager:
     
 
     def get_rotated_frame(self, anim_name: str, frame_idx: int, angle: int, flip_x: bool = False, flip_y: bool = False):
-
-        key = (anim_name, frame_idx, angle, flip_x, flip_y)
+        # include offset in cache key because rotation result depends on it
+        base: AnimationData = self.animations[anim_name]
+        offset = base.final_offsets.get(frame_idx, (0, 0))
+        key = (anim_name, frame_idx, angle, flip_x, flip_y, offset)
 
         if key in self._rotation_cache:
             return self._rotation_cache[key]
 
-        base: AnimationData = self.animations[anim_name]
-
-        # Access frames via attribute, not dictionary
         frame = base.frames[frame_idx]
 
-        # Rotate around center
-        rotated = pygame.transform.rotate(frame, angle)
-        rect = rotated.get_rect(center=frame.get_rect().center)
-
-        # Create a new surface to hold the rotated image
-        final_surf = pygame.Surface(rect.size, pygame.SRCALPHA)
-        final_surf.blit(rotated, rect.topleft)
-
-        # Apply flipping if needed
+        # Apply flipping first if requested
         if flip_x or flip_y:
-            final_surf = pygame.transform.flip(final_surf, flip_x, flip_y)
+            frame = pygame.transform.flip(frame, flip_x, flip_y)
 
-        # Cache the result
+        # We'll rotate around the sprite midpoint AFTER applying the offset.
+        # Compute pivot point (relative to frame): center + offset
+        fw, fh = frame.get_size()
+        ox, oy = offset
+        pivot = (fw / 2 + ox, fh / 2 + oy)
+
+        # Create a temporary surface large enough to hold the sprite with pivot centered
+        # Use a safe multiplier to avoid clipping; this is simpler and robust.
+        tmp_w = int(fw * 3)
+        tmp_h = int(fh * 3)
+        tmp = pygame.Surface((tmp_w, tmp_h), pygame.SRCALPHA)
+
+        # Blit the frame so that pivot maps to the center of tmp
+        center_x, center_y = tmp_w // 2, tmp_h // 2
+        blit_x = int(center_x - pivot[0])
+        blit_y = int(center_y - pivot[1])
+        tmp.blit(frame, (blit_x, blit_y))
+
+        # Rotate the temporary surface
+        rotated = pygame.transform.rotate(tmp, angle)
+
+        # Crop to content to remove excessive transparent border
+        bbox = rotated.get_bounding_rect()
+        if bbox.width == 0 or bbox.height == 0:
+            final_surf = pygame.Surface((1, 1), pygame.SRCALPHA)
+        else:
+            final_surf = pygame.Surface((bbox.width, bbox.height), pygame.SRCALPHA)
+            final_surf.blit(rotated, (0, 0), bbox)
+
+        # Cache and return
         self._rotation_cache[key] = final_surf
         return final_surf
+
+
+

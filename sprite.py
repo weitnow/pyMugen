@@ -146,7 +146,12 @@ class Sprite:
     # ---------------------
 
     def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2 | tuple[int, int]):
-        pass
+        # Original sprite rectangle (dark grey) 
+        self._dm.draw_rect_game(pos=world_pos, width=self.sprite_size[0], height=self.sprite_size[1], color=(50, 50, 50))
+                                
+        # dark grey ) # Offset rectangle (light grey) 
+        offset = self.final_offsets.get(self.current_frame_idx, (0, 0)) 
+        self._dm.draw_rect_game( pos=world_pos + pygame.Vector2(offset), width=self.sprite_size[0], height=self.sprite_size[1], color=(200, 200, 200))
 
     # ---------------------
     # Private helpers
