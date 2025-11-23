@@ -45,10 +45,6 @@ class AnimationData:
     # ------------------------------------------------------------------
     def _rebuild_offsets(self):
         
-        """
-        Computes final per-frame offsets: global + tag + frame.
-        Prints warnings if a frame belongs to multiple tags.
-        """
         self.final_offsets = {}
         frame_to_tag: dict[int, str] = {}
 
@@ -84,9 +80,6 @@ class AnimationData:
             fy += frame_offset[1]
 
             self.final_offsets[idx] = (fx, fy)
-
-
-
 
 
 @singleton
@@ -185,18 +178,17 @@ class ResourceManager:
         return self.animations[name]
     
 
-    def get_rotated_frame(self, anim_name: str, frame_idx: int,
-                          angle: int, flip_x: bool = False, flip_y: bool = False):
+    def get_rotated_frame(self, anim_name: str, frame_idx: int, angle: int, flip_x: bool = False, flip_y: bool = False):
 
         key = (anim_name, frame_idx, angle, flip_x, flip_y)
 
         if key in self._rotation_cache:
             return self._rotation_cache[key]
 
-        base = self.animations[anim_name]
-        # support both AnimationData instances and legacy dict storage
-    
-        frame = base["frames"][frame_idx]
+        base: AnimationData = self.animations[anim_name]
+
+        # Access frames via attribute, not dictionary
+        frame = base.frames[frame_idx]
 
         # Rotate around center
         rotated = pygame.transform.rotate(frame, angle)
@@ -210,5 +202,6 @@ class ResourceManager:
         if flip_x or flip_y:
             final_surf = pygame.transform.flip(final_surf, flip_x, flip_y)
 
+        # Cache the result
         self._rotation_cache[key] = final_surf
         return final_surf

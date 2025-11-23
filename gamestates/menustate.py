@@ -1,7 +1,7 @@
 import pygame
 from gamestates.gamestate_base import GameState
 from input_manager import Action
-from better_sprite import Sprite
+from sprite import Sprite
 
 class MenuState(GameState):
 
@@ -10,9 +10,15 @@ class MenuState(GameState):
         mySprite = Sprite()
         mySprite.set_anim_name("nesFighter")
         mySprite.set_frame_tag("Idle")
-
-
+        mySprite.rotation = 30
+        mySprite.flip_x = True
         self.mySprite = mySprite
+        
+
+
+        mySprite2 = Sprite()
+        mySprite2.set_anim_name("debug32x32")
+        self.mySprite2 = mySprite2
 
     def exit(self):
         pass
@@ -26,6 +32,7 @@ class MenuState(GameState):
 
     def update(self, dt):
         self.mySprite.update(dt)
+        self.mySprite2.update(dt)
         
 
     def draw(self):
@@ -33,8 +40,10 @@ class MenuState(GameState):
         text = font.render("MENU - Press Enter", True, (255, 255, 255))
         self.view_manager.game_surface.blit(text, (0, 0))
 
-        self.mySprite.draw(self.view_manager.game_surface, world_pos=(0, 0))
+        self.mySprite.draw(self.view_manager.game_surface, world_pos=(0, 50))
+        self.mySprite2.draw(self.view_manager.game_surface, world_pos=(100, 50))
 
     def debug_draw(self):
-        self.mySprite.debug_draw(self.view_manager.debug_surface, world_pos=(0, 0))
+        self.mySprite.debug_draw(self.view_manager.debug_surface, world_pos=(0, 50))
+        self.mySprite2.debug_draw(self.view_manager.debug_surface, world_pos=(100, 50))
 
