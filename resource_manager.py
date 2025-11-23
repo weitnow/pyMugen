@@ -196,8 +196,8 @@ class ResourceManager:
         pivot = (fw / 2, fh / 2)
         
         # Create a temporary surface large enough to hold the sprite with pivot centered
-        tmp_w = int(fw * 3)
-        tmp_h = int(fh * 3)
+        tmp_w = int(fw * 2)
+        tmp_h = int(fh * 2)
         tmp = pygame.Surface((tmp_w, tmp_h), pygame.SRCALPHA)
         
         # Blit the frame so that pivot maps to the center of tmp
