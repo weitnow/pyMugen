@@ -1,5 +1,5 @@
 import pygame
-from resource_manager import ResourceManager, AnimationData
+from resource_manager import ResourceManager
 from debug_manager import DebugManager
 
 class Sprite:
