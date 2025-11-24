@@ -126,19 +126,29 @@ class Sprite:
 
     def draw(self, surface: pygame.Surface, world_pos: pygame.Vector2 | tuple[int, int]):
 
-        if self.sprite_size == (0,0):
+        if self.sprite_size == (0, 0):
             return
-        
-        world_pos = world_pos + pygame.Vector2(self.final_offsets.get(self.current_frame_idx, (0, 0)))
-        
-        if self._rotation == 0 and not self._flip_x and not self._flip_y:
-            #no rotation or flip, use original frame
-            frame = self.frames[self.current_frame_idx]
-        else:
-            frame = self._get_transformed_frame()
 
-        if frame:
-            surface.blit(frame, world_pos)
+        # Apply per-frame Aseprite offset
+        world_pos = pygame.Vector2(world_pos) + pygame.Vector2(
+            self.final_offsets.get(self.current_frame_idx, (0, 0))
+        )
+
+        # Fast path: no rotation or flip
+        if self._rotation == 0 and not self._flip_x and not self._flip_y:
+            frame = self.frames[self.current_frame_idx]
+            offset = (0, 0)
+        else:
+            frame, offset = self._get_transformed_frame()
+
+        # Apply offset correction (only non-zero when rotated)
+        world_pos -= pygame.Vector2(offset)
+
+        surface.blit(frame, world_pos)
+
+    
+
+
 
     # ---------------------
     # Debug Draw
@@ -146,11 +156,9 @@ class Sprite:
 
     def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2 | tuple[int, int]):
         # Original sprite rectangle (dark grey) 
-        self._dm.draw_rect_game(pos=world_pos, width=self.sprite_size[0], height=self.sprite_size[1], color=(50, 50, 50))
+        self._dm.draw_rect_game(pos=world_pos, width=self.sprite_size[0], height=self.sprite_size[1], color=(150, 150, 150))
                                 
-        # dark grey ) # Offset rectangle (light grey) 
-        offset = self.final_offsets.get(self.current_frame_idx, (0, 0)) 
-        self._dm.draw_rect_game( pos=world_pos + pygame.Vector2(offset), width=self.sprite_size[0], height=self.sprite_size[1], color=(200, 200, 200))
+
 
     # ---------------------
     # Private helpers
