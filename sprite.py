@@ -129,20 +129,25 @@ class Sprite:
         if self.sprite_size == (0, 0):
             return
 
-        # Apply per-frame Aseprite offset
-        world_pos = pygame.Vector2(world_pos) + pygame.Vector2(
-            self.final_offsets.get(self.current_frame_idx, (0, 0))
-        )
+        # Apply per-frame Aseprite offset (but flipped!)
+        offset = pygame.Vector2(self.final_offsets.get(self.current_frame_idx, (0, 0)))
+
+        if self._flip_x:
+            offset.x = -offset.x
+        if self._flip_y:
+            offset.y = -offset.y
+
+        world_pos = pygame.Vector2(world_pos) + offset
 
         # Fast path: no rotation or flip
         if self._rotation == 0 and not self._flip_x and not self._flip_y:
             frame = self.frames[self.current_frame_idx]
-            offset = (0, 0)
+            rot_offset = (0, 0)
         else:
-            frame, offset = self._get_transformed_frame()
+            frame, rot_offset = self._get_transformed_frame()
 
-        # Apply offset correction (only non-zero when rotated)
-        world_pos -= pygame.Vector2(offset)
+        # Rotation bounding-box offset
+        world_pos -= pygame.Vector2(rot_offset)
 
         surface.blit(frame, world_pos)
 
