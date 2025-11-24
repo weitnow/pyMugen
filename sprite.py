@@ -151,7 +151,6 @@ class Sprite:
 
         surface.blit(frame, world_pos)
 
-    
 
 
 
