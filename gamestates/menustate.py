@@ -10,7 +10,7 @@ class MenuState(GameState):
         mySprite = Sprite()
         mySprite.set_anim_name("nesFighter")
         mySprite.set_frame_tag("Idle")
-        mySprite.flip_x = True
+        #mySprite.flip_x = True
 
         self.mySprite = mySprite
         
@@ -18,6 +18,7 @@ class MenuState(GameState):
 
         mySprite2 = Sprite()
         mySprite2.set_anim_name("debug32x32")
+        mySprite2.flip_x = True
         self.mySprite2 = mySprite2
 
     def exit(self):
@@ -35,6 +36,7 @@ class MenuState(GameState):
         self.mySprite2.update(dt)
 
         self.mySprite.rotation += 1
+        self.mySprite2.rotation += 1
 
         
 
@@ -43,10 +45,10 @@ class MenuState(GameState):
         text = font.render("MENU - Press Enter", True, (255, 255, 255))
         self.view_manager.game_surface.blit(text, (0, 0))
 
-        self.mySprite.draw(self.view_manager.game_surface, world_pos=(0, 50))
+        self.mySprite.draw(self.view_manager.game_surface, world_pos=(20, 50))
         self.mySprite2.draw(self.view_manager.game_surface, world_pos=(100, 50))
 
     def debug_draw(self):
-        self.mySprite.debug_draw(self.view_manager.debug_surface, world_pos=(0, 50))
+        self.mySprite.debug_draw(self.view_manager.debug_surface, world_pos=(20, 50))
         self.mySprite2.debug_draw(self.view_manager.debug_surface, world_pos=(100, 50))
 

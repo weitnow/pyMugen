@@ -36,6 +36,7 @@ resource_manager.load_spritesheet("stages", "assets/Graphics/Aseprite/stages.png
 
 # --- Set Offsets for spritesheets ---
 resource_manager.set_global_offset("nesFighter", x=5, y=0)
+resource_manager.set_global_offset("debug32x32", x=16, y=0)
 #resource_manager.set_tag_offset("nesFighter", "Idle", x=5, y=-3)
 #resource_manager.set_frame_offset("nesFighter", 1, x=6, y=-2)
 
