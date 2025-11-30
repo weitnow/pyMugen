@@ -11,7 +11,9 @@ class MenuState(GameState):
         mySprite.set_anim_name("nesFighter")
         mySprite.set_frame_tag("Idle")
         #mySprite.flip_x = True
+        mySprite.playing = False
         self.mySprite = mySprite
+
 
         mySprite2 = Sprite()
         mySprite2.set_anim_name("debug32x32")
@@ -20,7 +22,11 @@ class MenuState(GameState):
 
         mySprite3 = Sprite()
         mySprite3.set_anim_name("debug32")
+        mySprite3.set_frame(0)
+        mySprite3.playing = True
+
         self.mySprite3 = mySprite3
+
 
     def exit(self):
         pass
