@@ -11,7 +11,7 @@ class: gaming
 :root {
   --accent-color-bright: rgba(255, 255, 255, 0.9);
   --accent-color: #ff8c00; /* Dunkles Orange */
-  --accent-color-rgba-light: rgba(255, 140, 0, 0.15); /* Leichter Orange Glow */
+  --accent-color-rgba-light: rgba(255, 140, 0, 0.05); /* Leichter Orange Glow */
   --accent-color-rgba-medium: rgba(255, 140, 0, 0.5); /* Mittlerer Orange Glow */
   --accent-color-rgba-strong: rgba(255, 140, 0, 0.8); /* Starker Orange Glow */
 }
