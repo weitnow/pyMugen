@@ -1,83 +1,39 @@
-import pygame
 from gamestates.gamestate_base import GameState
-from gameobjects.game_object import GameObject, HitboxType, HurtboxType
+from game_object import GameObject, HitboxType, HurtboxType
 from input_manager import PlayerController, Action
-from resource_manager import ResourceManager
-from sprite import Sprite  # your Sprite class
+from sprite import Sprite
+from physics_component import PhysicsComponent
 
 
-# -----------------------
-# PlayingState
-# -----------------------
+
 class PlayingState(GameState):
 
     def enter(self):
-        # --- Create Fighter ---
-        player = GameObject((100, 100))
-
-        # Create Sprite for the fighter
-        sprite = Sprite()
-        # load the animation
-        sprite.load_anim("gbFighter")
-        sprite.load_anim("nesFighter")
-        sprite.set_anim("nesFighter")
-        sprite.set_frame_tag("Idle")
-
-        # Attach sprite to the player GameObject
-        player.add_sprite(sprite)
+        #create a game object and add sprite
+        myGameObject = GameObject((0, 0))
+        myGameObject.add_sprite(Sprite().set_anim_name("nesFighter").set_frame_tag("Idle"))
 
 
-
-        # Setup hitbox / hurtbox
-        # Usage examples:
-
-        # Example 1: Hitbox active for all frames of "player_attack" animation
-        player.add_hitbox(
-            pygame.Rect(20, 10, 30, 40), 
-            HitboxType.HIGH, 
-            base_name="gbFighter"
-        )
-
-        # Example 2: Hurtbox active only during "idle" tag of "player" animation
-        player.add_hurtbox(
-            pygame.Rect(0, 0, 32, 64),
-            HurtboxType.PUNCH,
-            base_name="gbFighter",
-            tag_name="Idle"
-        )
-
-        # Example 3: Hitbox active only on frame 5 of "player_attack" animation
-        player.add_hitbox(
-            pygame.Rect(32, 0, 5, 5),
-            HitboxType.LOW,
-            base_name="nesFighter",
-            frame=2
-        )
+        # add physics
+        physics = PhysicsComponent(gravity=980, ground_y= 120, jump_force=-400)
+        myGameObject.set_physics(physics)
 
 
-
-        self.player = player
+        self.myGameObject = myGameObject
 
     def exit(self):
         pass
 
     def handle_input(self):
-        pass
+        actions = self.input_manager.get_just_pressed_actions(0)
+        if Action.UP in actions:
+            self.myGameObject.physics.jump()
 
     def update(self, dt):
-        self.player.update(dt)
-
-        # Example 4: Query active boxes
-        active_hitboxes = self.player.get_active_hitboxes()
-        for rect, hitbox_type in active_hitboxes:
-            print(f"Active hitbox: {hitbox_type} at {rect}")
-
-        active_hurtboxes = self.player.get_active_hurtboxes()
-        for rect, hurtbox_type in active_hurtboxes:
-            print(f"Active hurtbox: {hurtbox_type} at {rect}")
+        self.myGameObject.update(dt)
 
     def draw(self):
-        self.player.draw(self.view_manager.game_surface)
+        self.myGameObject.draw(self.view_manager.game_surface)
 
     def debug_draw(self):
-        self.player.draw_debug(self.view_manager.debug_surface)
+        self.myGameObject.draw_debug(self.view_manager.debug_surface)

@@ -88,6 +88,8 @@ class ResourceManager:
         self.animations = {}        # name -> AnimationData
         self._rotation_cache = {}   # shared cache across all objects
 
+        self.convert_alpha = True  # whether to convert images with alpha
+
     def load_spritesheet(self, name: str, image_path: str, json_path: str):
         if name in self.animations:
             raise ValueError(f"Animation '{name}' already loaded.")
@@ -95,7 +97,8 @@ class ResourceManager:
         with open(json_path, "r") as f:
             data = json.load(f)
 
-        spritesheet = pygame.image.load(image_path).convert_alpha()
+        img = pygame.image.load(image_path)
+        spritesheet = img.convert_alpha() if self.convert_alpha else img.convert()
 
         frames = {}
         durations = {}
@@ -132,7 +135,8 @@ class ResourceManager:
         if name in self.animations:
             raise ValueError(f"Spritesheet with name '{name}' already loaded.")
 
-        image = pygame.image.load(image_path).convert_alpha()
+        img = pygame.image.load(image_path)
+        image = img.convert_alpha() if self.convert_alpha else img.convert()
 
         # fill in data
         frames = {0: image}

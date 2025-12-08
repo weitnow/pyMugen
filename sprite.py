@@ -7,15 +7,14 @@ class Sprite:
         # PUBLIC attributes (with property access)
         self._flip_x: bool = False
         self._flip_y: bool = False
-        self._rotation: int = 0
-        self._snapped_rotation: int = 0
+        self._rotation: int = 0     
         
         # Animation data
-        self.frames = None  # is a Dict[int, pygame.Surface], is a reference to the origianal, reference, do NOT modify!
+        self.frames = None  # is a Dict[int, pygame.Surface], reference, do NOT modify!
         self.frame_durations = None  # is a Dict[int, int] mapping frame index to duration in ms, reference, do NOT modify!
         self.tags = None  # is a Dict[str, Dict[str, int]] mapping tag name to {"from": int, "to": int}, reference, do NOT modify!
         self.final_offsets = None  # is a Dict[int, (x, y)], reference, do NOT modify!
-        self.sprite_size = None  # is a tuple (width, height)
+        self.sprite_size = (0,0)  # is a tuple (width, height) 
        
         self.base_name = None # is a str name of the current animation-file
         self.current_tag = None # is a str name of the current tag
@@ -27,6 +26,7 @@ class Sprite:
         # Private attributes
         self._rm: ResourceManager = ResourceManager()
         self._dm: DebugManager = DebugManager()
+        self._snapped_rotation: int = 0
         
         
     # ---------------------
@@ -79,6 +79,7 @@ class Sprite:
             self.timer = 0
             self.playing = True
             self.png = anim.png
+        return self # allow chaining
         
     def set_frame_tag(self, tag_name: str):
         """Set animation to specific tag."""
@@ -88,6 +89,7 @@ class Sprite:
             self.current_frame_idx = tag_data["from"]
             self.timer = 0
             self.playing = True
+        return self
 
     def set_frame(self, frame_index: int):
         """Set animation to specific frame."""
@@ -96,6 +98,7 @@ class Sprite:
             self.current_frame_idx = frame_index
             self.timer = 0
             self.playing = False
+        return self
 
     # ---------------------
     # Update / Draw

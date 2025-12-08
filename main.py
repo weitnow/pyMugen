@@ -21,6 +21,7 @@ gamestate_manager = GameStateManager()
 input_manager = InputManager()
 debug_manager = DebugManager()
 resource_manager = ResourceManager()
+resource_manager.convert_alpha = False  # for debugging, do not convert alpha
 
 # --- Create GameView and DebugView ---
 view_manager = ViewManager()
@@ -35,7 +36,7 @@ resource_manager.load_spritesheet("stages", "assets/Graphics/Aseprite/stages.png
 
 
 # --- Set Offsets for spritesheets ---
-resource_manager.set_global_offset("nesFighter", x=5, y=0)
+resource_manager.set_global_offset("nesFighter", x=0, y=0)
 resource_manager.set_global_offset("debug32x32", x=16, y=0)
 resource_manager.set_global_offset("debug32", x=16, y=0)
 #resource_manager.set_tag_offset("nesFighter", "Idle", x=5, y=-3)
@@ -46,7 +47,7 @@ resource_manager.set_global_offset("debug32", x=16, y=0)
 gamestate_manager.add_state("menu", MenuState())
 gamestate_manager.add_state("playing", PlayingState())
 
-gamestate_manager.change_state("menu") # start in playing state
+gamestate_manager.change_state("playing") # start in playing state
 
 # --- Block certain events from pygame event queue to optimize ---
 pygame.event.set_blocked(None) # block all events
@@ -55,7 +56,7 @@ pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN]) # allow only these event
 # --- Main loop ---
 running = True
 while running:
-    dt = clock.tick(60) # dt in milliseconds as integer (16ms at 60fps)
+    dt = clock.tick(15) # dt in milliseconds as integer (16ms at 60fps)
 
     # --- Global Event Handling for all States --- 
     for event in pygame.event.get():

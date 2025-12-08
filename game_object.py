@@ -3,6 +3,7 @@ from enum import Enum
 from dataclasses import dataclass
 import globals  
 from debug_manager import DebugManager
+from sprite import Sprite
 
 class HitboxType(Enum):
     HIGH = "high"
@@ -66,7 +67,7 @@ class HurtboxData:
         # If only base_name is specified (or nothing), it's active
         return True
 
-class GameObject:
+class GameObject():
     def __init__(self, pos):
         # World transform only
         self.pos = pygame.Vector2(pos)
@@ -156,7 +157,6 @@ class GameObject:
             world_pos = self.pos + sprite.offset
             sprite.draw(surface, world_pos)
 
-        self.draw_debug(surface)
 
 
     # ------------------------
