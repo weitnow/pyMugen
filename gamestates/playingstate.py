@@ -15,7 +15,7 @@ class PlayingState(GameState):
 
 
         # add physics
-        physics = PhysicsComponent(gravity=980, ground_y= 120, jump_force=-400)
+        physics = PhysicsComponent()
         myGameObject.set_physics(physics)
 
 
@@ -27,6 +27,7 @@ class PlayingState(GameState):
     def handle_input(self):
         actions = self.input_manager.get_just_pressed_actions(0)
         if Action.UP in actions:
+
             self.myGameObject.physics.jump()
 
     def update(self, dt):

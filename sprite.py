@@ -103,12 +103,12 @@ class Sprite:
     # ---------------------
     # Update / Draw
     # ---------------------
-    def update(self, dt: int):
+    def update(self, dt: float):
         """Update current animation frame."""
         if not self.playing or not self.frames or self.png:
             return
 
-        self.timer += dt
+        self.timer += dt * 1000.0  # Convert dt to milliseconds
         current_frame_duration = self.frame_durations.get(self.current_frame_idx, 100)  # default to 100ms if not specified
 
         while self.timer >= current_frame_duration:

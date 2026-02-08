@@ -56,7 +56,7 @@ pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN]) # allow only these event
 # --- Main loop ---
 running = True
 while running:
-    dt = clock.tick(15) # dt in milliseconds as integer (16ms at 60fps)
+    dt = clock.tick(60) / 1000.0 # dt in seconds as float (0.016 at 60fps)
 
     # --- Global Event Handling for all States --- 
     for event in pygame.event.get():

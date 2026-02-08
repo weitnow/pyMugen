@@ -24,7 +24,7 @@ class GameStateManager:
 
     def update(self, dt):
         if self.current_state:
-            self.current_state.update(dt)
+            self.current_state.update(dt) # dt is now in seconds
 
     def draw(self):
         if self.current_state:

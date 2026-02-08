@@ -17,7 +17,7 @@ class ViewManager:
             (2560, 1440),
         ]
         self.CLEAR_COLOR = (30, 30, 30) # background color for game view
-        self.current_resolution_index = 4  # start with 1920x1080
+        self.current_resolution_index = 3  # start with 1920x1080
         self.fullscreen_enabled = False
         self.show_overlay = True
 
@@ -54,7 +54,7 @@ class ViewManager:
         self.debug_manager.set_view_manager(self) # inform debug manager about view manager
 
     def update(self, dt):
-        pass
+        pass # dt is now in seconds
 
     # --- Internal helper ---
     def _apply_display_mode(self):

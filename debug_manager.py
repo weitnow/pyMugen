@@ -38,9 +38,9 @@ class DebugManager:
             return
             
         now = time.time()
-        self.frame_time_ms = dt
+        self.frame_time_ms = dt * 1000.0
         if now - self.last_time > 0:
-            self.fps = 1000.0 / dt if dt > 0 else 0
+            self.fps = 1.0 / dt if dt > 0 else 0
             self.last_time = now
         
         # Only update system info at the specified interval
