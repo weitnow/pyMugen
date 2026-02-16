@@ -139,7 +139,6 @@ class GameObject():
 
         # Physics movement
         if self.physics:
-            print(self.physics.on_ground)
             self.physics.update(dt)
 
         # Sprite animation updates

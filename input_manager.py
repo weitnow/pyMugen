@@ -3,7 +3,7 @@ import pygame
 from collections import deque
 from typing import Optional, Set
 from enum import Enum, auto
-from decorators  import singleton
+from decorators import singleton
 
 # --- Actions ---
 class Action(Enum):
