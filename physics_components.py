@@ -28,6 +28,8 @@ class PhysicsComponent:
         else:
             self.on_ground = False
 
+  
+
         # set horizontal velocity to 0 if no left/right input (friction)
         #self.owner.vel.x *= 0.8  # simple friction effect
             

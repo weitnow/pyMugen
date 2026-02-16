@@ -74,7 +74,7 @@ class GameObject():
         self.vel = pygame.Vector2(0, 0)
 
         # Components
-        self.sprites = []         # list of Sprite instances
+        self.sprites = []   # list of Sprite instances
         self.physics = None       # PhysicsComponent
 
         # Collision
@@ -84,6 +84,8 @@ class GameObject():
         # State
         self.active = True
         self.visible = True
+        self.on_ground = None # update this from physics component to track if on ground for jump logic, etc.
+       
 
         # Private attributes
         self._dm = DebugManager()
@@ -140,11 +142,21 @@ class GameObject():
         # Physics movement
         if self.physics:
             self.physics.update(dt)
+            self.on_ground = self.physics.on_ground  # Update on_ground state from physics component
+
 
         # Sprite animation updates
         for sprite in self.sprites:
             sprite.update(dt)
 
+        self.update_test(dt) #TODO: remove this test method
+
+
+    def update_test(self, dt): #TODO: remove this test method
+        if self.on_ground:
+            self.sprites[0].set_frame_tag("Idle")
+        else:
+            self.sprites[0].set_frame_tag("Jumping")
 
     # ------------------------
     # Draw
