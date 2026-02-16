@@ -27,9 +27,6 @@ class PlayingState(GameState):
     def handle_input(self):
         actions = self.input_manager.get_pressed_actions(0)
 
-        # Vertical movement
-        if Action.UP in actions:
-            self.myGameObject.physics.move_up()
 
         # Horizontal movement
         if Action.LEFT in actions:
@@ -39,6 +36,11 @@ class PlayingState(GameState):
         else:
             # Neither LEFT nor RIGHT is being pressed
             self.myGameObject.physics.stop()
+
+        
+        # Vertical movement
+        if Action.UP in actions:
+            self.myGameObject.physics.move_up()
 
         
 

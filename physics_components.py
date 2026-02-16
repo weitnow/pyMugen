@@ -1,5 +1,5 @@
 class PhysicsComponent:
-    def __init__(self, gravity=1180, ground_y=120, jump_speed=400):
+    def __init__(self, gravity=1180, ground_y=120, jump_speed=400, walk_speed=100):
         """
         Initialize physics component with millisecond-based values.
         Args:
@@ -11,6 +11,7 @@ class PhysicsComponent:
         self.gravity = gravity
         self.ground_y = ground_y
         self.jump_speed = jump_speed
+        self.walk_speed = walk_speed
         self.on_ground = False
         
     def update(self, dt):
@@ -37,17 +38,19 @@ class PhysicsComponent:
             self.on_ground = False
 
 class FighterPhysicsComponent(PhysicsComponent):
-    def __init__(self, gravity=1180, ground_y=120, jump_speed=400):
-        super().__init__(gravity, ground_y, jump_speed)
+    def __init__(self, gravity=1180, ground_y=120, jump_speed=400, walk_speed=100):
+        super().__init__(gravity, ground_y, jump_speed, walk_speed)
         # Additional fighter-specific physics properties can be added here
 
     def move_left(self):
         # Implement left movement logic (e.g., set horizontal velocity)
-        self.owner.vel.x = -10  # Example horizontal speed to the left
+        if self.on_ground:
+            self.owner.vel.x = -self.walk_speed  # Use walk_speed for horizontal movement
 
     def move_right(self):
         # Implement right movement logic (e.g., set horizontal velocity)
-        self.owner.vel.x = 10  # Example horizontal speed to the right
+        if self.on_ground:
+            self.owner.vel.x = self.walk_speed  # Use walk_speed for horizontal movement
 
     def move_down(self):
         # Implement down movement logic if needed
@@ -55,7 +58,8 @@ class FighterPhysicsComponent(PhysicsComponent):
 
     def stop(self):
         # Stop horizontal movement (e.g., when no left/right input)
-        self.owner.vel.x = 0
+        if self.on_ground:
+            self.owner.vel.x = 0
 
     
 
