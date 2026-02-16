@@ -20,7 +20,7 @@ gamestate_manager = GameStateManager()
 input_manager = InputManager()
 debug_manager = DebugManager()
 resource_manager = ResourceManager()
-resource_manager.convert_alpha = False  # for debugging, do not convert alpha
+resource_manager.convert_alpha = True  # for debugging, do not convert alpha
 
 # --- Create GameView and DebugView ---
 view_manager = ViewManager()

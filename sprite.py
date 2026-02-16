@@ -83,6 +83,9 @@ class Sprite:
         
     def set_frame_tag(self, tag_name: str):
         """Set animation to specific tag."""
+        if tag_name == self.current_tag:
+            return self # no change
+
         if tag_name in self.tags:
             tag_data = self.tags[tag_name]
             self.current_tag = tag_name

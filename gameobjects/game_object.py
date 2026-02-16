@@ -153,8 +153,10 @@ class GameObject():
 
 
     def update_test(self, dt): #TODO: remove this test method
-        if self.on_ground:
+        if self.on_ground and self.vel.x == 0:
             self.sprites[0].set_frame_tag("Idle")
+        elif self.on_ground:
+            self.sprites[0].set_frame_tag("Walking")
         else:
             self.sprites[0].set_frame_tag("Jumping")
 
