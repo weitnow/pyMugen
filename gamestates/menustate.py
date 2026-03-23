@@ -14,6 +14,8 @@ class MenuState(GameState):
         #mySprite.playing = False
         self.mySprite = mySprite
 
+        self.sound_manager.play_music("choices")
+
 
   
 

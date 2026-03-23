@@ -10,18 +10,26 @@ class PlayingState(GameState):
 
     def enter(self):
         #create a game object and add sprite
-        myGameObject = GameObject((0, 0))
-        myGameObject.add_sprite(Sprite().set_anim_name("nesFighter").set_frame_tag("Idle"))
+        myGameObject = GameObject((0, 0)).add_sprite(Sprite().set_anim_name("nesFighter").set_frame_tag("Idle"))
 
-        self.sound_manager.play_music("bg_music")
-
+        myGameObject2 = GameObject((100, 0)).add_sprite(Sprite().set_anim_name("gbFighter").set_frame_tag("Idle"))
+        myGameObject2.sprites[0].flip_x = True
 
         # add physics
         physics = FighterPhysicsComponent()
         myGameObject.set_physics(physics)
 
+        physics2 = FighterPhysicsComponent()
+        myGameObject2.set_physics(physics2) 
 
-        self.myGameObject = myGameObject
+        self.player1 = myGameObject
+        self.player2 = myGameObject2
+
+
+        for i in range(5):
+            self.add_game_object(GameObject((i * 50, 0)).add_sprite(Sprite().set_anim_name("gbFighter").set_frame_tag("Idle")))
+
+        self.sound_manager.play_music("darkchurch")
 
     def exit(self):
         pass
@@ -32,26 +40,26 @@ class PlayingState(GameState):
 
         # Horizontal movement
         if Action.LEFT in actions:
-            self.myGameObject.physics.move_left()
+            self.player1.physics.move_left()
         elif Action.RIGHT in actions:
-            self.myGameObject.physics.move_right()
+            self.player1.physics.move_right()
         else:
             # Neither LEFT nor RIGHT is being pressed
-            self.myGameObject.physics.stop()
+            self.player1.physics.stop()
 
         
         # Vertical movement
         if Action.UP in actions:
-            self.myGameObject.physics.move_up()
+            self.player1.physics.move_up()
 
         
 
     def update(self, dt):
-        self.myGameObject.update(dt)
+        super().update(dt)
 
     def draw(self):
-        self.myGameObject.draw(self.view_manager.game_surface)
+        super().draw()
 
     def debug_draw(self):
-        self.myGameObject.draw_debug(self.view_manager.debug_surface)
+        self.player1.draw_debug(self.view_manager.debug_surface)
 

@@ -98,6 +98,7 @@ class GameObject():
         """Attach sprite as a visual child."""
         sprite.offset = pygame.Vector2(offset)
         self.sprites.append(sprite)
+        return self
 
     def set_physics(self, physics_component):
         self.physics = physics_component

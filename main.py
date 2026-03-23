@@ -43,7 +43,8 @@ resource_manager.set_global_offset("debug32", x=16, y=0)
 #resource_manager.set_frame_offset("nesFighter", 1, x=6, y=-2)
 
 # --- Load soundeffect and music resources ---
-sound_manager.load_music("bg_music", "assets/Music/choices.mp3")
+sound_manager.load_music("choices", "assets/Music/choices.mp3")
+sound_manager.load_music("darkchurch", "assets/Music/darkchurch.mp3")
 sound_manager.load_sound("jump", "assets/Soundeffects/jump3.wav")
 
 
