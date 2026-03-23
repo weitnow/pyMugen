@@ -19,7 +19,7 @@ class ViewManager:
         self.CLEAR_COLOR = (30, 30, 30) # background color for game view
         self.current_resolution_index = 3  # start with 1920x1080
         self.fullscreen_enabled = False
-        self.show_overlay = True
+        self.show_overlay = False
 
 
         # Game and Debug surfaces, open for public access
