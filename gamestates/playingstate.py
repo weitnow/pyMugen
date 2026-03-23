@@ -13,6 +13,8 @@ class PlayingState(GameState):
         myGameObject = GameObject((0, 0))
         myGameObject.add_sprite(Sprite().set_anim_name("nesFighter").set_frame_tag("Idle"))
 
+        self.sound_manager.play_music("bg_music")
+
 
         # add physics
         physics = FighterPhysicsComponent()

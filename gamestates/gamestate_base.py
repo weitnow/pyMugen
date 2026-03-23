@@ -3,6 +3,7 @@ from input_manager import InputManager
 from gamestate_manager import GameStateManager
 from view_manager import ViewManager
 from debug_manager import DebugManager
+from sound_manager import SoundManager
 
 
 
@@ -11,11 +12,12 @@ class GameState(ABC): #ABC is Abstract Base Class
     """Base class for all game states."""
 
     def __init__(self):
-        
+        # all managers are singletons, so we use the instance directly
         self.gamestate_manager: GameStateManager = GameStateManager()
         self.input_manager: InputManager = InputManager()
         self.view_manager: ViewManager = ViewManager()
         self.debug_manager: DebugManager = DebugManager()
+        self.sound_manager: SoundManager = SoundManager()
 
     @abstractmethod
     def enter(self):
