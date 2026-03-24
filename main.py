@@ -5,7 +5,7 @@ from debug_manager import DebugManager
 from input_manager import InputManager
 from gamestate_manager import GameStateManager
 from sound_manager import SoundManager
-
+from gamesettings.settings_manager import SettingsManager
 
 # --- Import all States ---
 from gamestates.menustate import MenuState
@@ -23,6 +23,7 @@ debug_manager = DebugManager()
 resource_manager = ResourceManager()
 resource_manager.convert_alpha = True  # for debugging, do not convert alpha
 sound_manager = SoundManager()
+settings_manager = SettingsManager()
 
 # --- Create GameView and DebugView ---
 view_manager = ViewManager()

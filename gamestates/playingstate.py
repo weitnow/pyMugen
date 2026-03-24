@@ -27,7 +27,7 @@ class PlayingState(GameState):
 
 
         for i in range(5):
-            self.add_game_object(GameObject((i * 50, 0)).add_sprite(Sprite().set_anim_name("gbFighter").set_frame_tag("Idle")))
+            self.add_game_object(GameObject((i * 30, 0)).add_sprite(Sprite().set_anim_name("gbFighter").set_frame_tag("Idle")))
 
         self.sound_manager.play_music("darkchurch")
 

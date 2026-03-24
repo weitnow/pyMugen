@@ -4,7 +4,9 @@ from gamestate_manager import GameStateManager
 from view_manager import ViewManager
 from debug_manager import DebugManager
 from sound_manager import SoundManager
+from gamesettings.settings_manager import SettingsManager
 from gameobjects.game_object import GameObject
+
 
 
 
@@ -20,6 +22,7 @@ class GameState(ABC): #ABC is Abstract Base Class
         self.view_manager: ViewManager = ViewManager()
         self.debug_manager: DebugManager = DebugManager()
         self.sound_manager: SoundManager = SoundManager()
+        self.settings_manager: SettingsManager = SettingsManager()
 
         # --- Game Objects ---
         self.player1: GameObject = None
