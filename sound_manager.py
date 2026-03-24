@@ -1,6 +1,6 @@
 import pygame
-
 from decorators import singleton
+from gamesettings.settings_manager import SettingsManager
 
 @singleton
 class SoundManager:
@@ -11,9 +11,16 @@ class SoundManager:
         self.music_tracks = {}   # name -> filepath
         self.sounds = {}         # name -> Sound object
 
+        self.settings_manager = SettingsManager() # SettingsManager is a singleton
+        self.settings_manager.load() 
+
         # Volume control
-        self.music_volume = 0.5
-        self.sfx_volume = 0.7
+        # Load settings
+        self.music_off = self.settings_manager.music_off
+        self.master_volume = self.settings_manager.master_volume
+        self.music_volume = self.settings_manager.music_volume
+        self.sfx_volume = self.settings_manager.sfx_volume
+        
 
         # Current state
         self.current_music = None
@@ -27,7 +34,7 @@ class SoundManager:
 
     def load_sound(self, name, path):
         sound = pygame.mixer.Sound(path)
-        sound.set_volume(self.sfx_volume)
+        sound.set_volume(self._get_effective_sfx_volume())
         self.sounds[name] = sound
 
     # ------------------------
@@ -46,7 +53,7 @@ class SoundManager:
             pygame.mixer.music.fadeout(fade_ms)
 
         pygame.mixer.music.load(self.music_tracks[name])
-        pygame.mixer.music.set_volume(self.music_volume)
+        pygame.mixer.music.set_volume(self._get_effective_music_volume())
         pygame.mixer.music.play(-1 if loop else 0)
 
         self.current_music = name
@@ -76,12 +83,46 @@ class SoundManager:
     # VOLUME CONTROL
     # ------------------------
 
-    def set_music_volume(self, volume):
+    def set_master_volume(self, volume: float):
+        self.master_volume = max(0.0, min(1.0, volume))
+
+        # Update music
+        pygame.mixer.music.set_volume(self._get_effective_music_volume())
+
+        # Update all SFX
+        for sound in self.sounds.values():
+            sound.set_volume(self._get_effective_sfx_volume())
+
+    def set_music_off(self, off: bool):
+        self.music_off = off
+        pygame.mixer.music.set_volume(self._get_effective_music_volume())
+        if self.music_off:
+            pygame.mixer.music.stop()
+
+    def set_music_volume(self, volume: float):
         self.music_volume = max(0.0, min(1.0, volume))
         pygame.mixer.music.set_volume(self.music_volume)
 
-    def set_sfx_volume(self, volume):
+    def set_sfx_volume(self, volume: float):
         self.sfx_volume = max(0.0, min(1.0, volume))
 
         for sound in self.sounds.values():
-            sound.set_volume(self.sfx_volume)
+            sound.set_volume(self._get_effective_music_volume)
+
+
+    # ------------------------
+    # HELPER METHODS
+    # ------------------------
+
+    def _get_effective_music_volume(self):
+        if self.music_off:
+            return 0.0
+        return self.master_volume * self.music_volume
+
+
+    def _get_effective_sfx_volume(self):
+        return self.master_volume * self.sfx_volume
+
+
+
+    
