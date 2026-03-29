@@ -1,7 +1,7 @@
 import pygame
 from gamestates.gamestate_base import GameState
 from input_manager import Action
-from sprite import Sprite
+from gameobjects.sprite import Sprite
 
 class MenuState(GameState):
 

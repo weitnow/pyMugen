@@ -121,21 +121,54 @@ class DebugManager:
             self.BOX_THICKNESS
         )
 
-    def draw_text_game(self, x, y, text, color):
+    def draw_text_game(self, pos, text, color):
         """Draw text using game-space coordinates automatically scaled to debug coords."""
         if not self.debug_on or self.view_manager is None:
             return
 
-        dx, dy = self.view_manager.to_debug_coords(x, y)
+        dx, dy = self.view_manager.to_debug_coords(pos[0], pos[1])
 
         img = self.font.render(text, True, color)
         self.view_manager.debug_surface.blit(img, (dx, dy))
 
-    def draw_text_debug(self, x, y, text, color):
+    def draw_text_debug(self, pos, text, color):
         """Draw text directly in debug-surface coordinates (no scaling)."""
         if not self.debug_on or self.view_manager is None:
             return
 
         img = self.font.render(text, True, color)
-        self.view_manager.debug_surface.blit(img, (x, y))
+        self.view_manager.debug_surface.blit(img, pos)
+
+
+    def draw_crossed_rect_game(self, pos, width, height, color):
+        """Draws a rectangle with an 'X' inside using game-space coordinates."""
+        if not self.debug_on or self.view_manager is None:
+            return
+
+        # 1. Draw the outer rectangle using your existing logic
+        self.draw_rect_game(pos, width, height, color)
+
+        # 2. Calculate scaled coordinates for the 'X' lines
+        x1, y1 = self.view_manager.to_debug_coords(pos[0], pos[1])
+        x2, y2 = self.view_manager.to_debug_coords(pos[0] + width, pos[1] + height)
+
+        # Line 1: Top-Left to Bottom-Right
+        pygame.draw.line(
+            self.view_manager.debug_surface,
+            color,
+            (x1, y1),
+            (x2, y2),
+            self.BOX_THICKNESS
+        )
+
+        # Line 2: Top-Right to Bottom-Left
+        # x-coordinate of right side is x2, y-coordinate of top is y1
+        # x-coordinate of left side is x1, y-coordinate of bottom is y2
+        pygame.draw.line(
+            self.view_manager.debug_surface,
+            color,
+            (x2, y1),
+            (x1, y2),
+            self.BOX_THICKNESS
+        )
 

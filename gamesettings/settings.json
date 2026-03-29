@@ -1,5 +1,5 @@
 {
-    "music_off": false,
+    "music_off": true,
     "master_volume": 0.8,
     "music_volume": 0.8,
     "sfx_volume": 0.8,

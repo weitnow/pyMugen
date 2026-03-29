@@ -31,8 +31,6 @@ class Sprite:
         
     # ---------------------
     # Properties
-
-        # Determine ang
     # ---------------------
     @property
     def flip_x(self) -> bool:
@@ -166,7 +164,17 @@ class Sprite:
 
     def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2 | tuple[int, int]):
         # Original sprite rectangle (dark grey) 
-        self._dm.draw_rect_game(pos=world_pos, width=self.sprite_size[0], height=self.sprite_size[1], color=(150, 150, 150))
+        # offset could be an empty dict if no offsets were defined for this animation, so default to (0,0)
+        offset_x, offset_y = self.final_offsets.get(self.current_frame_idx, (0, 0)) if self.final_offsets else (0, 0)
+        self._dm.draw_rect_game(
+            pos=(world_pos[0] + offset_x, world_pos[1] + offset_y),
+            width=self.sprite_size[0],
+            height=self.sprite_size[1],
+            color=(150, 150, 150)
+            )
+        self._dm.draw_crossed_rect_game(pos=world_pos, width=3, height=3, color=(150, 150, 150))
+        self._dm.draw_text_game(pos=(world_pos[0] + 4, world_pos[1]), text=f"Pos: {world_pos} Tag: {self.current_tag}", color=(150, 150, 150))
+   
                                 
 
 

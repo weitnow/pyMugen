@@ -168,7 +168,7 @@ class ResourceManager:
         anim = self._require_anim(base_name)
         anim.set_frame_offset(frame_idx, x, y)
 
-    def _require_anim(self, name: str):
+    def _require_anim(self, name: str) -> "AnimationData":
         """Internal helper to validate animation existence."""
         if name not in self.animations:
             raise ValueError(f"Animation '{name}' not loaded.")

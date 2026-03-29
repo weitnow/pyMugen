@@ -3,12 +3,11 @@ from enum import Enum
 from dataclasses import dataclass
 import globals  
 from debug_manager import DebugManager
-from sprite import Sprite
+from gameobjects.sprite import Sprite
 
 class HitboxType(Enum):
     HIGH = "high"
     LOW = "low"
-
 
 class HurtboxType(Enum):
     PUNCH = "punch"
@@ -39,7 +38,6 @@ class HitboxData:
         
         # If only base_name is specified (or nothing), it's active
         return True
-
 
 @dataclass
 class HurtboxData:
@@ -78,8 +76,8 @@ class GameObject():
         self.physics = None       # PhysicsComponent
 
         # Collision
-        self.hurtbox: pygame.Rect | None = None
-        self.hitbox: pygame.Rect | None = None
+        self.hurtbox: pygame.Rect = None
+        self.hitbox: pygame.Rect = None
 
         # State
         self.active = True
@@ -103,6 +101,7 @@ class GameObject():
     def set_physics(self, physics_component):
         self.physics = physics_component
         physics_component.owner = self
+        return self
 
 
     # ------------------------
@@ -150,16 +149,6 @@ class GameObject():
         for sprite in self.sprites:
             sprite.update(dt)
 
-        self.update_test(dt) #TODO: remove this test method
-
-
-    def update_test(self, dt): #TODO: remove this test method
-        if self.on_ground and self.vel.x == 0:
-            self.sprites[0].set_frame_tag("Idle")
-        elif self.on_ground:
-            self.sprites[0].set_frame_tag("Walking")
-        else:
-            self.sprites[0].set_frame_tag("Jumping")
 
     # ------------------------
     # Draw
