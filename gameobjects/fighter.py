@@ -5,7 +5,7 @@ class Fighter(GameObject):
     def __init__(self, pos: tuple[float, float], player_index: int = 0):
         super().__init__(pos)
         self.origin_center_bottom = True
-        self.rotatable = True
+        
 
         # Movement attributes
         self.speed = 0.1

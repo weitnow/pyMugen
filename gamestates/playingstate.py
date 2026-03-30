@@ -10,13 +10,13 @@ class PlayingState(GameState):
 
     def enter(self):
         #create a game object and add sprite
-        myGameObject = GameObject((32, 32)).add_sprite(Sprite().set_anim_name("nesFighter").set_frame_tag("Idle"))
+        myGameObject = GameObject((32, 155-32), origin_center_bottom=True).add_sprite(Sprite().set_anim_name("nesFighter").set_frame_tag("Idle"))
 
        
 
         self.player1 = myGameObject
 
-        self.sprite = Sprite().set_anim_name("debug32x32")
+
    
 
 
@@ -35,18 +35,17 @@ class PlayingState(GameState):
     def update(self, dt):
         super().update(dt)
 
-        self.sprite.rotation += 90 * dt # rotate 90 degrees per second
+        
 
 
 
     def draw(self):
         super().draw()
 
-        self.sprite.draw(self.view_manager.game_surface, (100, 100))
 
 
     def debug_draw(self):
         self.player1.draw_debug(self.view_manager.debug_surface)
 
-        self.sprite.debug_draw(self.view_manager.debug_surface, (100, 100))
+    
 

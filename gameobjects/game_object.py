@@ -66,7 +66,10 @@ class HurtboxData:
         return True
 
 class GameObject():
-    def __init__(self, pos):
+    def __init__(self, pos, origin_center_bottom: bool = True):
+
+        self.origin_center_bottom = origin_center_bottom # this only affects drawingposition, hitbox/hurtbox positions are still relative to self.pos regardless of this setting. This is just for convenience when drawing sprites that are designed with center-bottom origin in mind.
+
         # World transform only
         self.pos = pygame.Vector2(pos)
         self.vel = pygame.Vector2(0, 0)
@@ -84,9 +87,13 @@ class GameObject():
         self.visible = True
         self.on_ground = None # update this from physics component to track if on ground for jump logic, etc.
        
-
+        # ---------------------
         # Private attributes
+        # ---------------------
         self._dm = DebugManager()
+
+
+        
 
 
     # ------------------------
@@ -154,12 +161,17 @@ class GameObject():
     # Draw
     # ------------------------
     def draw(self, surface):
-        if not self.visible:
+        if not self.visible or not self.active:
             return
-            
+        
+        # --- Draw sprites ---         
         for sprite in self.sprites:
-            world_pos = self.pos + sprite.offset
+            if self.origin_center_bottom:
+                world_pos = (self.pos.x + sprite.offset.x - sprite.sprite_size[0] / 2, self.pos.y - sprite.sprite_size[1] + sprite.offset.y)
+            else:
+                world_pos = self.pos + sprite.offset
             sprite.draw(surface, world_pos)
+        # --- End draw sprites ---
 
 
 
@@ -167,10 +179,16 @@ class GameObject():
     # Debug drawing
     # ------------------------
     def draw_debug(self, surface: pygame.Surface):
+        """ Draw world position point """
+        self._dm.draw_circle_game(self.pos.x, self.pos.y, 0.5, globals.COLOR_YELLOW)
+
 
         """Draw sprite debug info."""
         for sprite in self.sprites:
-            world_pos = self.pos + sprite.offset
+            if self.origin_center_bottom:
+                world_pos = (self.pos.x + sprite.offset.x - sprite.sprite_size[0] / 2, self.pos.y - sprite.sprite_size[1] + sprite.offset.y)
+            else:
+                world_pos = self.pos + sprite.offset
             sprite.debug_draw(surface, world_pos)
 
         """Draw hurtbox / hitbox for debugging."""

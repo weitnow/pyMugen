@@ -1,5 +1,5 @@
 import pygame
-from resource_manager import ResourceManager
+from graphic_manager import ResourceManager
 from debug_manager import DebugManager
 
 class Sprite:
@@ -165,7 +165,7 @@ class Sprite:
     def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2 | tuple[int, int]):
         # Original sprite rectangle (dark grey) 
         # offset could be an empty dict if no offsets were defined for this animation, so default to (0,0)
-        offset_x, offset_y = self.final_offsets.get(self.current_frame_idx, (0, 0)) if self.final_offsets else (0, 0)
+        offset_x, offset_y = self.final_offsets.get(self.current_frame_idx, (0, 0))
         self._dm.draw_rect_game(
             pos=(world_pos[0] + offset_x, world_pos[1] + offset_y),
             width=self.sprite_size[0],
