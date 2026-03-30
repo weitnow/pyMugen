@@ -17,10 +17,6 @@ class PlayingState(GameState):
         self.player1 = myGameObject
 
 
-   
-
-
-
         self.sound_manager.play_music("darkchurch")
 
     def exit(self):

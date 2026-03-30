@@ -66,7 +66,7 @@ class HurtboxData:
         return True
 
 class GameObject():
-    def __init__(self, pos, origin_center_bottom: bool = True):
+    def __init__(self, pos, origin_center_bottom: bool = False):
 
         self.origin_center_bottom = origin_center_bottom # this only affects drawingposition, hitbox/hurtbox positions are still relative to self.pos regardless of this setting. This is just for convenience when drawing sprites that are designed with center-bottom origin in mind.
 

@@ -41,7 +41,7 @@ resource_manager.set_global_offset("nesFighter", x=0, y=0)
 resource_manager.set_global_offset("debug32x32", x=16, y=0)
 resource_manager.set_global_offset("debug32", x=16, y=0)
 #resource_manager.set_tag_offset("nesFighter", "Idle", x=5, y=-3)
-resource_manager.set_frame_offset("nesFighter", 1, x=6, y=-2)
+#resource_manager.set_frame_offset("nesFighter", 1, x=6, y=-2)
 
 # --- Load soundeffect and music resources ---
 sound_manager.load_music("choices", "assets/Music/choices.mp3")
