@@ -128,7 +128,7 @@ class Sprite:
 
             current_frame_duration = self.frame_durations.get(self.current_frame_idx, 100)
 
-    def draw(self, surface: pygame.Surface, world_pos: pygame.Vector2 | tuple[int, int]):
+    def draw(self, surface: pygame.Surface, world_pos: pygame.Vector2, camera=None):
 
         if self.sprite_size == (0, 0):
             return
@@ -142,6 +142,10 @@ class Sprite:
             offset.y = -offset.y
 
         world_pos = pygame.Vector2(world_pos) + offset
+
+        # Apply camera transformation
+        if camera:
+            world_pos = camera.apply_vec2(world_pos)
 
         # Fast path: no rotation or flip
         if self._rotation == 0 and not self._flip_x and not self._flip_y:

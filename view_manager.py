@@ -1,6 +1,7 @@
 import pygame
 from decorators import singleton
 from debug_manager import DebugManager
+from camera import Camera
 
 @singleton
 class ViewManager:
@@ -20,6 +21,9 @@ class ViewManager:
         self.current_resolution_index = 3  # start with 1920x1080
         self.fullscreen_enabled = False
         self.show_overlay = False
+
+        # Camera setup (world size is arbitrary for now, can be adjusted as needed)
+        self.camera = Camera(self.GAME_VIEW_WIDTH, self.GAME_VIEW_HEIGHT, 1000, 1000)
 
 
         # Game and Debug surfaces, open for public access

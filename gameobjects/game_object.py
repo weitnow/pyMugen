@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import globals  
 from debug_manager import DebugManager
 from gameobjects.sprite import Sprite
+from view_manager import ViewManager # for camera access in draw method, consider refactoring to pass camera as argument instead of direct access
 
 class HitboxType(Enum):
     HIGH = "high"
@@ -91,6 +92,7 @@ class GameObject():
         # Private attributes
         # ---------------------
         self._dm = DebugManager()
+        self._vm = ViewManager()
 
 
         
@@ -170,7 +172,8 @@ class GameObject():
                 world_pos = (self.pos.x + sprite.offset.x - sprite.sprite_size[0] / 2, self.pos.y - sprite.sprite_size[1] + sprite.offset.y)
             else:
                 world_pos = self.pos + sprite.offset
-            sprite.draw(surface, world_pos)
+                
+            sprite.draw(surface, world_pos, self._vm.camera) # pass camera for proper world-to-screen transformation
         # --- End draw sprites ---
 
 

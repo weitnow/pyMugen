@@ -11,10 +11,15 @@ class PlayingState(GameState):
     def enter(self):
         #create a game object and add sprite
         myGameObject = GameObject((32, 155-32), origin_center_bottom=True).add_sprite(Sprite().set_anim_name("nesFighter").set_frame_tag("Idle"))
-
+        myGameObject2 = (GameObject((200, 155-32), origin_center_bottom=True)
+                        .add_sprite(Sprite()
+                        .set_anim_name("nesFighter")
+                        .set_frame_tag("Idle")))
+        myGameObject2.sprites[0].flip_x = True # just for testing, can be set in the spritesheet data later for convenience
        
 
         self.player1 = myGameObject
+        self.player2 = myGameObject2
 
 
         self.sound_manager.play_music("darkchurch")
@@ -29,6 +34,7 @@ class PlayingState(GameState):
         
 
     def update(self, dt):
+        self.view_manager.camera.update(self.player1, self.player2) # simple camera follow for testing, can be expanded later for more complex behavior (like lookahead, shake, etc)
         super().update(dt)
 
         
@@ -41,7 +47,7 @@ class PlayingState(GameState):
 
 
     def debug_draw(self):
-        self.player1.draw_debug(self.view_manager.debug_surface)
+        super().debug_draw()
 
     
 

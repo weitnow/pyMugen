@@ -1,3 +1,5 @@
+import pygame
+
 class Camera:
     def __init__(self, view_width, view_height, world_width, world_height):
         self.view_width = view_width
@@ -13,8 +15,8 @@ class Camera:
 
     def update(self, p1, p2):
         # --- midpoint ---
-        mid_x = (p1.rect.centerx + p2.rect.centerx) / 2
-        mid_y = (p1.rect.centery + p2.rect.centery) / 2
+        mid_x = (p1.pos.x + p2.pos.x) / 2
+        mid_y = (p1.pos.y + p2.pos.y) / 2
 
         # --- horizontal ---
         target_x = mid_x - self.view_width / 2
@@ -36,3 +38,6 @@ class Camera:
 
     def apply(self, rect):
         return rect.move(-self.x, -self.y)
+    
+    def apply_vec2(self, pos):
+        return pygame.Vector2(pos) - pygame.Vector2(self.x, self.y)
