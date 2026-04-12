@@ -1,6 +1,5 @@
 import json
 import pygame
-import copy
 from typing import Dict
 from decorators import singleton
 
@@ -83,7 +82,7 @@ class AnimationData:
 
 
 @singleton
-class ResourceManager:
+class GraphicManager:
     def __init__(self):
         self.animations = {}        # name -> AnimationData
         self._rotation_cache = {}   # shared cache across all objects

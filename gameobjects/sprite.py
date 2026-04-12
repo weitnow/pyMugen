@@ -1,5 +1,5 @@
 import pygame
-from graphic_manager import ResourceManager
+from graphic_manager import GraphicManager
 from debug_manager import DebugManager
 
 class Sprite:
@@ -24,9 +24,10 @@ class Sprite:
         self.png = False # True if this sprite is a single PNG, False if it is an animation
         
         # Private attributes
-        self._rm: ResourceManager = ResourceManager()
+        self._rm: GraphicManager = GraphicManager()
         self._dm: DebugManager = DebugManager()
         self._snapped_rotation: int = 0
+        self._rect = None # pygame.rect set later
         
         
     # ---------------------
@@ -147,17 +148,26 @@ class Sprite:
         if camera:
             world_pos = camera.apply_vec2(world_pos)
 
-        # Fast path: no rotation or flip
+        # Get frame
         if self._rotation == 0 and not self._flip_x and not self._flip_y:
             frame = self.frames[self.current_frame_idx]
             rot_offset = (0, 0)
         else:
+            # get frame from cache
             frame, rot_offset = self._get_transformed_frame()
 
-        # Rotation bounding-box offset
-        world_pos -= pygame.Vector2(rot_offset)
+        # Create rect from frame
+        rect = frame.get_rect() # TODO: this can be refactored to create a self.rect when choosing set_frame or set_frame_tag to save a bit of calculations
 
-        surface.blit(frame, world_pos)
+        # anchor it to center
+        rect.center = world_pos
+
+        # Rotation bounding-box offset correction
+        rect.x -= rot_offset[0]
+        rect.y -= rot_offset[1]
+
+
+        surface.blit(frame, rect)
 
 
 
