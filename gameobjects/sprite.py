@@ -1,6 +1,12 @@
 import pygame
 from graphic_manager import GraphicManager
 from debug_manager import DebugManager
+from enum import Enum, auto
+
+class RenderAnchor(Enum):
+    CENTER = auto()
+    TOPLEFT = auto()
+    BOTTOMMID = auto()
 
 class Sprite:
     def __init__(self):
@@ -129,7 +135,15 @@ class Sprite:
 
             current_frame_duration = self.frame_durations.get(self.current_frame_idx, 100)
 
-    def draw(self, surface: pygame.Surface, world_pos: pygame.Vector2, camera=None):
+    def draw(self, surface: pygame.Surface, world_pos: pygame.Vector2, render_anchor: RenderAnchor = RenderAnchor.CENTER, camera=None):
+
+        draw_pos = pygame.Vector2(world_pos)  # make a copy to avoid modifying caller's vector
+        if render_anchor == RenderAnchor.CENTER:
+            pass  # default is already center
+        elif render_anchor == RenderAnchor.TOPLEFT:
+            draw_pos += pygame.Vector2(self.sprite_size[0] // 2, self.sprite_size[1] // 2)
+        elif render_anchor == RenderAnchor.BOTTOMMID:
+            draw_pos += pygame.Vector2(0, self.sprite_size[1] // 2)
 
         if self.sprite_size == (0, 0):
             return
@@ -142,29 +156,22 @@ class Sprite:
         if self._flip_y:
             offset.y = -offset.y
 
-        world_pos = pygame.Vector2(world_pos) + offset
+        # apply offset to draw_pos
+        draw_pos = pygame.Vector2(draw_pos) + offset
 
         # Apply camera transformation
         if camera:
-            world_pos = camera.apply_vec2(world_pos)
+            draw_pos = camera.apply_vec2(world_pos)
+
 
         # Get frame
         if self._rotation == 0 and not self._flip_x and not self._flip_y:
             frame = self.frames[self.current_frame_idx]
-            rot_offset = (0, 0)
         else:
             # get frame from cache
-            frame, rot_offset = self._get_transformed_frame()
+            frame= self._get_transformed_frame()
 
-        # Create rect from frame
-        rect = frame.get_rect() # TODO: this can be refactored to create a self.rect when choosing set_frame or set_frame_tag to save a bit of calculations
-
-        # anchor it to center
-        rect.center = world_pos
-
-        # Rotation bounding-box offset correction
-        rect.x -= rot_offset[0]
-        rect.y -= rot_offset[1]
+        rect = frame.get_rect(center=draw_pos)
 
 
         surface.blit(frame, rect)
@@ -176,17 +183,31 @@ class Sprite:
     # Debug Draw
     # ---------------------
 
-    def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2 | tuple[int, int]):
+    def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2, render_anchor: RenderAnchor = RenderAnchor.CENTER, camera=None):
         # Original sprite rectangle (dark grey) 
+
+        world_pos = pygame.Vector2(world_pos)  # make a copy to avoid modifying caller's vector
+        if render_anchor == RenderAnchor.CENTER:
+            pass  # default is already center
+        elif render_anchor == RenderAnchor.TOPLEFT:
+            world_pos += pygame.Vector2(self.sprite_size[0] // 2, self.sprite_size[1] // 2)
+        elif render_anchor == RenderAnchor.BOTTOMMID:
+            world_pos += pygame.Vector2(0, self.sprite_size[1] // 2)
+
         # offset could be an empty dict if no offsets were defined for this animation, so default to (0,0)
         offset_x, offset_y = self.final_offsets.get(self.current_frame_idx, (0, 0))
+        
+        # Draw the original sprite rect (with offset) in dark grey for debugging
         self._dm.draw_rect_game(
-            pos=(world_pos[0] + offset_x, world_pos[1] + offset_y),
+            pos=(world_pos[0] + offset_x - self.sprite_size[0] // 2, world_pos[1] + offset_y - self.sprite_size[1] // 2),
             width=self.sprite_size[0],
             height=self.sprite_size[1],
             color=(150, 150, 150)
             )
-        self._dm.draw_crossed_rect_game(pos=world_pos, width=3, height=3, color=(150, 150, 150))
+        
+        # Draw a small cross in the center of the sprite which is also the rotation point
+        self._dm.draw_crossed_rect_game(pos=world_pos - pygame.Vector2(2, 2), width=4, height=4, color=(150, 150, 150))
+
         self._dm.draw_text_game(pos=(world_pos[0] + 4, world_pos[1]), text=f"Pos: {world_pos} Tag: {self.current_tag}", color=(150, 150, 150))
    
                                 

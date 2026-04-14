@@ -181,44 +181,39 @@ class GraphicManager:
         return self.animations[name]
     
         
-    def get_rotated_frame(self, anim_name: str, frame_idx: int, angle: int,
-                      flip_x: bool = False, flip_y: bool = False):
+    def get_rotated_frame(
+        self,
+        anim_name: str,
+        frame_idx: int,
+        angle: int,
+        flip_x: bool = False,
+        flip_y: bool = False
+    ):
 
         original = self.animations[anim_name].frames[frame_idx]
+
         key = (anim_name, frame_idx, angle, flip_x, flip_y)
 
-        # If cached: return (surface, offset)
         if key in self._rotation_cache:
             return self._rotation_cache[key]
 
-        # Step 1: apply flipping
-        working = (
-            pygame.transform.flip(original, flip_x, flip_y)
-            if (flip_x or flip_y)
-            else original
-        )
+        # 1. flip first
+        working = pygame.transform.flip(original, flip_x, flip_y) if (flip_x or flip_y) else original
 
-        # Step 2: no rotation needed → no size change
+        # 2. no rotation
         if angle == 0:
-            offset = (0, 0)
-            self._rotation_cache[key] = (working, offset)
-            return working, offset
+            self._rotation_cache[key] = (working, (0, 0))
+            return working, (0, 0)
 
-        # Step 3: rotate
+        # 3. rotate
         rotated = pygame.transform.rotate(working, angle)
 
-        # Step 4: compute offset correction
-        ow, oh = working.get_size()
-        rw, rh = rotated.get_size()
+        # 4. IMPORTANT:
+        # No offset correction anymore.
+        # We rely on center-based rect placement in Sprite.draw()
+        self._rotation_cache[key] = rotated
 
-        offset_x = (rw - ow) // 2
-        offset_y = (rh - oh) // 2
-
-        offset = (offset_x, offset_y)
-
-        # Cache the result: rotated + offset
-        self._rotation_cache[key] = (rotated, offset)
-        return rotated, offset
+        return rotated
 
 
 
