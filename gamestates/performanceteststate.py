@@ -10,12 +10,17 @@ from gameobjects.sprite import RenderAnchor
 
 
 
-class TestState(GameState):
+class PerformanceTestState(GameState):
 
     def enter(self):
         #create a game object and add sprite
+        self.sprites = []
         self.mySprite1 = Sprite().set_anim_name("debug32")
         self.mySprite1.set_frame(1)
+
+        for i in range(100):
+            sprite = Sprite().set_anim_name("nesFighter").set_frame_tag("Idle")
+            self.sprites.append(sprite)
 
         self.randoranchor = RenderAnchor.CENTER
 
@@ -53,7 +58,8 @@ class TestState(GameState):
     def update(self, dt):
         #self.view_manager.camera.update(self.player1, self.player2) # simple camera follow for testing, can be expanded later for more complex behavior (like lookahead, shake, etc)
         
-        #self.mySprite1.update(dt)
+        for sprite in self.sprites:
+            sprite.update(dt)
 
         super().update(dt)
 
@@ -63,12 +69,24 @@ class TestState(GameState):
 
     def draw(self):
         self.mySprite1.draw(self.view_manager.game_surface, (16, 16), render_anchor=self.randoranchor)
+
+
+        for i, sprite in enumerate(self.sprites):
+            x = 16 + (i % 20) * 32
+            y = 64 + (i // 20) * 32
+            sprite.draw(self.view_manager.game_surface, (x, y), render_anchor=RenderAnchor.TOPLEFT)
+
         super().draw()
 
 
 
     def debug_draw(self):
         self.mySprite1.debug_draw(self.view_manager.debug_surface, (16, 16), render_anchor=self.randoranchor)
+
+        for i, sprite in enumerate(self.sprites):
+            x = 16 + (i % 20) * 32
+            y = 64 + (i // 20) * 32
+            sprite.debug_draw(self.view_manager.debug_surface, (x, y), render_anchor=RenderAnchor.TOPLEFT)
         super().debug_draw()
 
     

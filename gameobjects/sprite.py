@@ -193,18 +193,25 @@ class Sprite:
     # ---------------------
 
     def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2, render_anchor: RenderAnchor = RenderAnchor.CENTER, camera=None): #TODO: implement camera support
-        # Original sprite rectangle (dark grey) 
+     
+        x, y = world_pos
 
-        world_pos = pygame.Vector2(world_pos)  # make a copy to avoid modifying caller's vector
-        if render_anchor == RenderAnchor.CENTER:
-            pass  # default is already center
-        elif render_anchor == RenderAnchor.TOPLEFT:
-            world_pos += pygame.Vector2(self.sprite_size[0] // 2, self.sprite_size[1] // 2)
-        elif render_anchor == RenderAnchor.BOTTOMMID:
-            world_pos += pygame.Vector2(0, self.sprite_size[1] // 2)
+        # --- Anchor adjustment --- but only if sprite size is not (0,0) to avoid weird anchor behavior when there is no sprite loaded yet
+        if self.sprite_size != (0, 0):
+            if render_anchor == RenderAnchor.TOPLEFT:
+                x += self.sprite_size[0] // 2
+                y += self.sprite_size[1] // 2
+            elif render_anchor == RenderAnchor.BOTTOMMID:
+                y += self.sprite_size[1] // 2
 
-        # offset could be an empty dict if no offsets were defined for this animation, so default to (0,0)
-        offset_x, offset_y = self.final_offsets.get(self.current_frame_idx, (0, 0))
+        # starting here x and y are the world position of the sprite with anchor adjustment, but before offset and camera
+
+
+        # --- Offset lookup ---
+        offset_x, offset_y = self._current_offset
+
+        
+
         
         # Draw the original sprite rect (with offset) in dark grey for debugging
         self._dm.draw_rect_game(
@@ -213,6 +220,9 @@ class Sprite:
             height=self.sprite_size[1],
             color=(150, 150, 150)
             )
+        
+
+
         
         # Draw a small cross in the center of the sprite which is also the rotation point
         self._dm.draw_crossed_rect_game(pos=world_pos - pygame.Vector2(2, 2), width=4, height=4, color=(150, 150, 150))

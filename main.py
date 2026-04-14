@@ -11,6 +11,7 @@ from gamesettings.settings_manager import SettingsManager
 from gamestates.menustate import MenuState
 from gamestates.playingstate import PlayingState
 from gamestates.teststate import TestState
+from gamestates.performanceteststate import PerformanceTestState
 
 # --- Initialize ---
 pygame.init()
@@ -39,8 +40,8 @@ resource_manager.load_spritesheet("stages", "assets/Graphics/Aseprite/stages.png
 
 # --- Set Offsets for spritesheets ---
 resource_manager.set_global_offset("nesFighter", x=0, y=0)
-resource_manager.set_global_offset("debug32x32", x=16, y=0)
-resource_manager.set_global_offset("debug32", x=0, y=0)
+resource_manager.set_global_offset("debug32x32", x=0, y=0)
+resource_manager.set_global_offset("debug32", x=16, y=0)
 #resource_manager.set_tag_offset("nesFighter", "Idle", x=5, y=-3)
 #resource_manager.set_frame_offset("nesFighter", 1, x=6, y=-2)
 
@@ -54,8 +55,10 @@ sound_manager.load_sound("jump", "assets/Soundeffects/jump3.wav")
 gamestate_manager.add_state("menu", MenuState())
 gamestate_manager.add_state("playing", PlayingState())
 gamestate_manager.add_state("test", TestState())
+gamestate_manager.add_state("performancetest", PerformanceTestState())
 
-gamestate_manager.change_state("menu") # start in playing state
+
+gamestate_manager.change_state("performancetest") # start in performance test state
 
 # --- Block certain events from pygame event queue to optimize ---
 pygame.event.set_blocked(None) # block all events
