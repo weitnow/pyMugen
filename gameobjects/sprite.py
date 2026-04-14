@@ -34,6 +34,7 @@ class Sprite:
         self._dm: DebugManager = DebugManager()
         self._snapped_rotation: int = 0
         self._rect = None # pygame.rect set later
+        self._current_offset = (0, 0) # current frame offset, updated in update() if frame changes
         
         
     # ---------------------
@@ -84,6 +85,7 @@ class Sprite:
             self.timer = 0
             self.playing = True
             self.png = anim.png
+            self._current_offset = self.final_offsets.get(0, (0, 0)) #get offset for first sprite, if there is none get (0,0)
         return self # allow chaining
         
     def set_frame_tag(self, tag_name: str):
@@ -133,6 +135,9 @@ class Sprite:
                 if self.current_frame_idx >= len(self.frames):
                     self.current_frame_idx = 0
 
+            # Update current offset property for the new frame        
+            self._current_offset = self.final_offsets.get(self.current_frame_idx, (0, 0))
+
             current_frame_duration = self.frame_durations.get(self.current_frame_idx, 100)
 
     def draw(self, surface: pygame.Surface, world_pos, render_anchor: RenderAnchor = RenderAnchor.CENTER, camera=None):
@@ -151,7 +156,7 @@ class Sprite:
             y += self.sprite_size[1] // 2
 
         # --- Offset lookup ---
-        offset_x, offset_y = self.final_offsets.get(self.current_frame_idx, (0, 0))
+        offset_x, offset_y = self._current_offset #self.final_offsets.get(self.current_frame_idx, (0, 0))
 
         if self._flip_x:
             offset_x = -offset_x

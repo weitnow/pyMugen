@@ -62,7 +62,7 @@ class TestState(GameState):
 
     def draw(self):
         self.mySprite1.draw(self.view_manager.game_surface, (16, 16), render_anchor=self.randoranchor)
-        self.mySprite2.draw(self.view_manager.game_surface, (64, 16), render_anchor=self.randoranchor)
+        self.mySprite2.draw(self.view_manager.game_surface, (16+32, 16), render_anchor=self.randoranchor)
 
 
 
