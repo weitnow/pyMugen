@@ -15,6 +15,9 @@ class TestState(GameState):
     def enter(self):
         #create a game object and add sprite
         self.mySprite1 = Sprite().set_anim_name("debug32")
+        self.mySprite1.set_frame(1)
+        self.mySprite2 = Sprite().set_anim_name("debug32x32")
+
         self.randoranchor = RenderAnchor.CENTER
 
 
@@ -29,8 +32,11 @@ class TestState(GameState):
 
         if Action.RIGHT in actions:
             self.mySprite1.rotation -= 45
+            self.mySprite2.rotation -= 45
+            print(self.mySprite1.sprite_size)
         elif Action.LEFT in actions:
             self.mySprite1.rotation += 45
+            self.mySprite2.rotation += 45
 
         if Action.UP in actions:
             # Cycle through render anchors for testing
@@ -56,6 +62,7 @@ class TestState(GameState):
 
     def draw(self):
         self.mySprite1.draw(self.view_manager.game_surface, (16, 16), render_anchor=self.randoranchor)
+        self.mySprite2.draw(self.view_manager.game_surface, (64, 16), render_anchor=self.randoranchor)
 
 
 

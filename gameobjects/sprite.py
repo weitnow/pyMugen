@@ -135,46 +135,52 @@ class Sprite:
 
             current_frame_duration = self.frame_durations.get(self.current_frame_idx, 100)
 
-    def draw(self, surface: pygame.Surface, world_pos: pygame.Vector2, render_anchor: RenderAnchor = RenderAnchor.CENTER, camera=None):
+    def draw(self, surface: pygame.Surface, world_pos, render_anchor: RenderAnchor = RenderAnchor.CENTER, camera=None):
 
-        draw_pos = pygame.Vector2(world_pos)  # make a copy to avoid modifying caller's vector
-        if render_anchor == RenderAnchor.CENTER:
-            pass  # default is already center
-        elif render_anchor == RenderAnchor.TOPLEFT:
-            draw_pos += pygame.Vector2(self.sprite_size[0] // 2, self.sprite_size[1] // 2)
-        elif render_anchor == RenderAnchor.BOTTOMMID:
-            draw_pos += pygame.Vector2(0, self.sprite_size[1] // 2)
-
-        if self.sprite_size == (0, 0):
+        if not self.frames or self.sprite_size == (0, 0):
             return
 
-        # Apply per-frame Aseprite offset (but flipped!)
-        offset = pygame.Vector2(self.final_offsets.get(self.current_frame_idx, (0, 0)))
+        # --- Use raw numbers instead of Vector2 (PERF FIX #1) ---
+        x, y = world_pos
+
+        # --- Anchor adjustment ---
+        if render_anchor == RenderAnchor.TOPLEFT:
+            x += self.sprite_size[0] // 2
+            y += self.sprite_size[1] // 2
+        elif render_anchor == RenderAnchor.BOTTOMMID:
+            y += self.sprite_size[1] // 2
+
+        # --- Offset lookup ---
+        offset_x, offset_y = self.final_offsets.get(self.current_frame_idx, (0, 0))
 
         if self._flip_x:
-            offset.x = -offset.x
+            offset_x = -offset_x
         if self._flip_y:
-            offset.y = -offset.y
+            offset_y = -offset_y
 
-        # apply offset to draw_pos
-        draw_pos = pygame.Vector2(draw_pos) + offset
+        x += offset_x
+        y += offset_y
 
-        # Apply camera transformation
+        # --- Camera (PERF FIX #3) ---
         if camera:
-            draw_pos = camera.apply_vec2(world_pos)
+            # assume camera has x/y instead of returning Vector2
+            x -= camera.x
+            y -= camera.y
 
-
-        # Get frame
+        # --- Get frame ---
         if self._rotation == 0 and not self._flip_x and not self._flip_y:
             frame = self.frames[self.current_frame_idx]
         else:
-            # get frame from cache
-            frame= self._get_transformed_frame()
+            frame = self._get_transformed_frame()
 
-        rect = frame.get_rect(center=draw_pos)
+        # --- Reuse rect (PERF FIX #2) ---
+        if self._rect is None:
+            self._rect = pygame.Rect(0, 0, 0, 0)
 
+        self._rect.size = frame.get_size()
+        self._rect.center = (x, y)
 
-        surface.blit(frame, rect)
+        surface.blit(frame, self._rect)
 
 
 
@@ -183,7 +189,7 @@ class Sprite:
     # Debug Draw
     # ---------------------
 
-    def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2, render_anchor: RenderAnchor = RenderAnchor.CENTER, camera=None):
+    def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2, render_anchor: RenderAnchor = RenderAnchor.CENTER, camera=None): #TODO: implement camera support
         # Original sprite rectangle (dark grey) 
 
         world_pos = pygame.Vector2(world_pos)  # make a copy to avoid modifying caller's vector
