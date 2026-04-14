@@ -202,8 +202,8 @@ class GraphicManager:
 
         # 2. no rotation
         if angle == 0:
-            self._rotation_cache[key] = (working, (0, 0))
-            return working, (0, 0)
+            self._rotation_cache[key] = working
+            return working
 
         # 3. rotate
         rotated = pygame.transform.rotate(working, angle)

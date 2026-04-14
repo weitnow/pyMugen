@@ -14,28 +14,28 @@ class Sprite:
         self._flip_x: bool = False
         self._flip_y: bool = False
         self._rotation: int = 0     
-        
-        # Animation data
+
+        # Animation data        
+        self.sprite_size = (0,0)  # is a tuple (width, height) 
+        self.base_name = None # is a str name of the current animation-file
+        self.current_tag = None # is a str name of the current tag
+        self.current_frame_idx = 0 # is an int index of the current frame within the animation for this sprite
+        self.timer = 0
+        self.playing = False
+        self.png = False # True if this sprite is a single PNG, False if it is an animation
+
+        # Animation data - readonly (references to ResourceManager data, do NOT modify these!)
         self.frames = None  # is a Dict[int, pygame.Surface], reference, do NOT modify!
         self.frame_durations = None  # is a Dict[int, int] mapping frame index to duration in ms, reference, do NOT modify!
         self.tags = None  # is a Dict[str, Dict[str, int]] mapping tag name to {"from": int, "to": int}, reference, do NOT modify!
         self.final_offsets = None  # is a Dict[int, (x, y)], reference, do NOT modify!
-        self.sprite_size = (0,0)  # is a tuple (width, height) 
-       
-        self.base_name = None # is a str name of the current animation-file
-        self.current_tag = None # is a str name of the current tag
-        self.current_frame_idx = 0
-        self.timer = 0
-        self.playing = False
-        self.png = False # True if this sprite is a single PNG, False if it is an animation
         
         # Private attributes
-        self._rm: GraphicManager = GraphicManager()
+        self._gm: GraphicManager = GraphicManager()
         self._dm: DebugManager = DebugManager()
         self._snapped_rotation: int = 0
-        self._rect = None # pygame.rect set later
         self._current_offset = (0, 0) # current frame offset, updated in update() if frame changes
-        
+        self._draw_rect = pygame.Rect(0, 0, 0, 0) # reusable rect for drawing, to avoid creating new rects every frame (PERF FIX #2)
         
     # ---------------------
     # Properties
@@ -65,6 +65,7 @@ class Sprite:
     @rotation.setter
     def rotation(self, angle: int):
         self._rotation = int(angle) % 360
+        self._snapped_rotation = round(self._rotation / 45) * 45 % 360  # update snapped rotation for caching
 
     # ---------------------
     # Animation methods
@@ -73,7 +74,7 @@ class Sprite:
     def set_anim_name(self, name: str):
         if name != self.base_name:
             # Load new animation data from ResourceManager
-            anim = self._rm.get_animationdata_reference(name)
+            anim = self._gm.get_animationdata_reference(name)
             self.frames = anim.frames
             self.frame_durations = anim.durations
             self.tags = anim.tags
@@ -85,7 +86,7 @@ class Sprite:
             self.timer = 0
             self.playing = True
             self.png = anim.png
-            self._current_offset = self.final_offsets.get(0, (0, 0)) #get offset for first sprite, if there is none get (0,0)
+            self._current_offset = self.final_offsets.get(0, (0, 0)) #get offset for first frame, if there is none get (0,0)
         return self # allow chaining
         
     def set_frame_tag(self, tag_name: str):
@@ -135,17 +136,18 @@ class Sprite:
                 if self.current_frame_idx >= len(self.frames):
                     self.current_frame_idx = 0
 
-            # Update current offset property for the new frame        
+            # Update current offset property for the current frame, if there is none default to (0,0)        
             self._current_offset = self.final_offsets.get(self.current_frame_idx, (0, 0))
 
+            # Update current frame duration for the current frame, if there is none default to 100ms
             current_frame_duration = self.frame_durations.get(self.current_frame_idx, 100)
 
     def draw(self, surface: pygame.Surface, world_pos, render_anchor: RenderAnchor = RenderAnchor.CENTER, camera=None):
 
+        # if there are no frames or sprite size is (0,0), skip drawing to avoid errors
         if not self.frames or self.sprite_size == (0, 0):
             return
 
-        # --- Use raw numbers instead of Vector2 (PERF FIX #1) ---
         x, y = world_pos
 
         # --- Anchor adjustment ---
@@ -156,13 +158,14 @@ class Sprite:
             y += self.sprite_size[1] // 2
 
         # --- Offset lookup ---
-        offset_x, offset_y = self._current_offset #self.final_offsets.get(self.current_frame_idx, (0, 0))
+        offset_x, offset_y = self._current_offset
 
         if self._flip_x:
             offset_x = -offset_x
         if self._flip_y:
             offset_y = -offset_y
 
+        # Apply offsets to position
         x += offset_x
         y += offset_y
 
@@ -176,18 +179,13 @@ class Sprite:
         if self._rotation == 0 and not self._flip_x and not self._flip_y:
             frame = self.frames[self.current_frame_idx]
         else:
+            # get transformed frame from ResourceManager cache (handles rotation and flipping)
             frame = self._get_transformed_frame()
 
-        # --- Reuse rect (PERF FIX #2) ---
-        if self._rect is None:
-            self._rect = pygame.Rect(0, 0, 0, 0)
+        self._draw_rect.size = frame.get_size()
+        self._draw_rect.center = (x, y)
 
-        self._rect.size = frame.get_size()
-        self._rect.center = (x, y)
-
-        surface.blit(frame, self._rect)
-
-
+        surface.blit(frame, self._draw_rect)
 
 
     # ---------------------
@@ -230,11 +228,9 @@ class Sprite:
     def _get_transformed_frame(self) -> pygame.Surface | None:
         """Get current animation frame with rotation/flip applied, using ResourceManager cache."""
 
-        # Determine angle to snap for caching
-        self._snapped_rotation = round(self._rotation / 45) * 45 % 360
 
         # Use ResourceManager cached rotated+flipped frame
-        return self._rm.get_rotated_frame(
+        return self._gm.get_rotated_frame(
             anim_name=self.base_name,
             frame_idx=self.current_frame_idx,
             angle=self._snapped_rotation,

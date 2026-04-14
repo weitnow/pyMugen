@@ -14,8 +14,9 @@ class TestState(GameState):
 
     def enter(self):
         #create a game object and add sprite
-        self.mySprite1 = Sprite().set_anim_name("debug32")
-        self.mySprite1.set_frame(1)
+        self.mySprite1 = Sprite().set_anim_name("nesFighter").set_frame_tag("Idle")
+        
+        #self.mySprite1.set_frame(1)
         self.mySprite2 = Sprite().set_anim_name("debug32x32")
 
         self.randoranchor = RenderAnchor.CENTER
@@ -46,6 +47,10 @@ class TestState(GameState):
                 self.randoranchor = RenderAnchor.BOTTOMMID
             else:
                 self.randoranchor = RenderAnchor.CENTER
+
+        if Action.DOWN in actions:
+            self.mySprite1.flip_x = not self.mySprite1.flip_x
+            self.mySprite2.flip_x = not self.mySprite2.flip_x
         
 
 
