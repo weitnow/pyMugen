@@ -206,16 +206,17 @@ class Sprite:
 
         # starting here x and y are the world position of the sprite with anchor adjustment, but before offset and camera
 
-
         # --- Offset lookup ---
         offset_x, offset_y = self._current_offset
 
-        
+        if self._flip_x:
+            offset_x = -offset_x
+        if self._flip_y:
+            offset_y = -offset_y
 
-        
         # Draw the original sprite rect (with offset) in dark grey for debugging
         self._dm.draw_rect_game(
-            pos=(world_pos[0] + offset_x - self.sprite_size[0] // 2, world_pos[1] + offset_y - self.sprite_size[1] // 2),
+            pos=(x + offset_x - self.sprite_size[0] // 2, y + offset_y - self.sprite_size[1] // 2),
             width=self.sprite_size[0],
             height=self.sprite_size[1],
             color=(150, 150, 150)
@@ -225,7 +226,7 @@ class Sprite:
 
         
         # Draw a small cross in the center of the sprite which is also the rotation point
-        self._dm.draw_crossed_rect_game(pos=world_pos - pygame.Vector2(2, 2), width=4, height=4, color=(150, 150, 150))
+        self._dm.draw_crossed_rect_game(pos=(x + offset_x, y + offset_y) - pygame.Vector2(2, 2), width=4, height=4, color=(150, 150, 150))
 
         self._dm.draw_text_game(pos=(world_pos[0] + 4, world_pos[1]), text=f"Pos: {world_pos} Tag: {self.current_tag}", color=(150, 150, 150))
    
