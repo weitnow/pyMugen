@@ -18,7 +18,7 @@ class PerformanceTestState(GameState):
         self.mySprite1 = Sprite().set_anim_name("debug32")
         self.mySprite1.set_frame(1)
 
-        for i in range(100):
+        for i in range(50):
             sprite = Sprite().set_anim_name("nesFighter").set_frame_tag("Idle")
             self.sprites.append(sprite)
 
@@ -37,20 +37,29 @@ class PerformanceTestState(GameState):
         if Action.RIGHT in actions:
             self.mySprite1.rotation -= 45
 
+            for sprite in self.sprites:
+                sprite.rotation -= 45
+
         elif Action.LEFT in actions:
             self.mySprite1.rotation += 45
+
+            for sprite in self.sprites:
+                sprite.rotation += 45
  
         if Action.UP in actions:
             # Cycle through render anchors for testing
             if self.randoranchor == RenderAnchor.CENTER:
                 self.randoranchor = RenderAnchor.TOPLEFT
             elif self.randoranchor == RenderAnchor.TOPLEFT:
-                self.randoranchor = RenderAnchor.BOTTOMMID
+                self.randoranchor = RenderAnchor.BOTTOMCENTER
             else:
                 self.randoranchor = RenderAnchor.CENTER
 
         if Action.DOWN in actions:
             self.mySprite1.flip_x = not self.mySprite1.flip_x
+
+            for sprite in self.sprites:
+                sprite.flip_x = not sprite.flip_x
   
         
 
@@ -74,7 +83,7 @@ class PerformanceTestState(GameState):
         for i, sprite in enumerate(self.sprites):
             x = 16 + (i % 20) * 32
             y = 64 + (i // 20) * 32
-            sprite.draw(self.view_manager.game_surface, (x, y), render_anchor=RenderAnchor.TOPLEFT)
+            sprite.draw(self.view_manager.game_surface, (x, y), render_anchor=self.randoranchor)
 
         super().draw()
 
@@ -86,7 +95,7 @@ class PerformanceTestState(GameState):
         for i, sprite in enumerate(self.sprites):
             x = 16 + (i % 20) * 32
             y = 64 + (i // 20) * 32
-            sprite.debug_draw(self.view_manager.debug_surface, (x, y), render_anchor=RenderAnchor.TOPLEFT)
+            sprite.debug_draw(self.view_manager.debug_surface, (x, y), render_anchor=self.randoranchor)
         super().debug_draw()
 
     

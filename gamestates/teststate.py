@@ -40,7 +40,7 @@ class TestState(GameState):
             if self.randoranchor == RenderAnchor.CENTER:
                 self.randoranchor = RenderAnchor.TOPLEFT
             elif self.randoranchor == RenderAnchor.TOPLEFT:
-                self.randoranchor = RenderAnchor.BOTTOMMID
+                self.randoranchor = RenderAnchor.BOTTOMCENTER
             else:
                 self.randoranchor = RenderAnchor.CENTER
 
@@ -62,13 +62,13 @@ class TestState(GameState):
 
 
     def draw(self):
-        self.mySprite1.draw(self.view_manager.game_surface, (16, 16), render_anchor=self.randoranchor)
+        self.mySprite1.draw(self.view_manager.game_surface, (32, 32), render_anchor=self.randoranchor)
         super().draw()
 
 
 
     def debug_draw(self):
-        self.mySprite1.debug_draw(self.view_manager.debug_surface, (16, 16), render_anchor=self.randoranchor)
+        self.mySprite1.debug_draw(self.view_manager.debug_surface, (32, 32), render_anchor=self.randoranchor)
         super().debug_draw()
 
     

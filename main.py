@@ -23,7 +23,7 @@ gamestate_manager = GameStateManager()
 input_manager = InputManager()
 debug_manager = DebugManager()
 resource_manager = GraphicManager()
-resource_manager.convert_alpha = False  # for debugging, do not convert alpha
+resource_manager.convert_alpha = True  # for debugging, do not convert alpha
 sound_manager = SoundManager()
 settings_manager = SettingsManager()
 
@@ -41,7 +41,7 @@ resource_manager.load_spritesheet("stages", "assets/Graphics/Aseprite/stages.png
 # --- Set Offsets for spritesheets ---
 resource_manager.set_global_offset("nesFighter", x=0, y=0)
 resource_manager.set_global_offset("debug32x32", x=0, y=0)
-resource_manager.set_global_offset("debug32", x=16, y=0)
+resource_manager.set_global_offset("debug32", x=0, y=0)
 #resource_manager.set_tag_offset("nesFighter", "Idle", x=5, y=-3)
 #resource_manager.set_frame_offset("nesFighter", 1, x=6, y=-2)
 
@@ -58,7 +58,7 @@ gamestate_manager.add_state("test", TestState())
 gamestate_manager.add_state("performancetest", PerformanceTestState())
 
 
-gamestate_manager.change_state("test") # start in performance test state
+gamestate_manager.change_state("performancetest") # start in performance test state
 
 # --- Block certain events from pygame event queue to optimize ---
 pygame.event.set_blocked(None) # block all events

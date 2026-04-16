@@ -6,7 +6,7 @@ from enum import Enum, auto
 class RenderAnchor(Enum):
     CENTER = auto()
     TOPLEFT = auto()
-    BOTTOMMID = auto()
+    BOTTOMCENTER = auto()
 
 class Sprite:
     def __init__(self):
@@ -154,8 +154,8 @@ class Sprite:
         if render_anchor == RenderAnchor.TOPLEFT:
             x += self.sprite_size[0] // 2
             y += self.sprite_size[1] // 2
-        elif render_anchor == RenderAnchor.BOTTOMMID:
-            y += self.sprite_size[1] // 2
+        elif render_anchor == RenderAnchor.BOTTOMCENTER:
+            y -= self.sprite_size[1] // 2
 
         # --- Offset lookup ---
         offset_x, offset_y = self._current_offset
@@ -201,8 +201,8 @@ class Sprite:
             if render_anchor == RenderAnchor.TOPLEFT:
                 x += self.sprite_size[0] // 2
                 y += self.sprite_size[1] // 2
-            elif render_anchor == RenderAnchor.BOTTOMMID:
-                y += self.sprite_size[1] // 2
+            elif render_anchor == RenderAnchor.BOTTOMCENTER:
+                y -= self.sprite_size[1] // 2
 
         # starting here x and y are the world position of the sprite with anchor adjustment, but before offset and camera
 
@@ -214,21 +214,27 @@ class Sprite:
         if self._flip_y:
             offset_y = -offset_y
 
-        # Draw the original sprite rect (with offset) in dark grey for debugging
+        # Draw the original sprite rect (with offset) for debugging
         self._dm.draw_rect_game(
             pos=(x + offset_x - self.sprite_size[0] // 2, y + offset_y - self.sprite_size[1] // 2),
             width=self.sprite_size[0],
             height=self.sprite_size[1],
-            color=(150, 150, 150)
+            color=(247, 0, 255)
             )
-        
+          
+        # Draw a small circle in the center of the sprite which is also the rotation point
+        self._dm.draw_circle_game(x + offset_x, y + offset_y, radius=1, color=(255, 255, 0))
 
+        # Draw a small rectangle at the origin point
+        self._dm.draw_rect_game(
+            pos=(world_pos[0] - 1, world_pos[1] - 1),
+            width=2,
+            height=2,
+            color=(247, 0, 255)
+        )
 
-        
-        # Draw a small cross in the center of the sprite which is also the rotation point
-        self._dm.draw_crossed_rect_game(pos=(x + offset_x, y + offset_y) - pygame.Vector2(2, 2), width=4, height=4, color=(150, 150, 150))
-
-        self._dm.draw_text_game(pos=(world_pos[0] + 4, world_pos[1]), text=f"Pos: {world_pos} Tag: {self.current_tag}", color=(150, 150, 150))
+        # Draw text with world position and current tag for debugging
+        self._dm.draw_text_game(pos=(world_pos[0] + 4, world_pos[1]), text=f"Pos: {world_pos} Tag: {self.current_tag}", color=(247, 0, 255))
    
                                 
 
