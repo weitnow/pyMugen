@@ -3,8 +3,8 @@ from enum import Enum
 from dataclasses import dataclass
 import globals  
 from debug_manager import DebugManager
-from gameobjects.sprite import Sprite
-from view_manager import ViewManager # for camera access in draw method, consider refactoring to pass camera as argument instead of direct access
+from gameobjects.sprite import Sprite, RenderAnchor
+from view_manager import ViewManager
 
 class HitboxType(Enum):
     HIGH = "high"
@@ -67,10 +67,10 @@ class HurtboxData:
         return True
 
 class GameObject():
-    def __init__(self, pos, origin_center_bottom: bool = False):
+    def __init__(self, pos, render_anchor: RenderAnchor = RenderAnchor.CENTER):
 
-        self.origin_center_bottom = origin_center_bottom # this only affects drawingposition, hitbox/hurtbox positions are still relative to self.pos regardless of this setting. This is just for convenience when drawing sprites that are designed with center-bottom origin in mind.
-
+        self.anchor = render_anchor # this only affects drawingposition, hitbox/hurtbox positions are still relative to self.pos regardless of this setting. This is just for convenience when drawing sprites that are designed with center-bottom origin in mind.
+        
         # World transform only
         self.pos = pygame.Vector2(pos)
         self.vel = pygame.Vector2(0, 0)
@@ -93,9 +93,7 @@ class GameObject():
         # ---------------------
         self._dm = DebugManager()
         self._vm = ViewManager()
-
-
-        
+        self._camera = None
 
 
     # ------------------------
@@ -107,11 +105,14 @@ class GameObject():
         self.sprites.append(sprite)
         return self
 
-    def set_physics(self, physics_component):
+    def add_physics(self, physics_component):
         self.physics = physics_component
         physics_component.owner = self
         return self
 
+    def add_camera(self, camera):
+        self._camera = camera
+        return self
 
     # ------------------------
     # Collision / Hurtbox
@@ -168,12 +169,7 @@ class GameObject():
         
         # --- Draw sprites ---         
         for sprite in self.sprites:
-            if self.origin_center_bottom:
-                world_pos = (self.pos.x + sprite.offset.x - sprite.sprite_size[0] / 2, self.pos.y - sprite.sprite_size[1] + sprite.offset.y)
-            else:
-                world_pos = self.pos + sprite.offset
-                
-            sprite.draw(surface, world_pos, self._vm.camera) # pass camera for proper world-to-screen transformation
+            sprite.draw(surface, self.pos, self.anchor, self._camera) # pass camera for proper world-to-screen transformation
         # --- End draw sprites ---
 
 

@@ -169,9 +169,8 @@ class Sprite:
         x += offset_x
         y += offset_y
 
-        # --- Camera (PERF FIX #3) ---
-        if camera:
-            # assume camera has x/y instead of returning Vector2
+        # --- Camera ---
+        if camera: # move x/y according to camera
             x -= camera.x
             y -= camera.y
 
@@ -209,6 +208,10 @@ class Sprite:
         # --- Offset lookup ---
         offset_x, offset_y = self._current_offset
 
+        if camera:
+            x -= camera.x
+            y -= camera.y
+
         if self._flip_x:
             offset_x = -offset_x
         if self._flip_y:
@@ -227,14 +230,14 @@ class Sprite:
 
         # Draw a small rectangle at the origin point
         self._dm.draw_rect_game(
-            pos=(world_pos[0] - 1, world_pos[1] - 1),
+            pos=(world_pos[0] - 1 - camera.x, world_pos[1] - 1 - camera.y),
             width=2,
             height=2,
             color=(247, 0, 255)
         )
 
         # Draw text with world position and current tag for debugging
-        self._dm.draw_text_game(pos=(world_pos[0] + 4, world_pos[1]), text=f"Pos: {world_pos} Tag: {self.current_tag}", color=(247, 0, 255))
+        self._dm.draw_text_game((x + offset_x - self.sprite_size[0] // 2, y + offset_y - self.sprite_size[1] // 2 - 2), text=f"Pos: {world_pos} Tag: {self.current_tag}", color=(247, 0, 255))
    
                                 
 

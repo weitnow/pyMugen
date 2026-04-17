@@ -60,7 +60,6 @@ class PerformanceTestState(GameState):
 
             for sprite in self.sprites:
                 sprite.flip_x = not sprite.flip_x
-  
         
 
 

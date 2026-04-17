@@ -32,9 +32,9 @@ class Camera:
         target_x = max(0, min(target_x, self.world_width - self.view_width))
         target_y = max(0, min(target_y, self.world_height - self.view_height))
 
-        # --- smooth ---
-        self.x += (target_x - self.x) * self.smooth_speed
-        self.y += (target_y - self.y) * self.smooth_speed
+        # --- smooth --- #TODO: uncomment both lines below
+        #self.x += (target_x - self.x) * self.smooth_speed
+        #self.y += (target_y - self.y) * self.smooth_speed
 
     def apply(self, rect):
         return rect.move(-self.x, -self.y)

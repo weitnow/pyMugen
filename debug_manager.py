@@ -20,6 +20,7 @@ class DebugManager:
         self.SHOW_HURTBOXES = True
         self.SHOW_BOUNDING_BOXES = True
         self.SHOW_FPS_SYSTEM_INFO = True
+        self.SHOW_SPRITE_BOUNDS = True
         
         # For CPU/Memory updates - cache these
         self.last_system_info_update = 0

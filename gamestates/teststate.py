@@ -17,6 +17,10 @@ class TestState(GameState):
         self.mySprite1 = Sprite().set_anim_name("debug32")
         self.mySprite1.set_frame(1)
 
+        self.myGameObject = GameObject(pos=(128,32), render_anchor=RenderAnchor.BOTTOMCENTER)
+        self.myGameObject.add_sprite(Sprite().set_anim_name("debug32").set_frame(2))
+        self.myGameObject.add_camera(self.view_manager.camera)
+
         self.randoranchor = RenderAnchor.CENTER
 
 
@@ -30,10 +34,10 @@ class TestState(GameState):
         actions = self.input_manager.get_just_pressed_actions(0)
 
         if Action.RIGHT in actions:
-            self.mySprite1.rotation -= 45
+            self.view_manager.camera.x += 10
 
         elif Action.LEFT in actions:
-            self.mySprite1.rotation += 45
+            self.view_manager.camera.x -= 10
  
         if Action.UP in actions:
             # Cycle through render anchors for testing
@@ -55,6 +59,7 @@ class TestState(GameState):
         
         #self.mySprite1.update(dt)
 
+
         super().update(dt)
 
     
@@ -62,13 +67,18 @@ class TestState(GameState):
 
 
     def draw(self):
-        self.mySprite1.draw(self.view_manager.game_surface, (32, 32), render_anchor=self.randoranchor)
+        self.mySprite1.draw(self.view_manager.game_surface, (32, 32), render_anchor=self.randoranchor, camera=self.view_manager.camera)
+
+        self.myGameObject.draw(self.view_manager.game_surface)
+ 
+
         super().draw()
 
 
 
     def debug_draw(self):
-        self.mySprite1.debug_draw(self.view_manager.debug_surface, (32, 32), render_anchor=self.randoranchor)
+        self.mySprite1.debug_draw(self.view_manager.debug_surface, (32, 32), render_anchor=self.randoranchor, camera=self.view_manager.camera)
+ 
         super().debug_draw()
 
     
