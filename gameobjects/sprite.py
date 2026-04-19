@@ -1,4 +1,5 @@
 import pygame
+import camera
 from graphic_manager import GraphicManager
 from debug_manager import DebugManager
 from enum import Enum, auto
@@ -191,7 +192,7 @@ class Sprite:
     # Debug Draw
     # ---------------------
 
-    def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2, render_anchor: RenderAnchor = RenderAnchor.CENTER, camera=None): #TODO: implement camera support
+    def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2, render_anchor: RenderAnchor = RenderAnchor.CENTER, camera=None, debug_draw_text = True): #TODO: implement camera support
      
         x, y = world_pos
 
@@ -208,9 +209,11 @@ class Sprite:
         # --- Offset lookup ---
         offset_x, offset_y = self._current_offset
 
-        if camera:
-            x -= camera.x
-            y -= camera.y
+        cam_x = camera.x if camera else 0
+        cam_y = camera.y if camera else 0
+
+        x -= cam_x
+        y -= cam_y
 
         if self._flip_x:
             offset_x = -offset_x
@@ -230,14 +233,15 @@ class Sprite:
 
         # Draw a small rectangle at the origin point
         self._dm.draw_rect_game(
-            pos=(world_pos[0] - 1 - camera.x, world_pos[1] - 1 - camera.y),
+            pos=(world_pos[0] - 1 - cam_x, world_pos[1] - 1 - cam_y),
             width=2,
             height=2,
             color=(247, 0, 255)
         )
 
-        # Draw text with world position and current tag for debugging
-        self._dm.draw_text_game((x + offset_x - self.sprite_size[0] // 2, y + offset_y - self.sprite_size[1] // 2 - 2), text=f"Pos: {world_pos} Tag: {self.current_tag}", color=(247, 0, 255))
+        if debug_draw_text:
+            # Draw text with world position and current tag for debugging
+            self._dm.draw_text_game((x + offset_x - self.sprite_size[0] // 2, y + offset_y - self.sprite_size[1] // 2 - 2), text=f"world_pos: {world_pos}, screen_pos: ({x + offset_x}, {y + offset_y}), Tag: {self.current_tag}", color=(247, 0, 255))
    
                                 
 

@@ -110,4 +110,6 @@ while running:
         
     view_manager.draw_to_screen()
 
+    
+
 pygame.quit()

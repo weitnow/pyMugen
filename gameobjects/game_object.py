@@ -72,7 +72,8 @@ class GameObject():
         self.anchor = render_anchor # this only affects drawingposition, hitbox/hurtbox positions are still relative to self.pos regardless of this setting. This is just for convenience when drawing sprites that are designed with center-bottom origin in mind.
         
         # World transform only
-        self.pos = pygame.Vector2(pos)
+        self.screen_pos = pygame.Vector2(pos)
+        self.world_pos = pygame.Vector2(pos)
         self.vel = pygame.Vector2(0, 0)
 
         # Components
@@ -129,16 +130,16 @@ class GameObject():
         """Store rect relative to GameObject position."""
         if relative_to_pos:
             return rect.copy()
-        return rect.move(-int(self.pos.x), -int(self.pos.y))
+        return rect.move(-int(self.screen_pos.x), -int(self.screen_pos.y))
 
     def get_world_hurtbox(self) -> pygame.Rect | None:
         if self.hurtbox:
-            return self.hurtbox.move(self.pos)
+            return self.hurtbox.move(self.screen_pos)
         return None
 
     def get_world_hitbox(self) -> pygame.Rect | None:
         if self.hitbox:
-            return self.hitbox.move(self.pos)
+            return self.hitbox.move(self.screen_pos)
         return None
 
 
@@ -148,6 +149,9 @@ class GameObject():
     def update(self, dt):
         if not self.active:
             return
+        
+        if self._camera:
+            self.world_pos = self.screen_pos + (self._camera.x, self._camera.y)
 
         # Physics movement
         if self.physics:
@@ -160,6 +164,9 @@ class GameObject():
             sprite.update(dt)
 
 
+        #print(f"GameObject at {self.screen_pos} and world pos {self.world_pos} with velocity {self.vel}, camera pos is ({self._camera.x}, {self._camera.y}))")
+
+
     # ------------------------
     # Draw
     # ------------------------
@@ -169,7 +176,7 @@ class GameObject():
         
         # --- Draw sprites ---         
         for sprite in self.sprites:
-            sprite.draw(surface, self.pos, self.anchor, self._camera) # pass camera for proper world-to-screen transformation
+            sprite.draw(surface, self.screen_pos, self.anchor, None)
         # --- End draw sprites ---
 
 
@@ -177,18 +184,14 @@ class GameObject():
     # ------------------------
     # Debug drawing
     # ------------------------
-    def draw_debug(self, surface: pygame.Surface):
+    def debug_draw(self, surface: pygame.Surface):
         """ Draw world position point """
-        self._dm.draw_circle_game(self.pos.x, self.pos.y, 0.5, globals.COLOR_YELLOW)
+        self._dm.draw_circle_game(self.screen_pos.x, self.screen_pos.y, 0.5, globals.COLOR_YELLOW)
 
 
         """Draw sprite debug info."""
         for sprite in self.sprites:
-            if self.origin_center_bottom:
-                world_pos = (self.pos.x + sprite.offset.x - sprite.sprite_size[0] / 2, self.pos.y - sprite.sprite_size[1] + sprite.offset.y)
-            else:
-                world_pos = self.pos + sprite.offset
-            sprite.debug_draw(surface, world_pos)
+            sprite.debug_draw(surface, self.screen_pos, self.anchor, None, debug_draw_text=False) 
 
         """Draw hurtbox / hitbox for debugging."""
         hitboxes = self.get_active_hitboxes()
@@ -240,7 +243,7 @@ class GameObject():
             
             for hitbox in self.hitboxes:
                 if hitbox.is_active(base_name, tag_name, frame_idx):
-                    world_rect = hitbox.rect.move(self.pos)
+                    world_rect = hitbox.rect.move(self.screen_pos)
                     active.append((world_rect, hitbox.hitbox_type))
         
         return active
@@ -263,7 +266,7 @@ class GameObject():
             
             for hurtbox in self.hurtboxes:
                 if hurtbox.is_active(base_name, tag_name, frame_idx):
-                    world_rect = hurtbox.rect.move(self.pos)
+                    world_rect = hurtbox.rect.move(self.screen_pos)
                     active.append((world_rect, hurtbox.hurtbox_type))
         
         return active

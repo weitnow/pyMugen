@@ -32,11 +32,11 @@ class Fighter(GameObject):
         # Horizontal movement
         if actions.get(Action.RIGHT, False):
             print("Right pressed")
-            self.pos.x += self.speed * dt
+            self.screen_pos.x += self.speed * dt
             self.facing_right = True
         if actions.get(Action.LEFT, False):
             print("Left pressed")
-            self.pos.x -= self.speed * dt
+            self.screen_pos.x -= self.speed * dt
             self.facing_right = False
 
         # Jump
