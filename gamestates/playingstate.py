@@ -1,8 +1,8 @@
 from gamestates.gamestate_base import GameState
 from gameobjects.game_object import GameObject, HitboxType, HurtboxType
-from input_manager import PlayerController, Action
+from gameobjects.components.player_controller_component import PlayerController
 from gameobjects.sprite import Sprite
-from physics_components import FighterPhysicsComponent
+from gameobjects.components.physics_components import FighterPhysicsComponent
 
 
 

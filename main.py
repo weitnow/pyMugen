@@ -58,7 +58,7 @@ gamestate_manager.add_state("test", TestState())
 gamestate_manager.add_state("performancetest", PerformanceTestState())
 
 
-gamestate_manager.change_state("test") # start in performance test state
+gamestate_manager.change_state("performancetest") # start in performance test state
 
 # --- Block certain events from pygame event queue to optimize ---
 pygame.event.set_blocked(None) # block all events

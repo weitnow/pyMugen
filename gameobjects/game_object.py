@@ -67,18 +67,19 @@ class HurtboxData:
         return True
 
 class GameObject():
-    def __init__(self, pos, render_anchor: RenderAnchor = RenderAnchor.CENTER):
+    def __init__(self, world_pos, render_anchor: RenderAnchor = RenderAnchor.CENTER):
 
         self.anchor = render_anchor # this only affects drawingposition, hitbox/hurtbox positions are still relative to self.pos regardless of this setting. This is just for convenience when drawing sprites that are designed with center-bottom origin in mind.
         
         # World transform only
-        self.screen_pos = pygame.Vector2(pos)
-        self.world_pos = pygame.Vector2(pos)
+        self.world_pos = pygame.Vector2(world_pos)
+        self.screen_pos = pygame.Vector2(world_pos)
         self.vel = pygame.Vector2(0, 0)
 
         # Components
         self.sprites = []   # list of Sprite instances
         self.physics = None       # PhysicsComponent
+        self.player_controller = None # PlayerController
 
         # Collision
         self.hurtbox: pygame.Rect = None
@@ -114,6 +115,11 @@ class GameObject():
     def add_camera(self, camera):
         self._camera = camera
         return self
+    
+    def add_player_controller(self, player_controller):
+        self.player_controller = player_controller
+        player_controller.owner = self
+        return self
 
     # ------------------------
     # Collision / Hurtbox
@@ -130,16 +136,16 @@ class GameObject():
         """Store rect relative to GameObject position."""
         if relative_to_pos:
             return rect.copy()
-        return rect.move(-int(self.screen_pos.x), -int(self.screen_pos.y))
+        return rect.move(-int(self.world_pos.x), -int(self.world_pos.y))
 
     def get_world_hurtbox(self) -> pygame.Rect | None:
         if self.hurtbox:
-            return self.hurtbox.move(self.screen_pos)
+            return self.hurtbox.move(self.world_pos)
         return None
 
     def get_world_hitbox(self) -> pygame.Rect | None:
         if self.hitbox:
-            return self.hitbox.move(self.screen_pos)
+            return self.hitbox.move(self.world_pos)
         return None
 
 
@@ -151,12 +157,15 @@ class GameObject():
             return
         
         if self._camera:
-            self.world_pos = self.screen_pos + (self._camera.x, self._camera.y)
+            self.screen_pos = self.world_pos - (self._camera.x, self._camera.y)
 
         # Physics movement
         if self.physics:
             self.physics.update(dt)
             self.on_ground = self.physics.on_ground  # Update on_ground state from physics component
+
+        if self.player_controller:
+            self.player_controller.update(dt)
 
 
         # Sprite animation updates
@@ -243,7 +252,7 @@ class GameObject():
             
             for hitbox in self.hitboxes:
                 if hitbox.is_active(base_name, tag_name, frame_idx):
-                    world_rect = hitbox.rect.move(self.screen_pos)
+                    world_rect = hitbox.rect.move(self.world_pos)
                     active.append((world_rect, hitbox.hitbox_type))
         
         return active
@@ -266,7 +275,7 @@ class GameObject():
             
             for hurtbox in self.hurtboxes:
                 if hurtbox.is_active(base_name, tag_name, frame_idx):
-                    world_rect = hurtbox.rect.move(self.screen_pos)
+                    world_rect = hurtbox.rect.move(self.world_pos)
                     active.append((world_rect, hurtbox.hurtbox_type))
         
         return active
