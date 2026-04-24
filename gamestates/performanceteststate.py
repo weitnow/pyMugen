@@ -96,10 +96,8 @@ class PerformanceTestState(GameState):
         super().draw()
 
     def debug_draw(self):
-        self.mySprite1.debug_draw(self.view_manager.debug_surface, (32, 32), 
-                                 render_anchor=RenderAnchor.CENTER, camera=self.view_manager.camera)
-
+        self.mySprite1.debug_draw(self.view_manager.game_surface, (32, 32), 
+            render_anchor=RenderAnchor.CENTER, camera=self.view_manager.camera)
         for obj in self.test_objects:
-            obj.debug_draw(self.view_manager.debug_surface)
- 
+            obj.debug_draw(self.view_manager.game_surface)
         super().debug_draw()

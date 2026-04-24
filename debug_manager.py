@@ -13,38 +13,29 @@ class DebugManager:
         self.view_manager = None
         self.BOX_THICKNESS = 2
         
-        # --- Debug Toggles ---
         self.debug_on = True
-        self.stop_game_for_debugging = False
         self.SHOW_HITBOXES = True
         self.SHOW_HURTBOXES = True
         self.SHOW_BOUNDING_BOXES = True
         self.SHOW_FPS_SYSTEM_INFO = True
         self.SHOW_SPRITE_BOUNDS = True
         
-        # For CPU/Memory updates - cache these
         self.last_system_info_update = 0
-        self.system_info_update_interval = 3.0  # update every 3 seconds
+        self.system_info_update_interval = 3.0
         self.cpu_percent = 0
         self.mem_used_mb = 0
-        
-        # Cache the process object instead of creating it every frame
         self.process = psutil.Process()
 
-    def set_view_manager(self, view_manager):   # gets called from view manager after its creation, to inform debug manager about it
+    def set_view_manager(self, view_manager):
         self.view_manager = view_manager
 
     def update(self, dt):
         if not self.debug_on:
             return
-            
         now = time.time()
         self.frame_time_ms = dt * 1000.0
-        if now - self.last_time > 0:
-            self.fps = 1.0 / dt if dt > 0 else 0
-            self.last_time = now
-        
-        # Only update system info at the specified interval
+        self.fps = 1.0 / dt if dt > 0 else 0
+        self.last_time = now
         if now - self.last_system_info_update >= self.system_info_update_interval:
             self._update_system_info()
             self.last_system_info_update = now
@@ -52,124 +43,78 @@ class DebugManager:
     def debug_draw(self):
         if not self.debug_on:
             return
-        self._draw_fps_systeminfo(self.view_manager.debug_surface)
+        if self.SHOW_FPS_SYSTEM_INFO:
+            self._draw_fps_systeminfo()
 
-    def _draw_fps_systeminfo(self, surface):
-        if not self.SHOW_FPS_SYSTEM_INFO:
-            return
-        
-        # Use cached values instead of calling psutil every frame
+    def _draw_fps_systeminfo(self):
         text = f"FPS: {self.fps:.1f} | CPU: {self.cpu_percent:.1f}% | RAM: {self.mem_used_mb:.1f} MB"
-        img = self.font.render(text, True, (255, 255, 255))
-        surface.blit(img, (4, 4))
+        self._draw_text_screen((4, 4), text, (255, 255, 0))
 
     def _update_system_info(self):
-        # Get CPU percentage (non-blocking, uses cached value from psutil)
         self.cpu_percent = self.process.cpu_percent()
-        
-        # Get memory info
         mem_info = self.process.memory_info()
         self.mem_used_mb = mem_info.rss / (1024 * 1024)
 
-        # --- Debug Drawing Helpers ---
+    # --- Draw on game_surface (game-space coordinates) ---
+
     def draw_rect_game(self, pos, width, height, color):
-        """Draw a rectangle using game-space coordinates automatically scaled to debug coords."""
         if not self.debug_on or self.view_manager is None:
             return
-
-        # Convert position using ViewManager scaling
-        dx, dy = self.view_manager.to_debug_coords(pos[0], pos[1])
-
-        # Convert rect size
-        dw, dh = self.view_manager.to_debug_coords(width, height)
-
         pygame.draw.rect(
-            self.view_manager.debug_surface,
+            self.view_manager.game_surface,
             color,
-            pygame.Rect(dx, dy, dw, dh),
+            pygame.Rect(pos[0], pos[1], width, height),
             self.BOX_THICKNESS
         )
 
     def draw_circle_game(self, x, y, radius, color):
-        """Draw a circle using game-space coordinates automatically scaled to debug coords."""
         if not self.debug_on or self.view_manager is None:
             return
-
-        dx, dy = self.view_manager.to_debug_coords(x, y)
-        dr, _ = self.view_manager.to_debug_coords(radius, radius)
-
         pygame.draw.circle(
-            self.view_manager.debug_surface,
+            self.view_manager.game_surface,
             color,
-            (int(dx), int(dy)),
-            int(dr),
+            (int(x), int(y)),
+            int(radius),
             self.BOX_THICKNESS
         )
 
     def draw_line_game(self, x1, y1, x2, y2, color):
-        """Draw a line using game-space coordinates automatically scaled to debug coords."""
         if not self.debug_on or self.view_manager is None:
             return
-
-        dx1, dy1 = self.view_manager.to_debug_coords(x1, y1)
-        dx2, dy2 = self.view_manager.to_debug_coords(x2, y2)
-
         pygame.draw.line(
-            self.view_manager.debug_surface,
-            color,
-            (dx1, dy1),
-            (dx2, dy2),
-            self.BOX_THICKNESS
-        )
-
-    def draw_text_game(self, pos, text, color):
-        """Draw text using game-space coordinates automatically scaled to debug coords."""
-        if not self.debug_on or self.view_manager is None:
-            return
-
-        dx, dy = self.view_manager.to_debug_coords(pos[0], pos[1])
-
-        img = self.font.render(text, True, color)
-        self.view_manager.debug_surface.blit(img, (dx, dy))
-
-    def draw_text_debug(self, pos, text, color):
-        """Draw text directly in debug-surface coordinates (no scaling)."""
-        if not self.debug_on or self.view_manager is None:
-            return
-
-        img = self.font.render(text, True, color)
-        self.view_manager.debug_surface.blit(img, pos)
-
-
-    def draw_crossed_rect_game(self, pos, width, height, color):
-        """Draws a rectangle with an 'X' inside using game-space coordinates."""
-        if not self.debug_on or self.view_manager is None:
-            return
-
-        # 1. Draw the outer rectangle using your existing logic
-        self.draw_rect_game(pos, width, height, color)
-
-        # 2. Calculate scaled coordinates for the 'X' lines
-        x1, y1 = self.view_manager.to_debug_coords(pos[0], pos[1])
-        x2, y2 = self.view_manager.to_debug_coords(pos[0] + width, pos[1] + height)
-
-        # Line 1: Top-Left to Bottom-Right
-        pygame.draw.line(
-            self.view_manager.debug_surface,
+            self.view_manager.game_surface,
             color,
             (x1, y1),
             (x2, y2),
             self.BOX_THICKNESS
         )
 
-        # Line 2: Top-Right to Bottom-Left
-        # x-coordinate of right side is x2, y-coordinate of top is y1
-        # x-coordinate of left side is x1, y-coordinate of bottom is y2
-        pygame.draw.line(
-            self.view_manager.debug_surface,
-            color,
-            (x2, y1),
-            (x1, y2),
-            self.BOX_THICKNESS
-        )
+    def draw_text_game(self, pos, text, color):
+        if not self.debug_on or self.view_manager is None:
+            return
+        img = self.font.render(text, True, color)
+        self.view_manager.game_surface.blit(img, pos)
 
+    def draw_crossed_rect_game(self, pos, width, height, color):
+        if not self.debug_on or self.view_manager is None:
+            return
+        self.draw_rect_game(pos, width, height, color)
+        x1, y1 = pos[0], pos[1]
+        x2, y2 = pos[0] + width, pos[1] + height
+        pygame.draw.line(self.view_manager.game_surface, color, (x1, y1), (x2, y2), self.BOX_THICKNESS)
+        pygame.draw.line(self.view_manager.game_surface, color, (x2, y1), (x1, y2), self.BOX_THICKNESS)
+
+    # --- Draw directly on screen (bypasses SCALED layer) ---
+
+    def _draw_text_screen(self, pos, text, color):
+        if self.view_manager is None:
+            return
+        real_screen = pygame.display.get_surface()
+        img = self.font.render(text, True, color)
+        real_screen.blit(img, pos)
+
+    def draw_text_screen(self, pos, text, color):
+        """Public method to draw text at physical screen coordinates."""
+        if not self.debug_on or self.view_manager is None:
+            return
+        self._draw_text_screen(pos, text, color)

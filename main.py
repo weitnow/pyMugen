@@ -77,14 +77,8 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_F1:
                 debug_manager.debug_on = not debug_manager.debug_on
-            elif event.key == pygame.K_F2:
-                debug_manager.stop_game_for_debugging = not debug_manager.stop_game_for_debugging
-            elif event.key == pygame.K_F3:
-                debug_manager.view_manager.toggle_overlay()
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_F4:
-            view_manager.toggle_fullscreen()
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_F5:
-            view_manager.cycle_resolution()                         
+            
+                             
 
     # --- Update CORE-Systems ---
     debug_manager.update(dt)
