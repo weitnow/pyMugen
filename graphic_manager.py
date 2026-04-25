@@ -89,7 +89,7 @@ class GraphicManager:
 
         self.convert_alpha = True  # whether to convert images with alpha
 
-    def load_spritesheet(self, name: str, image_path: str, json_path: str):
+    def load_spritesheet(self, name: str, image_path: str, json_path: str, scale: int = 1):
         if name in self.animations:
             raise ValueError(f"Animation '{name}' already loaded.")
 
@@ -105,11 +105,15 @@ class GraphicManager:
         for k, v in data["frames"].items():
             idx = int(k)
             rect = pygame.Rect(v["frame"]["x"], v["frame"]["y"], v["frame"]["w"], v["frame"]["h"])
-            frames[idx] = spritesheet.subsurface(rect).copy()
+            frame = spritesheet.subsurface(rect).copy()
+            if scale != 1:
+                new_size = (int(rect.width * scale), int(rect.height * scale))
+                frame = pygame.transform.scale(frame, new_size)
+            frames[idx] = frame
             durations[idx] = v.get("duration", 100)
         
         # Get sprite size from first frame
-        sprite_size = (data["frames"]["0"]["frame"]["w"], data["frames"]["0"]["frame"]["h"])
+        sprite_size = frames[0].get_size() if frames else (0, 0)
 
         tags_list = data.get("meta", {}).get("frameTags", [])
         seen = set()
@@ -130,12 +134,15 @@ class GraphicManager:
         
 
     # --- SINGLE PNG ---
-    def load_png(self, name: str, image_path: str):
+    def load_png(self, name: str, image_path: str, scale: int = 1):
         if name in self.animations:
             raise ValueError(f"Spritesheet with name '{name}' already loaded.")
 
         img = pygame.image.load(image_path)
         image = img.convert_alpha() if self.convert_alpha else img.convert()
+        if scale != 1:
+            new_size = (int(image.get_width() * scale), int(image.get_height() * scale))
+            image = pygame.transform.scale(image, new_size)
 
         # fill in data
         frames = {0: image}

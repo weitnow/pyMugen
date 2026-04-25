@@ -93,9 +93,9 @@ class TestState(GameState):
 
 
     def debug_draw(self):
-        self.mySprite1.debug_draw(self.view_manager.debug_surface, (32, 32), render_anchor=RenderAnchor.CENTER, camera=self.view_manager.camera)
+        self.mySprite1.debug_draw(self.view_manager.game_surface, (32, 32), render_anchor=RenderAnchor.CENTER, camera=self.view_manager.camera)
 
-        self.myGameObject.debug_draw(self.view_manager.debug_surface)
+        self.myGameObject.debug_draw(self.view_manager.game_surface)
  
         super().debug_draw()
 

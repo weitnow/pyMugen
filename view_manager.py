@@ -6,8 +6,8 @@ from camera import Camera
 @singleton
 class ViewManager:
     def __init__(self):
-        self.GAME_VIEW_WIDTH = 640
-        self.GAME_VIEW_HEIGHT = 360
+        self.GAME_VIEW_WIDTH = 960
+        self.GAME_VIEW_HEIGHT = 540
         self.CLEAR_COLOR = (30, 30, 30)
 
         self.camera = Camera(self.GAME_VIEW_WIDTH, self.GAME_VIEW_HEIGHT, 1000, 1000)

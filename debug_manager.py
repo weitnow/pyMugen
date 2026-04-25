@@ -7,6 +7,7 @@ from decorators import singleton
 class DebugManager:
     def __init__(self):
         self.font = pygame.font.Font(None, 20)
+        self.small_font = pygame.font.Font(None, 14)
         self.last_time = time.time()
         self.fps = 0
         self.frame_time_ms = 0
@@ -48,7 +49,10 @@ class DebugManager:
 
     def _draw_fps_systeminfo(self):
         text = f"FPS: {self.fps:.1f} | CPU: {self.cpu_percent:.1f}% | RAM: {self.mem_used_mb:.1f} MB"
-        self._draw_text_screen((4, 4), text, (255, 255, 0))
+        if not self.debug_on or self.view_manager is None:
+            return
+        img = self.small_font.render(text, True, (255, 255, 0))
+        self.view_manager.game_surface.blit(img, (8, 8))
 
     def _update_system_info(self):
         self.cpu_percent = self.process.cpu_percent()
