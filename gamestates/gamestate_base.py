@@ -77,15 +77,15 @@ class GameState(ABC): #ABC is Abstract Base Class
     def debug_draw(self):
         """Draw debug information."""
         if self.player1:
-            self.player1.draw_debug(self.view_manager.debug_surface)
+            self.player1.draw_debug(self.view_manager.game_surface)
         if self.player2:
-            self.player2.draw_debug(self.view_manager.debug_surface)
+            self.player2.draw_debug(self.view_manager.game_surface)
         for projectile in self.projectiles_p1:
-            projectile.draw_debug(self.view_manager.debug_surface)
+            projectile.draw_debug(self.view_manager.game_surface)
         for projectile in self.projectiles_p2:
-            projectile.draw_debug(self.view_manager.debug_surface)
+            projectile.draw_debug(self.view_manager.game_surface)
         for game_object in self.game_objects:
-            game_object.draw_debug(self.view_manager.debug_surface)
+            game_object.draw_debug(self.view_manager.game_surface)
 
 
     def add_game_object(self, game_object: GameObject):

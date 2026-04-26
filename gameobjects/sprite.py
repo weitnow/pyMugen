@@ -4,6 +4,8 @@ from graphic_manager import GraphicManager
 from debug_manager import DebugManager
 from enum import Enum, auto
 
+from view_manager import ViewManager
+
 class RenderAnchor(Enum):
     CENTER = auto()
     TOPLEFT = auto()
@@ -34,9 +36,10 @@ class Sprite:
         # Private attributes
         self._gm: GraphicManager = GraphicManager()
         self._dm: DebugManager = DebugManager()
+        self._vm: ViewManager = ViewManager()
         self._snapped_rotation: int = 0
         self._current_offset = (0, 0) # current frame offset, updated in update() if frame changes
-        self._draw_rect = pygame.Rect(0, 0, 0, 0) # reusable rect for drawing, to avoid creating new rects every frame (PERF FIX #2)
+        self._draw_rect = pygame.Rect(0, 0, 0, 0)
         
     # ---------------------
     # Properties
@@ -192,7 +195,7 @@ class Sprite:
     # Debug Draw
     # ---------------------
 
-    def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2, render_anchor: RenderAnchor = RenderAnchor.CENTER, camera=None, debug_draw_text = True): #TODO: implement camera support
+    def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2, render_anchor: RenderAnchor = RenderAnchor.CENTER, camera=None): #TODO: implement camera support
      
         x, y = world_pos
 
@@ -221,28 +224,31 @@ class Sprite:
             offset_y = -offset_y
 
         # Draw the original sprite rect (with offset) for debugging
-        self._dm.draw_rect_game(
-            pos=(x + offset_x - self.sprite_size[0] // 2, y + offset_y - self.sprite_size[1] // 2),
+        self._vm.draw_rect_outline(
+            x + offset_x - self.sprite_size[0] // 2,
+            y + offset_y - self.sprite_size[1] // 2,
             width=self.sprite_size[0],
             height=self.sprite_size[1],
             color=(247, 0, 255)
             )
-          
-        # Draw a small circle in the center of the sprite which is also the rotation point
-        self._dm.draw_circle_game(x + offset_x, y + offset_y, radius=1, color=(255, 255, 0))
 
-        # Draw a small rectangle at the origin point
-        self._dm.draw_rect_game(
-            pos=(world_pos[0] - 1 - cam_x, world_pos[1] - 1 - cam_y),
-            width=2,
-            height=2,
-            color=(247, 0, 255)
+        # Draw a small circle in the center of the sprite which is also the rotation point
+        self._vm.draw_circle(x + offset_x, y + offset_y, radius=4, color=(255, 255, 0))
+
+        #Draw a small rectangle at the origin point
+        self._vm.draw_rect(
+            world_pos[0] - 2 - cam_x,
+            world_pos[1] - 2 - cam_y,
+            width=4,
+            height=4,
+            color=(255, 0, 255)
+
         )
 
-        if debug_draw_text:
-            # Draw text with world position and current tag for debugging
-            self._dm.draw_text_game((x + offset_x - self.sprite_size[0] // 2, y + offset_y - self.sprite_size[1] // 2 - 2), text=f"world_pos: {world_pos}, screen_pos: ({x + offset_x}, {y + offset_y}), Tag: {self.current_tag}", color=(247, 0, 255))
-   
+
+        # Draw text with world position and current tag for debugging
+        self._dm.draw_debug_text(x + offset_x - self.sprite_size[0] // 2, y + offset_y - self.sprite_size[1] // 2 - 10, text=f"world_pos: {world_pos}, screen_pos: ({x + offset_x}, {y + offset_y}), Tag: {self.current_tag}", color=(247, 0, 255))
+    
                                 
 
 
