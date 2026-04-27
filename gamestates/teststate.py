@@ -80,7 +80,7 @@ class TestState(GameState):
     def draw(self):
  
 
-        self.mySprite1.draw(self.view_manager.game_surface, (32 * 4, 32 * 4), render_anchor=self.anchor, camera=self.view_manager.camera)
+        self.mySprite1.draw(self.view_manager.game_surface, self.to_scaled_pos(pygame.Vector2(0, 0)), render_anchor=self.anchor, camera=self.view_manager.camera)
 
  
 
@@ -89,7 +89,7 @@ class TestState(GameState):
 
 
     def debug_draw(self):
-        self.mySprite1.debug_draw(self.view_manager.game_surface, (32 * 4, 32 * 4), render_anchor=self.anchor, camera=self.view_manager.camera)
+        self.mySprite1.debug_draw(self.view_manager.game_surface, self.to_scaled_pos(pygame.Vector2(0, 0)), render_anchor=self.anchor, camera=self.view_manager.camera)
 
  
         super().debug_draw()

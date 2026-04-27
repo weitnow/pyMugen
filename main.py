@@ -26,8 +26,6 @@ resource_manager = GraphicManager()
 resource_manager.convert_alpha = True  # for debugging, do not convert alpha
 sound_manager = SoundManager()
 settings_manager = SettingsManager()
-
-# --- Create GameView and DebugView ---
 view_manager = ViewManager()
 
 # --- Load graphic resources ---
@@ -98,9 +96,9 @@ while running:
     # --- Debug Draw ---    
     if debug_manager.debug_on:
         #global debug draw
-        debug_manager.debug_draw()      #draw to debug surface
+        debug_manager.debug_draw()      
         #gamestate specific debug draw
-        gamestate_manager.debug_draw()  # draw to debug surface
+        gamestate_manager.debug_draw()
         
     view_manager.draw_to_screen()
 

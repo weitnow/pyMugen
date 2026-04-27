@@ -247,7 +247,8 @@ class Sprite:
 
 
         # Draw text with world position and current tag for debugging
-        self._dm.draw_debug_text(x + offset_x - self.sprite_size[0] // 2, y + offset_y - self.sprite_size[1] // 2 - 10, text=f"world_pos: {world_pos}, screen_pos: ({x + offset_x}, {y + offset_y}), Tag: {self.current_tag}", color=(247, 0, 255))
+        if self._dm.debug_text:
+            self._dm.draw_debug_text(x + offset_x - self.sprite_size[0] // 2, y + offset_y - self.sprite_size[1] // 2 - 10, text=f"world_pos: {world_pos}, screen_pos: ({x + offset_x}, {y + offset_y}), Tag: {self.current_tag}", color=(247, 0, 255))
     
                                 
 

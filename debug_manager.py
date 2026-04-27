@@ -6,16 +6,17 @@ from decorators import singleton
 @singleton
 class DebugManager:
     def __init__(self):
+        self.debug_on = True
+        self.debug_text = True
+
+
         self.font = pygame.font.Font(None, 20)
         self.small_font = pygame.font.Font(None, 12)
         self.last_time = time.time()
         self.fps = 0
         self.frame_time_ms = 0
         self.view_manager = None
-        
-        
-        self.debug_on = True
-        
+                
         self.last_system_info_update = 0
         self.system_info_update_interval = 3.0
         self.cpu_percent = 0

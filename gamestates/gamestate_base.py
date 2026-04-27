@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+
+import pygame
 from input_manager import InputManager
 from gamestate_manager import GameStateManager
 from view_manager import ViewManager
@@ -95,3 +97,7 @@ class GameState(ABC): #ABC is Abstract Base Class
     def remove_game_object(self, game_object: GameObject):
         """Remove a game object from the state."""
         self.game_objects.remove(game_object)
+
+    def to_scaled_pos(self, pos: pygame.Vector2, scale: int = 4):
+        """transform unscaled to scaled position"""
+        return (int(pos.x * scale), int(pos.y * scale))
