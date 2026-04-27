@@ -5,9 +5,10 @@ from decorators import singleton
 
 
 class AnimationData:
-    def __init__(self, frames: Dict[int, pygame.Surface], durations: Dict[int, int], tags: Dict[str, dict], sprite_size: tuple, base_name: str, png: bool):
+    def __init__(self, frames: Dict[int, pygame.Surface], durations: Dict[int, int], tags: Dict[str, dict], sprite_size: tuple, base_name: str, png: bool, scale: int):
 
         self.base_name = base_name                         # name of the spritesheet this animation belongs to
+        self.imported_scale = scale                        # the scale factor applied during loading (for informational/debugging purposes, will not be applied again)
         self.frames = frames                # int -> Surface
         self.durations = durations              # int -> duration in ms
         self.tags = tags                       # str -> {"from": int, "to": int}
@@ -126,7 +127,7 @@ class GraphicManager:
             tags[tag_name] = tag
 
         # --- Create AnimationData instance ---
-        anim = AnimationData(frames, durations, tags, sprite_size, name, png=False)
+        anim = AnimationData(frames, durations, tags, sprite_size, name, png=False, scale=scale)
 
         # --- Store the AnimationData instance ---
         self.animations[name] = anim
@@ -151,7 +152,7 @@ class GraphicManager:
         sprite_size= image.get_size()
 
         # --- Create AnimationData instance ---
-        anim = AnimationData(frames, durations, tags, sprite_size, name, png=True)
+        anim = AnimationData(frames, durations, tags, sprite_size, name, png=True, scale=scale)
 
         # --- Store the AnimationData instance ---
         self.animations[name] = anim
