@@ -15,16 +15,8 @@ from gameobjects.sprite import RenderAnchor
 class TestState(GameState):
 
     def enter(self):
-        #create a game object and add sprite
+        pass
 
-        self.anchor = RenderAnchor.CENTER
-        self.mySprite1 = Sprite().set_anim_name("debug32")
-        self.mySprite1.set_frame(0)
-
-        
-
-
- 
 
     def exit(self):
         pass
@@ -35,10 +27,10 @@ class TestState(GameState):
 
         if Action.RIGHT in actions_held:
             #rotate sprite
-            self.mySprite1.rotation += 2
+            pass
 
         elif Action.LEFT in actions_held:
-            self.mySprite1.rotation -= 2
+            pass
         else:
             pass
  
@@ -48,11 +40,11 @@ class TestState(GameState):
         if Action.DOWN in actions:
             # cycle through anchors for testing
             if self.anchor == RenderAnchor.CENTER:
-                self.anchor = RenderAnchor.TOPLEFT
+                pass
             elif self.anchor == RenderAnchor.TOPLEFT:
-                self.anchor = RenderAnchor.BOTTOMCENTER
+                pass
             elif self.anchor == RenderAnchor.BOTTOMCENTER:
-                self.anchor = RenderAnchor.CENTER
+                pass
 
         
         #temp
@@ -66,11 +58,6 @@ class TestState(GameState):
 
     def update(self, dt):
         #self.view_manager.camera.update(self.player1, self.player2) # simple camera follow for testing, can be expanded later for more complex behavior (like lookahead, shake, etc)
-        
-        self.mySprite1.update(dt)
-
-
-
         super().update(dt)
 
     
@@ -78,20 +65,11 @@ class TestState(GameState):
 
 
     def draw(self):
- 
-
-        self.mySprite1.draw(self.view_manager.game_surface, self.to_scaled_pos(pygame.Vector2(0, 0)), render_anchor=self.anchor, camera=self.view_manager.camera)
-
- 
-
         super().draw()
 
 
 
     def debug_draw(self):
-        self.mySprite1.debug_draw(self.view_manager.game_surface, self.to_scaled_pos(pygame.Vector2(0, 0)), render_anchor=self.anchor, camera=self.view_manager.camera)
-
- 
         super().debug_draw()
 
     

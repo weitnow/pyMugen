@@ -10,9 +10,6 @@ from gamesettings.settings_manager import SettingsManager
 from gameobjects.game_object import GameObject
 
 
-
-
-
 class GameState(ABC): #ABC is Abstract Base Class
     """Base class for all game states."""
 

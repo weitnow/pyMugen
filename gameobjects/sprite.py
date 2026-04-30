@@ -91,7 +91,7 @@ class Sprite:
             self.timer = 0
             self.playing = True
             self.png = anim.png
-            self.imported_scale = anim.imported_scale
+            self.imported_scale = anim.imported_scale # just for informational/debugging purposes, will do nothing if changed later
             self._current_offset = self.final_offsets.get(0, (0, 0)) #get offset for first frame, if there is none get (0,0)
         return self # allow chaining
         
