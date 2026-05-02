@@ -29,15 +29,15 @@ settings_manager = SettingsManager()
 view_manager = ViewManager()
 
 # --- Load graphic resources ---
-resource_manager.load_spritesheet("gbFighter", "assets/Graphics/Aseprite/gbFighter.png", "assets/Graphics/Aseprite/gbFighter.json") # example spritesheet with tags
+resource_manager.load_spritesheet("gbFighter", "assets/Graphics/Aseprite/gbFighter.png", "assets/Graphics/Aseprite/gbFighter.json", scale=4) # example spritesheet with tags
 resource_manager.load_spritesheet("nesFighter", "assets/Graphics/Aseprite/nesFighter.png", "assets/Graphics/Aseprite/nesFighter.json")
-resource_manager.load_spritesheet("debug32", "assets/Graphics/Aseprite/debug32.png", "assets/Graphics/Aseprite/debug32.json", scale=4) # example spritesheet without tags
+resource_manager.load_spritesheet("debug32", "assets/Graphics/Aseprite/debug32.png", "assets/Graphics/Aseprite/debug32.json", scale=1) # example spritesheet without tags
 resource_manager.load_png("debug32x32", "assets/Graphics/Aseprite/debug32x32.png") # example single PNG
 resource_manager.load_spritesheet("stages", "assets/Graphics/Aseprite/stages.png", "assets/Graphics/Aseprite/stages.json")
 
 
 # --- Set Offsets for spritesheets ---
-resource_manager.set_global_offset("nesFighter", x=0, y=0)
+resource_manager.set_global_offset("gbFighter", x=16, y=0)
 resource_manager.set_global_offset("debug32x32", x=0, y=0)
 resource_manager.set_global_offset("debug32", x=0, y=0)
 #resource_manager.set_tag_offset("nesFighter", "Idle", x=5, y=-3)

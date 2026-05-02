@@ -30,6 +30,9 @@ class GameState(ABC): #ABC is Abstract Base Class
         self.projectiles_p2 = []
         self.game_objects = []
 
+        # --- Stage ---
+        self.stage: GameObject = None
+
     @abstractmethod
     def enter(self):
         """Called when the state is entered."""
@@ -58,33 +61,39 @@ class GameState(ABC): #ABC is Abstract Base Class
             projectile.update(dt)
         for game_object in self.game_objects:
             game_object.update(dt)
+        if self.stage:
+            self.stage.update(dt)
 
     @abstractmethod
     def draw(self):
         """Draw the state. """
         if self.player1:
-            self.player1.draw(self.view_manager.game_surface)
+            self.player1.draw()
         if self.player2:
-            self.player2.draw(self.view_manager.game_surface)
+            self.player2.draw()
         for projectile in self.projectiles_p1:
-            projectile.draw(self.view_manager.game_surface)
+            projectile.draw()
         for projectile in self.projectiles_p2:
-            projectile.draw(self.view_manager.game_surface)
+            projectile.draw()
         for game_object in self.game_objects:
-            game_object.draw(self.view_manager.game_surface)
+            game_object.draw()
+        if self.stage:
+            self.stage.draw()
 
     def debug_draw(self):
         """Draw debug information."""
         if self.player1:
-            self.player1.draw_debug(self.view_manager.game_surface)
+            self.player1.debug_draw()
         if self.player2:
-            self.player2.draw_debug(self.view_manager.game_surface)
+            self.player2.debug_draw()
         for projectile in self.projectiles_p1:
-            projectile.draw_debug(self.view_manager.game_surface)
+            projectile.debug_draw()
         for projectile in self.projectiles_p2:
-            projectile.draw_debug(self.view_manager.game_surface)
+            projectile.debug_draw()
         for game_object in self.game_objects:
-            game_object.draw_debug(self.view_manager.game_surface)
+            game_object.debug_draw()
+        if self.stage:
+            self.stage.debug_draw()
 
 
     def add_game_object(self, game_object: GameObject):

@@ -15,7 +15,10 @@ from gameobjects.sprite import RenderAnchor
 class TestState(GameState):
 
     def enter(self):
-        pass
+        self.stage = GameObject((0, 0))
+
+        self.sprite1 = Sprite().set_anim_name("gbFighter").set_frame_tag("Idle").use_camera(True)
+    
 
 
     def exit(self):
@@ -27,15 +30,16 @@ class TestState(GameState):
 
         if Action.RIGHT in actions_held:
             #rotate sprite
+            self.sprite1.rotation += 2
             pass
 
         elif Action.LEFT in actions_held:
-            pass
+            self.sprite1.rotation -= 2
         else:
             pass
  
         if Action.UP in actions:
-            pass
+            self.sprite1.flip_x = not self.sprite1.flip_x
 
         if Action.DOWN in actions:
             # cycle through anchors for testing
@@ -58,6 +62,8 @@ class TestState(GameState):
 
     def update(self, dt):
         #self.view_manager.camera.update(self.player1, self.player2) # simple camera follow for testing, can be expanded later for more complex behavior (like lookahead, shake, etc)
+        self.sprite1.update(dt)
+
         super().update(dt)
 
     
@@ -65,11 +71,16 @@ class TestState(GameState):
 
 
     def draw(self):
+        self.sprite1.draw((32, 32), RenderAnchor.TOPLEFT)
+
         super().draw()
+      
 
 
 
     def debug_draw(self):
+        self.sprite1.debug_draw((32, 32), RenderAnchor.TOPLEFT)
+
         super().debug_draw()
 
     

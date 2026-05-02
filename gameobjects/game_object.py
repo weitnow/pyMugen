@@ -95,6 +95,7 @@ class GameObject():
         # ---------------------
         self._dm = DebugManager()
         self._vm = ViewManager()
+        self._draw_surface = self._vm.game_surface # surface to draw on, usually the main game surface but can be changed for special effects, etc
         self._camera = None
 
 
@@ -179,13 +180,13 @@ class GameObject():
     # ------------------------
     # Draw
     # ------------------------
-    def draw(self, surface):
+    def draw(self):
         if not self.visible or not self.active:
             return
         
         # --- Draw sprites ---         
         for sprite in self.sprites:
-            sprite.draw(surface, self.screen_pos, self.anchor, None)
+            sprite.draw(self.screen_pos, self.anchor, None)
         # --- End draw sprites ---
 
 
@@ -193,19 +194,19 @@ class GameObject():
     # ------------------------
     # Debug drawing
     # ------------------------
-    def debug_draw(self, surface: pygame.Surface):
+    def debug_draw(self):
         """ Draw world position point """
-        self._dm.draw_circle_game(self.screen_pos.x, self.screen_pos.y, 0.5, globals.COLOR_YELLOW)
+        self._vm.draw_circle(self.screen_pos.x, self.screen_pos.y, 4, globals.COLOR_YELLOW)
 
 
         """Draw sprite debug info."""
         for sprite in self.sprites:
-            sprite.debug_draw(surface, self.screen_pos, self.anchor, None, debug_draw_text=False) 
+            sprite.debug_draw(self.screen_pos, self.anchor, None, debug_draw_text=False) 
 
         """Draw hurtbox / hitbox for debugging."""
         hitboxes = self.get_active_hitboxes()
         for rect, hitbox_type in hitboxes:
-            self._dm.draw_rect_game(rect.topleft, rect.width, rect.height, globals.COLOR_RED)
+            self._vm.draw_rect_outline(rect.topleft, rect.width, rect.height, globals.COLOR_RED)
       
         
 

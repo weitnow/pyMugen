@@ -33,11 +33,14 @@ class Sprite:
         self.frame_durations = None  # is a Dict[int, int] mapping frame index to duration in ms, reference, do NOT modify!
         self.tags = None  # is a Dict[str, Dict[str, int]] mapping tag name to {"from": int, "to": int}, reference, do NOT modify!
         self.final_offsets = None  # is a Dict[int, (x, y)], reference, do NOT modify!
-        
+
         # Private attributes
         self._gm: GraphicManager = GraphicManager()
         self._dm: DebugManager = DebugManager()
         self._vm: ViewManager = ViewManager()
+        self._draw_surface = self._vm.game_surface # surface to draw on, usually the main game surface but can be changed for special effects, etc
+        self._camera = self._vm.camera # dont modify camera directly from sprite, it should be handled by the view manager, this is just a reference for convenience when drawing
+        self._use_camera = True # whether to apply camera transformations when drawing this sprite, can be toggled for testing/debugging purposes
         self._snapped_rotation: int = 0
         self._current_offset = (0, 0) # current frame offset, updated in update() if frame changes
         self._draw_rect = pygame.Rect(0, 0, 0, 0)
@@ -116,6 +119,11 @@ class Sprite:
             self.timer = 0
             self.playing = False
         return self
+    
+    def use_camera(self, use: bool):
+        """Set whether to apply camera transformations when drawing this sprite."""
+        self._use_camera = bool(use)
+        return self
 
     # ---------------------
     # Update / Draw
@@ -148,13 +156,18 @@ class Sprite:
             # Update current frame duration for the current frame, if there is none default to 100ms
             current_frame_duration = self.frame_durations.get(self.current_frame_idx, 100)
 
-    def draw(self, surface: pygame.Surface, world_pos, render_anchor: RenderAnchor = RenderAnchor.CENTER, camera=None):
+    def draw(self, world_pos, render_anchor: RenderAnchor = RenderAnchor.CENTER):
 
         # if there are no frames or sprite size is (0,0), skip drawing to avoid errors
         if not self.frames or self.sprite_size == (0, 0):
             return
 
         x, y = world_pos
+
+        # --- Camera ---
+        if self._use_camera: # move x/y according to camera
+            x -= self._camera.x
+            y -= self._camera.y
 
         # --- Anchor adjustment ---
         if render_anchor == RenderAnchor.TOPLEFT:
@@ -175,10 +188,7 @@ class Sprite:
         x += offset_x
         y += offset_y
 
-        # --- Camera ---
-        if camera: # move x/y according to camera
-            x -= camera.x
-            y -= camera.y
+        
 
         # --- Get frame ---
         if self._rotation == 0 and not self._flip_x and not self._flip_y:
@@ -190,16 +200,20 @@ class Sprite:
         self._draw_rect.size = frame.get_size()
         self._draw_rect.center = (x, y)
 
-        surface.blit(frame, self._draw_rect)
+        self._draw_surface.blit(frame, self._draw_rect)
 
 
     # ---------------------
     # Debug Draw
     # ---------------------
 
-    def debug_draw(self, surface: pygame.Surface, world_pos: pygame.Vector2, render_anchor: RenderAnchor = RenderAnchor.CENTER, camera=None): #TODO: implement camera support
+    def debug_draw(self, world_pos: pygame.Vector2, render_anchor: RenderAnchor = RenderAnchor.CENTER): #TODO: implement camera support
      
         x, y = world_pos
+
+        if self._use_camera:
+            x -= self._camera.x
+            y -= self._camera.y
 
         # --- Anchor adjustment --- but only if sprite size is not (0,0) to avoid weird anchor behavior when there is no sprite loaded yet
         if self.sprite_size != (0, 0):
@@ -214,16 +228,13 @@ class Sprite:
         # --- Offset lookup ---
         offset_x, offset_y = self._current_offset
 
-        cam_x = camera.x if camera else 0
-        cam_y = camera.y if camera else 0
-
-        x -= cam_x
-        y -= cam_y
-
+        
         if self._flip_x:
             offset_x = -offset_x
         if self._flip_y:
             offset_y = -offset_y
+
+        
 
         # Draw the original sprite rect (with offset) for debugging
         self._vm.draw_rect_outline(
@@ -239,8 +250,8 @@ class Sprite:
 
         #Draw a small rectangle at the origin point
         self._vm.draw_rect(
-            world_pos[0] - 2 - cam_x,
-            world_pos[1] - 2 - cam_y,
+            world_pos[0] - 2 - self._camera.x if self._use_camera else world_pos[0] - 2,
+            world_pos[1] - 2 - self._camera.y if self._use_camera else world_pos[1] - 2,
             width=4,
             height=4,
             color=(255, 0, 255)
@@ -250,7 +261,7 @@ class Sprite:
 
         # Draw text with world position and current tag for debugging
         if self._dm.debug_text:
-            self._dm.draw_debug_text(x + offset_x - self.sprite_size[0] // 2, y + offset_y - self.sprite_size[1] // 2 - 10, text=f"world_pos: {world_pos}, screen_pos: ({x + offset_x}, {y + offset_y}), Tag: {self.current_tag}", color=(247, 0, 255))
+            self._dm.draw_debug_text(x + offset_x - self.sprite_size[0] // 2, y + offset_y - self.sprite_size[1] // 2 - 10, text=f"world_pos: {world_pos}, screen_pos: ({world_pos[0] - self._camera.x if self._use_camera else world_pos[0]}, {world_pos[1] - self._camera.y if self._use_camera else world_pos[1]}), cam_pos: ({self._camera.x}, {self._camera.y})", color=(247, 0, 255))
     
                                 
 
