@@ -1,10 +1,10 @@
 import pygame
-import camera
-from graphic_manager import GraphicManager
-from debug_manager import DebugManager
+import managers.camera as camera
+from managers.graphic_manager import GraphicManager
+from managers.debug_manager import DebugManager
 from enum import Enum, auto
 
-from view_manager import ViewManager
+from managers.view_manager import ViewManager
 
 class RenderAnchor(Enum):
     CENTER = auto()

@@ -2,7 +2,7 @@
 
 from gamestates.gamestate_base import GameState
 from gameobjects.game_object import GameObject, HitboxType, HurtboxType
-from input_manager import Action
+from managers.input_manager import Action
 from gameobjects.sprite import Sprite
 from gameobjects.components.physics_components import FighterPhysicsComponent
 from gameobjects.components.player_controller_component import PlayerController

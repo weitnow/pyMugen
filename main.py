@@ -1,11 +1,12 @@
 import pygame
-from graphic_manager import GraphicManager
-from view_manager import ViewManager
-from debug_manager import DebugManager
-from input_manager import InputManager
-from gamestate_manager import GameStateManager
-from sound_manager import SoundManager
+from managers.graphic_manager import GraphicManager
+from managers.view_manager import ViewManager
+from managers.debug_manager import DebugManager
+from managers.input_manager import InputManager
+from managers.gamestate_manager import GameStateManager
+from managers.sound_manager import SoundManager
 from gamesettings.settings_manager import SettingsManager
+from managers.serviceprovider import ServiceProvider
 
 # --- Import all States ---
 from gamestates.menustate import MenuState
@@ -19,14 +20,17 @@ display_info = pygame.display.Info()
 clock = pygame.time.Clock() 
 
 # --- Create Managers ---
-gamestate_manager = GameStateManager()
-input_manager = InputManager()
-debug_manager = DebugManager()
-graphic_manager = GraphicManager()
+service_provider = ServiceProvider() # create the service provider singleton to initialize all managers
+
+graphic_manager = service_provider.graphic_manager
 graphic_manager.convert_alpha = True  # for debugging, do not convert alpha
-sound_manager = SoundManager()
-settings_manager = SettingsManager()
-view_manager = ViewManager()
+view_manager = service_provider.view_manager
+debug_manager = service_provider.debug_manager
+input_manager = service_provider.input_manager
+gamestate_manager = service_provider.gamestate_manager
+sound_manager = service_provider.sound_manager
+settings_manager = service_provider.settings_manager
+
 
 # --- Load graphic resources ---
 graphic_manager.load_spritesheet("gbFighter", "assets/Graphics/Aseprite/gbFighter.png", "assets/Graphics/Aseprite/gbFighter.json") # example spritesheet with tags

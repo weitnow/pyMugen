@@ -1,4 +1,4 @@
-from input_manager import InputManager, Action
+from managers.input_manager import InputManager, Action
 from collections import deque
 import time
 from typing import Optional

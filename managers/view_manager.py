@@ -1,7 +1,7 @@
 import pygame
 from decorators import singleton
-from debug_manager import DebugManager
-from camera import Camera
+from managers.debug_manager import DebugManager
+from managers.camera import Camera
 
 @singleton
 class ViewManager:
@@ -24,7 +24,7 @@ class ViewManager:
         self.game_surface = pygame.Surface((self.GAME_VIEW_WIDTH, self.GAME_VIEW_HEIGHT))
 
         self.debug_manager = DebugManager()
-        self.debug_manager.set_view_manager(self)
+        self.debug_manager.bind_view_manager(self)
 
     def update(self, dt):
         pass

@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 
 import pygame
-from input_manager import InputManager
-from gamestate_manager import GameStateManager
-from view_manager import ViewManager
-from debug_manager import DebugManager
-from sound_manager import SoundManager
+from managers.input_manager import InputManager
+from managers.gamestate_manager import GameStateManager
+from managers.view_manager import ViewManager
+from managers.debug_manager import DebugManager
+from managers.sound_manager import SoundManager
 from gamesettings.settings_manager import SettingsManager
 from gameobjects.game_object import GameObject
 

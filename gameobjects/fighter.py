@@ -1,5 +1,5 @@
 from gameobjects.game_object import GameObject
-from input_manager import PlayerController, Action
+from managers.input_manager import PlayerController, Action
 
 class Fighter(GameObject):
     def __init__(self, pos: tuple[float, float], player_index: int = 0):

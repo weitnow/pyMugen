@@ -2,9 +2,9 @@ import pygame
 from enum import Enum
 from dataclasses import dataclass
 import globals  
-from debug_manager import DebugManager
+from managers.debug_manager import DebugManager
 from gameobjects.sprite import Sprite, RenderAnchor
-from view_manager import ViewManager
+from managers.view_manager import ViewManager
 
 class HitboxType(Enum):
     HIGH = "high"

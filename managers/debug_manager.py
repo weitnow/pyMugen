@@ -23,12 +23,13 @@ class DebugManager:
 
         self._rect_cache = {} # key: (w, h, color, alpha)        
 
-    def set_view_manager(self, view_manager):
+    def bind_view_manager(self, view_manager):
         self.view_manager = view_manager
         self.game_surface = view_manager.game_surface
         self.GAME_VIEW_WIDTH = view_manager.GAME_VIEW_WIDTH
         self.GAME_VIEW_HEIGHT = view_manager.GAME_VIEW_HEIGHT
         self.debug_overlay = self._get_rect_surface(self.GAME_VIEW_WIDTH, self.GAME_VIEW_HEIGHT, (0, 0, 0), 128)
+
 
 
 
