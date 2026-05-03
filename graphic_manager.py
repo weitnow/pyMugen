@@ -8,7 +8,6 @@ class AnimationData:
     def __init__(self, frames: Dict[int, pygame.Surface], durations: Dict[int, int], tags: Dict[str, dict], sprite_size: tuple, base_name: str, png: bool, scale: int):
 
         self.base_name = base_name                         # name of the spritesheet this animation belongs to
-        self.imported_scale = scale                        # the scale factor applied during loading (for informational/debugging purposes, will not be applied again)
         self.frames = frames                # int -> Surface
         self.durations = durations              # int -> duration in ms
         self.tags = tags                       # str -> {"from": int, "to": int}

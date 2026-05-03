@@ -26,7 +26,6 @@ class Sprite:
         self.timer = 0
         self.playing = False
         self.png = False # True if this sprite is a single PNG, False if it is an animation
-        self.imported_scale = 1 # the scale factor applied during loading (for informational/debugging purposes, will not be applied again)
 
         # Animation data - readonly (references to ResourceManager data, do NOT modify these!)
         self.frames = None  # is a Dict[int, pygame.Surface], reference, do NOT modify!
@@ -94,7 +93,6 @@ class Sprite:
             self.timer = 0
             self.playing = True
             self.png = anim.png
-            self.imported_scale = anim.imported_scale # just for informational/debugging purposes, will do nothing if changed later
             self._current_offset = self.final_offsets.get(0, (0, 0)) #get offset for first frame, if there is none get (0,0)
         return self # allow chaining
         
