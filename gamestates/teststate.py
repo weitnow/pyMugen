@@ -17,7 +17,7 @@ class TestState(GameState):
     def enter(self):
         self.stage = GameObject((0, 0))
 
-        self.sprite1 = Sprite().set_anim_name("gbFighter").set_frame_tag("Idle").use_camera(True)
+        self.sprite1 = Sprite().set_anim_name("gbFighter").set_frame_tag("Idle").use_camera(True).set_scale(4)
     
 
 

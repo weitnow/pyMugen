@@ -2,6 +2,7 @@ import json
 import pygame
 from typing import Dict
 from decorators import singleton
+import globals
 
 
 class AnimationData:
@@ -13,6 +14,7 @@ class AnimationData:
         self.tags = tags                       # str -> {"from": int, "to": int}
         self.sprite_size = sprite_size                   # (width, height)
         self.png = png                                    # True if this is a single PNG, False if it is an animation
+        self.scale = scale                                 # the scale factor 
         
         # Offset storage
         self._global_offset = (0, 0)   
@@ -20,20 +22,24 @@ class AnimationData:
         self._frame_offsets = {}       # frame_idx → (x, y)
         self.final_offsets = {}       # frame_idx → (x, y)      this is passed as reference to sprite objects
 
+        # Private attributes
+        self._source_image_path = None  # is set by GraphicManager when loading
+        self._source_json_path = None   # is set by GraphicManager when loading
+
     # ------------------------------------------------------------------
     # OFFSET SETTERS (clean and simple)
     # ------------------------------------------------------------------
-    def set_global_offset(self, x=0, y=0):
+    def set_global_offset(self, x, y):
         self._global_offset = (x, y)
         self._rebuild_offsets()
 
-    def set_tag_offset(self, tag_name: str, x=0, y=0):
+    def set_tag_offset(self, tag_name: str, x, y):
         if tag_name not in self.tags:
             raise ValueError(f"Tag '{tag_name}' does not exist in animation.")
         self._tag_offsets[tag_name] = (x, y)
         self._rebuild_offsets()
 
-    def set_frame_offset(self, frame_idx: int, x=0, y=0):
+    def set_frame_offset(self, frame_idx: int, x, y):
         if frame_idx not in self.frames:
             raise ValueError(f"Frame {frame_idx} does not exist.")
         self._frame_offsets[frame_idx] = (x, y)
@@ -90,8 +96,8 @@ class GraphicManager:
         self.convert_alpha = True  # whether to convert images with alpha
 
     def load_spritesheet(self, name: str, image_path: str, json_path: str, scale: int = 1):
-        if name in self.animations:
-            raise ValueError(f"Animation '{name}' already loaded.")
+        if name in self.animations and scale in self.animations[name]:
+            raise ValueError(f"Animation '{name}' with scale {scale} already loaded.")
 
         with open(json_path, "r") as f:
             data = json.load(f)
@@ -125,67 +131,135 @@ class GraphicManager:
             seen.add(tag_name)
             tags[tag_name] = tag
 
-        # --- Create AnimationData instance ---
-        anim = AnimationData(frames, durations, tags, sprite_size, name, png=False, scale=scale)
+        # ensure outer dict
+        if name not in self.animations:
+            self.animations[name] = {}
 
-        # --- Store the AnimationData instance ---
-        self.animations[name] = anim
+        # create base (scale 1) if missing
+        if 1 not in self.animations[name]:
+            base_frames = {}
+            for k, v in data["frames"].items():
+                idx = int(k)
+                rect = pygame.Rect(v["frame"]["x"], v["frame"]["y"], v["frame"]["w"], v["frame"]["h"])
+                base_frames[idx] = spritesheet.subsurface(rect).copy()
+
+            base_anim = AnimationData(base_frames, durations, tags,
+                                    base_frames[0].get_size() if base_frames else (0, 0),
+                                    name, png=False, scale=1)
+            
+            base_anim._source_image_path = image_path  # store source path for reference
+            base_anim._source_json_path = json_path    # store source path for reference
+
+            self.animations[name][1] = base_anim
+
+        # create requested scale if missing
+        if scale not in self.animations[name]:
+            if scale == 1:
+                return
+
+            scaled_frames = {}
+            for idx, frame in self.animations[name][1].frames.items():
+                new_size = (int(frame.get_width() * scale), int(frame.get_height() * scale))
+                scaled_frames[idx] = pygame.transform.scale(frame, new_size)
+
+            scaled_anim = AnimationData(
+                scaled_frames,
+                durations,
+                tags,
+                scaled_frames[0].get_size() if scaled_frames else (0, 0),
+                name,
+                png=False,
+                scale=scale
+            )
+
+            scaled_anim._source_image_path = self.animations[name][1]._source_image_path  # reference original source
+            scaled_anim._source_json_path = self.animations[name][1]._source_json_path    # reference original source
+
+            self.animations[name][scale] = scaled_anim
 
         
 
     # --- SINGLE PNG ---
     def load_png(self, name: str, image_path: str, scale: int = 1):
-        if name in self.animations:
-            raise ValueError(f"Spritesheet with name '{name}' already loaded.")
+        if name in self.animations and scale in self.animations[name]:
+            raise ValueError(f"PNG '{name}' with scale {scale} already loaded.")
 
         img = pygame.image.load(image_path)
-        image = img.convert_alpha() if self.convert_alpha else img.convert()
-        if scale != 1:
-            new_size = (int(image.get_width() * scale), int(image.get_height() * scale))
-            image = pygame.transform.scale(image, new_size)
+        base_image = img.convert_alpha() if self.convert_alpha else img.convert()
 
-        # fill in data
-        frames = {0: image}
-        durations = {0: 0}
-        tags = {}
-        sprite_size= image.get_size()
+        # create outer dictionary
+        if name not in self.animations:
+            self.animations[name] = {}
 
-        # --- Create AnimationData instance ---
-        anim = AnimationData(frames, durations, tags, sprite_size, name, png=True, scale=scale)
+        # always create/store scale 1
+        if 1 not in self.animations[name]:
+            base_anim = AnimationData(
+                frames={0: base_image},
+                durations={0: 0},
+                tags={},
+                sprite_size=base_image.get_size(),
+                base_name=name,
+                png=True,
+                scale=1
+            )
 
-        # --- Store the AnimationData instance ---
-        self.animations[name] = anim
+            base_anim._source_image_path = image_path  # store source path for reference
+
+            self.animations[name][1] = base_anim
+
+        # create requested scale if needed
+        if scale != 1 and scale not in self.animations[name]:
+            new_size = (
+                int(base_image.get_width() * scale),
+                int(base_image.get_height() * scale)
+            )
+
+            scaled_image = pygame.transform.scale(base_image, new_size)
+
+            scaled_anim = AnimationData(
+                frames={0: scaled_image},
+                durations={0: 0},
+                tags={},
+                sprite_size=scaled_image.get_size(),
+                base_name=name,
+                png=True,
+                scale=scale
+            )
+
+            scaled_anim._source_image_path = self.animations[name][1]._source_image_path  # reference original source
+
+            self.animations[name][scale] = scaled_anim
 
     # ------------------------------------------------------------------
     # CLEAN OFFSET API (delegates to AnimationData)
     # ------------------------------------------------------------------
-    def set_global_offset(self, base_name: str, x: int = 0, y: int = 0):
+    def set_global_offset(self, base_name: str, x: int, y: int, scale: int):
         """Set a global (x,y) offset for the animation."""
-        anim = self._require_anim(base_name)
-        anim.set_global_offset(x, y)
+        anim = self._require_anim(base_name, scale)
+        anim.set_global_offset(x, y, scale)
 
-    def set_tag_offset(self, base_name: str, tag_name: str, x: int = 0, y: int = 0):
+    def set_tag_offset(self, base_name: str, tag_name: str, x: int, y: int, scale: int):
         """Set a tag-specific (x,y) offset."""
-        anim = self._require_anim(base_name)
-        anim.set_tag_offset(tag_name, x, y)
+        anim = self._require_anim(base_name, scale)
+        anim.set_tag_offset(tag_name, x, y, scale)
 
-    def set_frame_offset(self, base_name: str, frame_idx: int, x: int = 0, y: int = 0):
+    def set_frame_offset(self, base_name: str, frame_idx: int, x: int, y: int, scale: int):
         """Set a frame-specific (x,y) offset."""
-        anim = self._require_anim(base_name)
-        anim.set_frame_offset(frame_idx, x, y)
+        anim = self._require_anim(base_name, scale)
+        anim.set_frame_offset(frame_idx, x, y, scale)
 
-    def _require_anim(self, name: str) -> "AnimationData":
+    def _require_anim(self, name: str, scale: int) -> "AnimationData":
         """Internal helper to validate animation existence."""
-        if name not in self.animations:
-            raise ValueError(f"Animation '{name}' not loaded.")
-        return self.animations[name]
+        if scale not in self.animations[name]:
+            raise ValueError(f"Animation '{name}' with scale {scale} not loaded.")
+        return self.animations[name][scale]
 
     
-    def get_animationdata_reference(self, name: str) -> "AnimationData":
+    def get_animationdata_reference(self, name: str, scale: int) -> "AnimationData":
         """Return a reference to the existing AnimationData instance."""
-        if name not in self.animations:
-            raise ValueError(f"Animation '{name}' doesn't exisit.")
-        return self.animations[name]
+        if scale not in self.animations[name]:
+            raise ValueError(f"Animation '{name}' with scale {scale} not loaded.")
+        return self.animations[name][scale]
     
         
     def get_rotated_frame(
@@ -193,13 +267,14 @@ class GraphicManager:
         anim_name: str,
         frame_idx: int,
         angle: int,
-        flip_x: bool = False,
-        flip_y: bool = False
+        flip_x: bool,
+        flip_y: bool,
+        scale: int
     ):
 
-        original = self.animations[anim_name].frames[frame_idx]
+        original = self.animations[anim_name][scale].frames[frame_idx]
 
-        key = (anim_name, frame_idx, angle, flip_x, flip_y)
+        key = (anim_name, frame_idx, angle, flip_x, flip_y, scale)
 
         if key in self._rotation_cache:
             return self._rotation_cache[key]
@@ -221,6 +296,40 @@ class GraphicManager:
         self._rotation_cache[key] = rotated
 
         return rotated
+    
+    def get_or_create_scaled(self, name: str, scale: int):
+        """
+        Ensure scale `factor` exists for animation `name`.
+        Derives from the scale=1 version, copying offsets proportionally.
+        """
+        if name not in self.animations:
+            raise ValueError(f"Animation '{name}' not loaded.")
+        if scale in self.animations[name]:
+            return  # already exists
+
+        source = self.animations[name][1]  # always derive from scale=1
+
+        if source.png:
+            self.load_png(name, source._source_image_path, scale=scale)
+        else:
+            self.load_spritesheet(name, source._source_image_path, source._source_json_path, scale=scale)
+
+        scaled = self.animations[name][scale]
+
+        # Copy offsets proportionally from scale=1
+        gx, gy = source._global_offset
+        if gx != 0 or gy != 0:
+            scaled.set_global_offset(int(gx * scale), int(gy * scale))
+
+        for tag_name, (tx, ty) in source._tag_offsets.items():
+            if tx != 0 or ty != 0:
+                scaled.set_tag_offset(tag_name, int(tx * scale), int(ty * scale))
+
+        for frame_idx, (fx, fy) in source._frame_offsets.items():
+            if fx != 0 or fy != 0:
+                scaled.set_frame_offset(frame_idx, int(fx * scale), int(fy * scale))
+    
+
 
 
 

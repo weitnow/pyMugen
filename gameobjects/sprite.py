@@ -12,7 +12,10 @@ class RenderAnchor(Enum):
     BOTTOMCENTER = auto()
 
 class Sprite:
-    def __init__(self):
+    def __init__(self, scale: int = 1):
+        #PUBLIC attributes
+        self.scale = scale
+
         # PUBLIC attributes (with property access)
         self._flip_x: bool = False
         self._flip_y: bool = False
@@ -81,7 +84,7 @@ class Sprite:
     def set_anim_name(self, name: str):
         if name != self.base_name:
             # Load new animation data from ResourceManager
-            anim = self._gm.get_animationdata_reference(name)
+            anim = self._gm.get_animationdata_reference(name, self.scale)
             self.frames = anim.frames
             self.frame_durations = anim.durations
             self.tags = anim.tags
@@ -122,6 +125,42 @@ class Sprite:
         """Set whether to apply camera transformations when drawing this sprite."""
         self._use_camera = bool(use)
         return self
+    
+
+    def set_scale(self, factor: int):
+        """
+        Switch to a different scale of the current animation.
+        If the scaled variant doesn't exist in GraphicManager yet, it is created
+        automatically from the scale=1 source. Preserves the current tag.
+        """
+        if self.base_name is None:
+            raise RuntimeError("No animation loaded. Call set_anim_name() first.")
+        if factor < 1:
+            raise ValueError(f"Scale factor must be >= 1, got {factor}.")
+        if factor == self.scale:
+            return self  # nothing to do
+
+        # Create the scaled variant if it doesn't exist yet
+        self._gm.get_or_create_scaled(self.base_name, factor)
+
+        # Switch scale and re-point all references
+        saved_tag = self.current_tag
+        self.scale = factor
+
+        anim = self._gm.get_animationdata_reference(self.base_name, self.scale)
+        self.frames = anim.frames
+        self.frame_durations = anim.durations
+        self.tags = anim.tags
+        self.final_offsets = anim.final_offsets
+        self.sprite_size = anim.sprite_size
+        self.png = anim.png
+        self._current_offset = self.final_offsets.get(self.current_frame_idx, (0, 0))
+
+        # Restore tag if it still exists
+        if saved_tag and saved_tag in self.tags:
+            self.set_frame_tag(saved_tag)
+
+        return self  # allow chaining
 
     # ---------------------
     # Update / Draw
@@ -277,7 +316,8 @@ class Sprite:
             frame_idx=self.current_frame_idx,
             angle=self._snapped_rotation,
             flip_x=self._flip_x,
-            flip_y=self._flip_y
+            flip_y=self._flip_y,
+            scale=self.scale
         )
 
 
