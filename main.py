@@ -1,11 +1,4 @@
 import pygame
-from managers.graphic_manager import GraphicManager
-from managers.view_manager import ViewManager
-from managers.debug_manager import DebugManager
-from managers.input_manager import InputManager
-from managers.gamestate_manager import GameStateManager
-from managers.sound_manager import SoundManager
-from gamesettings.settings_manager import SettingsManager
 from managers.serviceprovider import ServiceProvider
 
 # --- Import all States ---
@@ -20,47 +13,38 @@ display_info = pygame.display.Info()
 clock = pygame.time.Clock() 
 
 # --- Create Managers ---
-service_provider = ServiceProvider() # create the service provider singleton to initialize all managers
+sp = ServiceProvider() # create the service provider singleton to initialize all managers
 
-graphic_manager = service_provider.graphic_manager
-graphic_manager.convert_alpha = True  # for debugging, do not convert alpha
-view_manager = service_provider.view_manager
-debug_manager = service_provider.debug_manager
-input_manager = service_provider.input_manager
-gamestate_manager = service_provider.gamestate_manager
-sound_manager = service_provider.sound_manager
-settings_manager = service_provider.settings_manager
-
+sp.graphic_manager.convert_alpha = True  # for debugging, do not convert alpha
 
 # --- Load graphic resources ---
-graphic_manager.load_spritesheet("gbFighter", "assets/Graphics/Aseprite/gbFighter.png", "assets/Graphics/Aseprite/gbFighter.json") # example spritesheet with tags
-graphic_manager.load_spritesheet("nesFighter", "assets/Graphics/Aseprite/nesFighter.png", "assets/Graphics/Aseprite/nesFighter.json")
-graphic_manager.load_spritesheet("debug32", "assets/Graphics/Aseprite/debug32.png", "assets/Graphics/Aseprite/debug32.json") # example spritesheet without tags
-graphic_manager.load_png("debug32x32", "assets/Graphics/Aseprite/debug32x32.png") # example single PNG
-graphic_manager.load_spritesheet("stages", "assets/Graphics/Aseprite/stages.png", "assets/Graphics/Aseprite/stages.json")
-
+sp.graphic_manager.load_spritesheet("gbFighter", "assets/Graphics/Aseprite/gbFighter.png", "assets/Graphics/Aseprite/gbFighter.json") # example spritesheet with tags
+sp.graphic_manager.load_spritesheet("nesFighter", "assets/Graphics/Aseprite/nesFighter.png", "assets/Graphics/Aseprite/nesFighter.json")
+sp.graphic_manager.load_spritesheet("debug32", "assets/Graphics/Aseprite/debug32.png", "assets/Graphics/Aseprite/debug32.json") # example spritesheet without tags
+sp.graphic_manager.load_png("debug32x32", "assets/Graphics/Aseprite/debug32x32.png") # example single PNG
+sp.graphic_manager.load_spritesheet("stages", "assets/Graphics/Aseprite/stages.png", "assets/Graphics/Aseprite/stages.json")
 
 # --- Set Offsets for spritesheets ---
-#graphic_manager.set_global_offset("gbFighter", x=0, y=0)
-#graphic_manager.set_global_offset("debug32x32", x=0, y=0)
-#graphic_manager.set_global_offset("debug32", x=0, y=0)
-#graphic_manager.set_tag_offset("nesFighter", "Idle", x=5, y=-3)
-#graphic_manager.set_frame_offset("nesFighter", 1, x=6, y=-2)
+#sp.graphic_manager.set_global_offset("gbFighter", x=0, y=0)
+#sp.graphic_manager.set_global_offset("debug32x32", x=0, y=0)
+#sp.graphic_manager.set_global_offset("debug32", x=0, y=0)
+#sp.graphic_manager.set_tag_offset("nesFighter", "Idle", x=5, y=-3)
+#sp.graphic_manager.set_frame_offset("nesFighter", 1, x=6, y=-2)
 
 # --- Load soundeffect and music resources ---
-sound_manager.load_music("choices", "assets/Music/choices.mp3")
-sound_manager.load_music("darkchurch", "assets/Music/darkchurch.mp3")
-sound_manager.load_sound("jump", "assets/Soundeffects/jump3.wav")
+sp.sound_manager.load_music("choices", "assets/Music/choices.mp3")
+sp.sound_manager.load_music("darkchurch", "assets/Music/darkchurch.mp3")
+sp.sound_manager.load_sound("jump", "assets/Soundeffects/jump3.wav")
 
 
 # --- Register Game States ---
-gamestate_manager.add_state("menu", MenuState())
-gamestate_manager.add_state("playing", PlayingState())
-gamestate_manager.add_state("test", TestState())
-gamestate_manager.add_state("performancetest", PerformanceTestState())
+sp.gamestate_manager.add_state("menu", MenuState())
+sp.gamestate_manager.add_state("playing", PlayingState())
+sp.gamestate_manager.add_state("test", TestState())
+sp.gamestate_manager.add_state("performancetest", PerformanceTestState())
 
 
-gamestate_manager.change_state("test") # start in performance test state
+sp.gamestate_manager.change_state("test") # start in performance test state
 
 # --- Block certain events from pygame event queue to optimize ---
 pygame.event.set_blocked(None) # block all events
@@ -83,28 +67,28 @@ while running:
                              
 
     # --- Update CORE-Systems ---
-    debug_manager.update(dt)
-    input_manager.update(dt)
-    view_manager.update(dt) 
+    sp.debug_manager.update(dt)
+    sp.input_manager.update(dt)
+    sp.view_manager.update(dt) 
 
     # --- Handle Input ---
-    gamestate_manager.handle_input()
+    sp.gamestate_manager.handle_input()
 
     # --- Update current Game State ---
-    gamestate_manager.update(dt)
+    sp.gamestate_manager.update(dt)
 
     # --- Draw ---
-    view_manager.clear() # clear both game and debug surfaces
-    gamestate_manager.draw() # draw to game surface
+    sp.view_manager.clear() # clear both game and debug surfaces
+    sp.gamestate_manager.draw() # draw to game surface
 
     # --- Debug Draw ---    
-    if debug_manager.debug_on:
+    if sp.debug_manager.debug_on:
         #global debug draw
-        debug_manager.debug_draw()      
+        sp.debug_manager.debug_draw()      
         #gamestate specific debug draw
-        gamestate_manager.debug_draw()
+        sp.gamestate_manager.debug_draw()
         
-    view_manager.draw_to_screen()
+    sp.view_manager.draw_to_screen()
 
     
 
