@@ -3,7 +3,7 @@ from decorators import singleton
 
 
 from managers.graphic_manager import GraphicManager
-from managers.view_manager import ViewManager
+from managers.view_manager.view_manager import ViewManager
 from managers.debug_manager import DebugManager
 from managers.input_manager import InputManager
 from managers.gamestate_manager import GameStateManager

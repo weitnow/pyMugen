@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import globals  
 from managers.debug_manager import DebugManager
 from gameobjects.sprite import Sprite, RenderAnchor
-from managers.view_manager import ViewManager
+from managers.view_manager.view_manager import ViewManager
 
 class HitboxType(Enum):
     HIGH = "high"

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import pygame
 from managers.input_manager import InputManager
 from managers.gamestate_manager import GameStateManager
-from managers.view_manager import ViewManager
+from managers.view_manager.view_manager import ViewManager
 from managers.debug_manager import DebugManager
 from managers.sound_manager import SoundManager
 from gamesettings.settings_manager import SettingsManager
