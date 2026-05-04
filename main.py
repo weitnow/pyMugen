@@ -1,11 +1,9 @@
 import pygame
-from managers.serviceprovider import ServiceProvider
+from managers.service_provider import ServiceProvider
 
 # --- Import all States ---
-from gamestates.menustate import MenuState
-from gamestates.playingstate import PlayingState
 from gamestates.teststate import TestState
-from gamestates.performanceteststate import PerformanceTestState
+
 
 # --- Initialize ---
 pygame.init()
@@ -15,7 +13,7 @@ clock = pygame.time.Clock()
 # --- Create Managers ---
 sp = ServiceProvider() # create the service provider singleton to initialize all managers
 
-sp.graphic_manager.convert_alpha = True  # for debugging, do not convert alpha
+#sp.graphic_manager.convert_alpha = False  # for debugging, do not convert alpha
 
 # --- Load graphic resources ---
 sp.graphic_manager.load_spritesheet("gbFighter", "assets/Graphics/Aseprite/gbFighter.png", "assets/Graphics/Aseprite/gbFighter.json") # example spritesheet with tags
@@ -38,10 +36,8 @@ sp.sound_manager.load_sound("jump", "assets/Soundeffects/jump3.wav")
 
 
 # --- Register Game States ---
-sp.gamestate_manager.add_state("menu", MenuState())
-sp.gamestate_manager.add_state("playing", PlayingState())
 sp.gamestate_manager.add_state("test", TestState())
-sp.gamestate_manager.add_state("performancetest", PerformanceTestState())
+
 
 
 sp.gamestate_manager.change_state("test") # start in performance test state
@@ -62,7 +58,7 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_F1:
-                debug_manager.debug_on = not debug_manager.debug_on
+                sp.debug_manager.debug_on = not sp.debug_manager.debug_on
             
                              
 
@@ -78,7 +74,7 @@ while running:
     sp.gamestate_manager.update(dt)
 
     # --- Draw ---
-    sp.view_manager.clear() # clear both game and debug surfaces
+    sp.view_manager.clear() # clear game surface
     sp.gamestate_manager.draw() # draw to game surface
 
     # --- Debug Draw ---    

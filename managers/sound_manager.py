@@ -1,6 +1,6 @@
 import pygame
 from decorators import singleton
-from gamesettings.settings_manager import SettingsManager
+from managers.settings_manager.settings_manager import SettingsManager
 
 @singleton
 class SoundManager:

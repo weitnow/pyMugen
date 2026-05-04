@@ -186,7 +186,7 @@ class GameObject():
         
         # --- Draw sprites ---         
         for sprite in self.sprites:
-            sprite.draw(self.screen_pos, self.anchor, None)
+            sprite.draw(self.screen_pos, self.anchor)
         # --- End draw sprites ---
 
 
@@ -201,7 +201,7 @@ class GameObject():
 
         """Draw sprite debug info."""
         for sprite in self.sprites:
-            sprite.debug_draw(self.screen_pos, self.anchor, None, debug_draw_text=False) 
+            sprite.debug_draw(self.screen_pos, self.anchor) 
 
         """Draw hurtbox / hitbox for debugging."""
         hitboxes = self.get_active_hitboxes()

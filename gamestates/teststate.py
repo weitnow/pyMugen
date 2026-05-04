@@ -9,13 +9,14 @@ from gameobjects.components.player_controller_component import PlayerController
 import pygame
 
 from gameobjects.sprite import RenderAnchor
+from gameobjects.base_stage import BaseStage
 
 
 
 class TestState(GameState):
 
     def enter(self):
-        self.stage = GameObject((0, 0))
+        self.stage = BaseStage().add_sprite(Sprite().set_anim_name("stages"))
 
         self.sprite1 = Sprite().set_anim_name("gbFighter").set_frame_tag("Punch").use_camera(True).set_scale(4)
     

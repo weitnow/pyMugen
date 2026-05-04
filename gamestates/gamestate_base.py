@@ -6,7 +6,8 @@ from managers.gamestate_manager import GameStateManager
 from managers.view_manager.view_manager import ViewManager
 from managers.debug_manager import DebugManager
 from managers.sound_manager import SoundManager
-from gamesettings.settings_manager import SettingsManager
+from managers.settings_manager.settings_manager import SettingsManager
+
 from gameobjects.game_object import GameObject
 
 
@@ -16,12 +17,18 @@ class GameState(ABC): #ABC is Abstract Base Class
     def __init__(self):
         # --- Managers ---
         # all managers are singletons, so we use the instance directly
+
         self.gamestate_manager: GameStateManager = GameStateManager()
         self.input_manager: InputManager = InputManager()
         self.view_manager: ViewManager = ViewManager()
         self.debug_manager: DebugManager = DebugManager()
         self.sound_manager: SoundManager = SoundManager()
         self.settings_manager: SettingsManager = SettingsManager()
+
+        # references for easier access
+        self.camera = self.view_manager.camera # reference for easy access
+        self.GAME_VIEW_HEIGHT = self.view_manager.GAME_VIEW_HEIGHT
+        self.GAME_VIEW_WIDTH = self.view_manager.GAME_VIEW_WIDTH
 
         # --- Game Objects ---
         self.player1: GameObject = None
@@ -67,33 +74,35 @@ class GameState(ABC): #ABC is Abstract Base Class
     @abstractmethod
     def draw(self):
         """Draw the state. """
-        if self.player1:
-            self.player1.draw()
-        if self.player2:
-            self.player2.draw()
+        if self.stage:
+            self.stage.draw()
         for projectile in self.projectiles_p1:
             projectile.draw()
         for projectile in self.projectiles_p2:
             projectile.draw()
         for game_object in self.game_objects:
             game_object.draw()
-        if self.stage:
-            self.stage.draw()
+        if self.player1:
+            self.player1.draw()
+        if self.player2:
+            self.player2.draw()
+        
 
     def debug_draw(self):
         """Draw debug information."""
-        if self.player1:
-            self.player1.debug_draw()
-        if self.player2:
-            self.player2.debug_draw()
+        if self.stage:
+            self.stage.debug_draw()
         for projectile in self.projectiles_p1:
             projectile.debug_draw()
         for projectile in self.projectiles_p2:
             projectile.debug_draw()
         for game_object in self.game_objects:
             game_object.debug_draw()
-        if self.stage:
-            self.stage.debug_draw()
+        if self.player1:
+            self.player1.debug_draw()
+        if self.player2:
+            self.player2.debug_draw()
+        
 
 
     def add_game_object(self, game_object: GameObject):
