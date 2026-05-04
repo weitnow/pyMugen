@@ -78,7 +78,7 @@ class GameObject(Sprite):
         self.vel = pygame.Vector2(0, 0)
 
         # Components
-        self.sprites = []   # list additional Sprite instances
+        self.sprites = []   # list additional Sprite instances #TODO: check if i need this or can get rid of it
         self.physics = None       # PhysicsComponent
         self.player_controller = None # PlayerController
 
@@ -89,9 +89,6 @@ class GameObject(Sprite):
         # State
         self.on_ground = None # update this from physics component to track if on ground for jump logic, etc.
        
-        
-
-
     # ------------------------
     # Components
     # ------------------------
@@ -142,7 +139,6 @@ class GameObject(Sprite):
             return self.hitbox.move(self.world_pos)
         return None
 
-
     # ------------------------
     # Update
     # ------------------------
@@ -168,10 +164,6 @@ class GameObject(Sprite):
 
         super().update(dt) # update sprite class
 
-
-        
-
-
     # ------------------------
     # Draw
     # ------------------------
@@ -186,7 +178,6 @@ class GameObject(Sprite):
 
         #draw own sprite (from inherited sprite class)
         super().draw(self.world_pos, self.anchor)
-
 
 
     # ------------------------
@@ -204,10 +195,6 @@ class GameObject(Sprite):
         hitboxes = self.get_active_hitboxes()
         for rect, hitbox_type in hitboxes:
             self._vm.draw_rect_outline(rect.topleft, rect.width, rect.height, globals.COLOR_RED)
-
-      
-        
-
 
 
     def add_hitbox(self, rect: pygame.Rect, hitbox_type: HitboxType, 

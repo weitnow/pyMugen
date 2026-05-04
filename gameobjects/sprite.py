@@ -128,7 +128,7 @@ class Sprite:
         return self
     
 
-    def set_scale(self, factor: int):
+    def set_scale(self, scale: int):
         """
         Switch to a different scale of the current animation.
         If the scaled variant doesn't exist in GraphicManager yet, it is created
@@ -136,17 +136,17 @@ class Sprite:
         """
         if self.base_name is None:
             raise RuntimeError("No animation loaded. Call set_anim_name() first.")
-        if factor < 1:
-            raise ValueError(f"Scale factor must be >= 1, got {factor}.")
-        if factor == self.scale:
+        if scale < 1:
+            raise ValueError(f"Scale factor must be >= 1, got {scale}.")
+        if scale == self.scale:
             return self  # nothing to do
 
         # Create the scaled variant if it doesn't exist yet
-        self._gm.get_or_create_scaled(self.base_name, factor)
+        self._gm.get_or_create_scaled(self.base_name, scale)
 
         # Switch scale and re-point all references
         saved_tag = self.current_tag
-        self.scale = factor
+        self.scale = scale
 
         anim = self._gm.get_animationdata_reference(self.base_name, self.scale)
         self.frames = anim.frames

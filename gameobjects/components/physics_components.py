@@ -7,7 +7,7 @@ class PhysicsComponent:
             ground_y: Y position of the ground (default: 120)
             jump_speed: Initial upward speed in pixels/ms (default: 0.1)
         """
-        self.owner = None
+        self.owner = None # will be set by add_physics methode from game_object
         self.gravity = gravity
         self.ground_y = ground_y
         self.jump_speed = jump_speed
@@ -40,7 +40,7 @@ class PhysicsComponent:
             self.on_ground = False
 
 class FighterPhysicsComponent(PhysicsComponent):
-    def __init__(self, gravity=1180, ground_y=120, jump_speed=400, walk_speed=100):
+    def __init__(self, gravity=1180, ground_y=420, jump_speed=400, walk_speed=100):
         super().__init__(gravity, ground_y, jump_speed, walk_speed)
         # Additional fighter-specific physics properties can be added here
 

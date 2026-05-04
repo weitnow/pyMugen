@@ -5,11 +5,11 @@ from typing import Optional
 
 # --- PlayerController ---
 class PlayerController:
-    def __init__(self, player_index: int, owner: any): # owner is the GameObject this controller is attached to
+    def __init__(self, player_index: int): # owner is the GameObject this controller is attached to
         self.player_index = player_index
         self.input_manager = InputManager()
-        self.owner = owner
-        self.specialmovelist = owner.specialmovelist
+        self.owner = None # will be set by add_player_controller methode of game_object
+        self.specialmovelist = None # will be set by add_player_controller methode of game_object
         
         # Current frame actions
         self.actions: dict[Action, bool] = {action: False for action in Action}
