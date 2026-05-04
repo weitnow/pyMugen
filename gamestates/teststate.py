@@ -16,12 +16,11 @@ from gameobjects.base_stage import BaseStage
 class TestState(GameState):
 
     def enter(self):
-        #self.stage = BaseStage().add_sprite(Sprite().set_anim_name("stages").set_frame(2))
-        #self.stage.sprites[0].set_scale(4)
+        self.stage = BaseStage().add_sprite(Sprite().set_anim_name("stages").set_frame(2))
+        self.stage.sprites[0].set_scale(4)
 
-        #self.player1 = GameObject(world_pos=(128, 128)).set_anim_name("gbFighter").set_frame_tag("Punch").use_camera(True).set_scale(1)
-        self.player1 = GameObject(world_pos=(128, 128))
-        self.player1.set_anim_name("gbFighter")
+        self.player1 = GameObject(world_pos=(128, 128)).set_anim_name("gbFighter").set_frame_tag("Punch").use_camera(True).set_scale(4)
+        
     
 
 
@@ -64,7 +63,6 @@ class TestState(GameState):
         super().update(dt)
 
     
-
 
 
     def draw(self):

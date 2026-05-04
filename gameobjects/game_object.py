@@ -87,17 +87,9 @@ class GameObject(Sprite):
         self.hitbox: pygame.Rect = None
 
         # State
-        self.active = False
-        self.visible = True
         self.on_ground = None # update this from physics component to track if on ground for jump logic, etc.
        
-        # ---------------------
-        # Private attributes
-        # ---------------------
-        self._dm = DebugManager()
-        self._vm = ViewManager()
-        self._draw_surface = self._vm.game_surface # surface to draw on, usually the main game surface but can be changed for special effects, etc
-        self._camera = None
+        
 
 
     # ------------------------
@@ -170,12 +162,14 @@ class GameObject(Sprite):
             self.player_controller.update(dt)
 
 
-        # Sprite animation updates
+        # additional sprite animation updates
         for sprite in self.sprites:
             sprite.update(dt)
 
+        super().update(dt) # update sprite class
 
-        #print(f"GameObject at {self.screen_pos} and world pos {self.world_pos} with velocity {self.vel}, camera pos is ({self._camera.x}, {self._camera.y}))")
+
+        
 
 
     # ------------------------
@@ -185,10 +179,13 @@ class GameObject(Sprite):
         if not self.visible:
             return
         
-        # --- Draw sprites ---         
+        # --- Draw additional sprites ---         
         for sprite in self.sprites:
             sprite.draw(self.screen_pos, self.anchor)
         # --- End draw sprites ---
+
+        #draw own sprite (from inherited sprite class)
+        super().draw(self.world_pos, self.anchor)
 
 
 
@@ -199,15 +196,18 @@ class GameObject(Sprite):
         """ Draw world position point """
         self._vm.draw_circle(self.screen_pos.x, self.screen_pos.y, 4, globals.COLOR_YELLOW)
 
-
         """Draw sprite debug info."""
         for sprite in self.sprites:
             sprite.debug_draw(self.screen_pos, self.anchor) 
+
+        #draw own sprite (from inherited sprite class)
+        super().debug_draw(self.world_pos, self.anchor)
 
         """Draw hurtbox / hitbox for debugging."""
         hitboxes = self.get_active_hitboxes()
         for rect, hitbox_type in hitboxes:
             self._vm.draw_rect_outline(rect.topleft, rect.width, rect.height, globals.COLOR_RED)
+
       
         
 

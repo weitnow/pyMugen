@@ -29,7 +29,7 @@ class Sprite:
         self.timer = 0
         self.active = False # wheter or not sprite gets updated/animated
         self.visible = True # wheter or not sprite gets drawn
-        self.png = False # True if this sprite is a single PNG, False if it is an animation
+        self.png = None # True if this sprite is a single PNG, False if it is an animation
 
         # Animation data - readonly (references to ResourceManager data, do NOT modify these!)
         self.frames = None  # is a Dict[int, pygame.Surface], reference, do NOT modify!
