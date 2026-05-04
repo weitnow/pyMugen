@@ -16,13 +16,10 @@ from gameobjects.base_stage import BaseStage
 class TestState(GameState):
 
     def enter(self):
-        self.stage = BaseStage().add_sprite(Sprite().set_anim_name("stages").set_frame(2))
-        self.stage.sprites[0].set_scale(4)
-
-        self.player1 = GameObject(world_pos=(128, 128)).set_anim_name("gbFighter").set_frame_tag("Punch").use_camera(True).set_scale(4)
-        
+        self.stage = BaseStage().set_anim_name("stages").set_frame(2).set_scale(4)
+ 
+        self.player1 = GameObject(world_pos=(128, 128), render_anchor=RenderAnchor.BOTTOMCENTER).set_anim_name("gbFighter").set_frame_tag("Punch").set_scale(4)
     
-
 
     def exit(self):
         pass
@@ -46,8 +43,7 @@ class TestState(GameState):
 
         if Action.DOWN in actions:
             pass
-
-        
+   
         #temp
         keys = pygame.key.get_pressed()
         if keys[pygame.K_n]:
@@ -59,16 +55,12 @@ class TestState(GameState):
 
     def update(self, dt):
         #self.view_manager.camera.update(self.player1, self.player2) # simple camera follow for testing, can be expanded later for more complex behavior (like lookahead, shake, etc)
-
         super().update(dt)
-
-    
 
 
     def draw(self):
         super().draw()
 
-      
 
     def debug_draw(self):
         super().debug_draw()

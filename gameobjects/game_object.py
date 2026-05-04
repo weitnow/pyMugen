@@ -193,9 +193,6 @@ class GameObject(Sprite):
     # Debug drawing
     # ------------------------
     def debug_draw(self):
-        """ Draw world position point """
-        self._vm.draw_circle(self.screen_pos.x, self.screen_pos.y, 4, globals.COLOR_YELLOW)
-
         """Draw sprite debug info."""
         for sprite in self.sprites:
             sprite.debug_draw(self.screen_pos, self.anchor) 
