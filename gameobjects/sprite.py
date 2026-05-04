@@ -27,7 +27,8 @@ class Sprite:
         self.current_tag = None # is a str name of the current tag
         self.current_frame_idx = 0 # is an int index of the current frame within the animation for this sprite
         self.timer = 0
-        self.playing = False
+        self.active = False # wheter or not sprite gets updated/animated
+        self.visible = True # wheter or not sprite gets drawn
         self.png = False # True if this sprite is a single PNG, False if it is an animation
 
         # Animation data - readonly (references to ResourceManager data, do NOT modify these!)
@@ -94,7 +95,7 @@ class Sprite:
             self.current_tag = None
             self.current_frame_idx = 0
             self.timer = 0
-            self.playing = True
+            self.active = True
             self.png = anim.png
             self._current_offset = self.final_offsets.get(0, (0, 0)) #get offset for first frame, if there is none get (0,0)
         return self # allow chaining
@@ -109,7 +110,7 @@ class Sprite:
             self.current_tag = tag_name
             self.current_frame_idx = tag_data["from"]
             self.timer = 0
-            self.playing = True
+            self.active = True
         return self
 
     def set_frame(self, frame_index: int):
@@ -118,7 +119,7 @@ class Sprite:
             self.current_tag = None
             self.current_frame_idx = frame_index
             self.timer = 0
-            self.playing = False
+            self.active = False
         return self
     
     def use_camera(self, use: bool):
@@ -167,7 +168,7 @@ class Sprite:
     # ---------------------
     def update(self, dt: float):
         """Update current animation frame."""
-        if not self.playing or not self.frames or self.png:
+        if not self.active or not self.frames or self.png:
             return
 
         self.timer += dt * 1000.0  # Convert dt to milliseconds
@@ -196,7 +197,7 @@ class Sprite:
     def draw(self, world_pos, render_anchor: RenderAnchor = RenderAnchor.CENTER):
 
         # if there are no frames or sprite size is (0,0), skip drawing to avoid errors
-        if not self.frames or self.sprite_size == (0, 0):
+        if not self.frames or self.sprite_size == (0, 0) or not self.visible:
             return
 
         x, y = world_pos

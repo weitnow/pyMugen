@@ -16,10 +16,12 @@ from gameobjects.base_stage import BaseStage
 class TestState(GameState):
 
     def enter(self):
-        self.stage = BaseStage().add_sprite(Sprite().set_anim_name("stages").set_frame(2))
-        self.stage.sprites[0].set_scale(4)
+        #self.stage = BaseStage().add_sprite(Sprite().set_anim_name("stages").set_frame(2))
+        #self.stage.sprites[0].set_scale(4)
 
-        self.sprite1 = Sprite().set_anim_name("gbFighter").set_frame_tag("Punch").use_camera(True).set_scale(4)
+        #self.player1 = GameObject(world_pos=(128, 128)).set_anim_name("gbFighter").set_frame_tag("Punch").use_camera(True).set_scale(1)
+        self.player1 = GameObject(world_pos=(128, 128))
+        self.player1.set_anim_name("gbFighter")
     
 
 
@@ -32,25 +34,19 @@ class TestState(GameState):
 
         if Action.RIGHT in actions_held:
             #rotate sprite
-            self.sprite1.rotation += 2
+            self.player1.rotation += 2
             pass
 
         elif Action.LEFT in actions_held:
-            self.sprite1.rotation -= 2
+            self.player1.rotation -= 2
         else:
             pass
  
         if Action.UP in actions:
-            self.sprite1.flip_x = not self.sprite1.flip_x
+            self.player1.flip_x = not self.player1.flip_x
 
         if Action.DOWN in actions:
-            # cycle through anchors for testing
-            if self.anchor == RenderAnchor.CENTER:
-                pass
-            elif self.anchor == RenderAnchor.TOPLEFT:
-                pass
-            elif self.anchor == RenderAnchor.BOTTOMCENTER:
-                pass
+            pass
 
         
         #temp
@@ -64,7 +60,6 @@ class TestState(GameState):
 
     def update(self, dt):
         #self.view_manager.camera.update(self.player1, self.player2) # simple camera follow for testing, can be expanded later for more complex behavior (like lookahead, shake, etc)
-        self.sprite1.update(dt)
 
         super().update(dt)
 
@@ -75,15 +70,12 @@ class TestState(GameState):
     def draw(self):
         super().draw()
 
-        self.sprite1.draw((32, 32), RenderAnchor.TOPLEFT)
       
-
-
 
     def debug_draw(self):
         super().debug_draw()
 
-        self.sprite1.debug_draw((32, 32), RenderAnchor.TOPLEFT)
+
 
     
 

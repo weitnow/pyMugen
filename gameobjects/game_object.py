@@ -66,8 +66,9 @@ class HurtboxData:
         # If only base_name is specified (or nothing), it's active
         return True
 
-class GameObject():
+class GameObject(Sprite):
     def __init__(self, world_pos, render_anchor: RenderAnchor = RenderAnchor.CENTER):
+        super().__init__()
 
         self.anchor = render_anchor # this only affects drawingposition, hitbox/hurtbox positions are still relative to self.pos regardless of this setting. This is just for convenience when drawing sprites that are designed with center-bottom origin in mind.
         
@@ -77,7 +78,7 @@ class GameObject():
         self.vel = pygame.Vector2(0, 0)
 
         # Components
-        self.sprites = []   # list of Sprite instances
+        self.sprites = []   # list additional Sprite instances
         self.physics = None       # PhysicsComponent
         self.player_controller = None # PlayerController
 
@@ -86,7 +87,7 @@ class GameObject():
         self.hitbox: pygame.Rect = None
 
         # State
-        self.active = True
+        self.active = False
         self.visible = True
         self.on_ground = None # update this from physics component to track if on ground for jump logic, etc.
        
@@ -181,7 +182,7 @@ class GameObject():
     # Draw
     # ------------------------
     def draw(self):
-        if not self.visible or not self.active:
+        if not self.visible:
             return
         
         # --- Draw sprites ---         
