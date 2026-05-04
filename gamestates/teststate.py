@@ -56,9 +56,9 @@ class TestState(GameState):
         #temp
         keys = pygame.key.get_pressed()
         if keys[pygame.K_n]:
-            self.view_manager.camera.x += 1
-        elif keys[pygame.K_m]:
             self.view_manager.camera.x -= 1
+        elif keys[pygame.K_m]:
+            self.view_manager.camera.x += 1
         
 
 

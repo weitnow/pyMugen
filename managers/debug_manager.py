@@ -29,9 +29,7 @@ class DebugManager:
         self.GAME_VIEW_WIDTH = view_manager.GAME_VIEW_WIDTH
         self.GAME_VIEW_HEIGHT = view_manager.GAME_VIEW_HEIGHT
         self.debug_overlay = self._get_rect_surface(self.GAME_VIEW_WIDTH, self.GAME_VIEW_HEIGHT, (0, 0, 0), 128)
-
-
-
+        self.camera = view_manager.camera
 
     def update(self, dt):
         if not self.debug_on:
@@ -52,6 +50,10 @@ class DebugManager:
 
         # draw sys info and fps
         self._draw_fps_systeminfo()
+
+        # draw camera pos
+        self.draw_debug_text(64, 64, text=f"cam.x: {self.camera.x}, cam.y: {self.camera.y}")
+        
       
 
     def draw_debug_text(self, x=8, y=8, text="", color=(255, 255, 0)):
