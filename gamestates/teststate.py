@@ -16,7 +16,8 @@ from gameobjects.base_stage import BaseStage
 class TestState(GameState):
 
     def enter(self):
-        self.stage = BaseStage().add_sprite(Sprite().set_anim_name("stages"))
+        self.stage = BaseStage().add_sprite(Sprite().set_anim_name("stages").set_frame(2))
+        self.stage.sprites[0].set_scale(4)
 
         self.sprite1 = Sprite().set_anim_name("gbFighter").set_frame_tag("Punch").use_camera(True).set_scale(4)
     
@@ -72,17 +73,17 @@ class TestState(GameState):
 
 
     def draw(self):
-        self.sprite1.draw((32, 32), RenderAnchor.TOPLEFT)
-
         super().draw()
+
+        self.sprite1.draw((32, 32), RenderAnchor.TOPLEFT)
       
 
 
 
     def debug_draw(self):
-        self.sprite1.debug_draw((32, 32), RenderAnchor.TOPLEFT)
-
         super().debug_draw()
+
+        self.sprite1.debug_draw((32, 32), RenderAnchor.TOPLEFT)
 
     
 
