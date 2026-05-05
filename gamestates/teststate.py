@@ -2,6 +2,7 @@
 
 from gamestates.gamestate_base import GameState
 from gameobjects.game_object import GameObject, HitboxType, HurtboxType
+from gameobjects.base_fighter import Fighter
 from managers.input_manager import Action
 from gameobjects.sprite import Sprite
 from gameobjects.components.physics_components import FighterPhysicsComponent
@@ -18,8 +19,10 @@ class TestState(GameState):
     def enter(self):
         self.stage = BaseStage().set_anim_name("stages").set_frame(2).set_scale(4)
  
-        self.player1 = GameObject(world_pos=(128, 128), render_anchor=RenderAnchor.BOTTOMCENTER).set_anim_name("gbFighter").set_frame_tag("Punch").set_scale(4)
-        self.player1.add_physics(FighterPhysicsComponent())
+        #self.player1 = GameObject(world_pos=(128, 128), render_anchor=RenderAnchor.BOTTOMCENTER).set_anim_name("gbFighter").set_frame_tag("Punch").set_scale(4)
+        #self.player1.add_physics(FighterPhysicsComponent())
+
+        self.player1 = Fighter(world_pos=(128, 228), player_index=0).set_anim_name("gbFighter").set_frame_tag("Idle").set_scale(4)
         
 
     def exit(self):
@@ -30,17 +33,15 @@ class TestState(GameState):
         actions_held = self.input_manager.get_pressed_actions(0)
 
         if Action.RIGHT in actions_held:
-            #rotate sprite
-            self.player1.rotation += 2
             pass
 
         elif Action.LEFT in actions_held:
-            self.player1.rotation -= 2
+            pass
         else:
             pass
  
         if Action.UP in actions:
-            self.player1.flip_x = not self.player1.flip_x
+            pass
 
         if Action.DOWN in actions:
             pass

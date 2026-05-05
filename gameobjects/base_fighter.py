@@ -1,7 +1,7 @@
 from gameobjects.sprite import RenderAnchor
 from gameobjects.game_object import GameObject
 from managers.input_manager import Action
-from components.player_controller_component import PlayerController
+from gameobjects.components.player_controller_component import PlayerController
 
 class Fighter(GameObject):
     def __init__(self, world_pos, player_index: int = 0):
@@ -22,14 +22,15 @@ class Fighter(GameObject):
             "Super Kick": [Action.DOWN, Action.UP, Action.A],
         }
 
-        # Controller
+        # Add a PlayerController
         self.player_controller = PlayerController(player_index, self)
 
     def update(self, dt):
-        # Player controller updates if there is a player controller attached
+        # Update player controller
         if self.player_controller:
             self.player_controller.update(dt)
-            
+
+        # Get current actions from player controller
         actions = self.player_controller.actions
 
         # Horizontal movement
