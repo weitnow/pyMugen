@@ -1,5 +1,5 @@
 class PhysicsComponent:
-    def __init__(self, gravity=1180, ground_y=120, jump_speed=400, walk_speed=100):
+    def __init__(self, gravity=1180, ground_y=400, jump_speed=400, walk_speed=100):
         """
         Initialize physics component with millisecond-based values.
         Args:

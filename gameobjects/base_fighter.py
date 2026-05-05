@@ -2,6 +2,7 @@ from gameobjects.sprite import RenderAnchor
 from gameobjects.game_object import GameObject
 from managers.input_manager import Action
 from gameobjects.components.player_controller_component import PlayerController
+from gameobjects.components.physics_components import FighterPhysicsComponent
 
 class Fighter(GameObject):
     def __init__(self, world_pos, player_index: int = 0):
@@ -9,7 +10,7 @@ class Fighter(GameObject):
     
 
         # Movement attributes
-        self.speed = 0.1
+        self.speed = 100
         self.jump_velocity = -0.4
         self.on_ground = True
         self.facing_right = True
@@ -21,6 +22,8 @@ class Fighter(GameObject):
             "Sonic Boom": [Action.LEFT, Action.RIGHT, Action.A],
             "Super Kick": [Action.DOWN, Action.UP, Action.A],
         }
+
+        self.add_physics(FighterPhysicsComponent())
 
         # Add a PlayerController
         self.player_controller = PlayerController(player_index, self)

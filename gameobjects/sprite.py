@@ -122,7 +122,7 @@ class Sprite:
             self.active = False
         return self
     
-    def use_camera(self, use: bool):
+    def use_camera(self, use: bool): #TODO at scrollfactor speed
         """Set whether to apply camera transformations when drawing this sprite."""
         self._use_camera = bool(use)
         return self
