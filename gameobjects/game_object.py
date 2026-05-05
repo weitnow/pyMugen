@@ -2,9 +2,8 @@ import pygame
 from enum import Enum
 from dataclasses import dataclass
 import globals  
-from managers.debug_manager import DebugManager
 from gameobjects.sprite import Sprite, RenderAnchor
-from managers.view_manager.view_manager import ViewManager
+
 
 class HitboxType(Enum):
     HIGH = "high"
@@ -80,7 +79,6 @@ class GameObject(Sprite):
         # Components
         self.sprites = []   # list additional Sprite instances #TODO: check if i need this or can get rid of it
         self.physics = None       # PhysicsComponent
-        self.player_controller = None # PlayerController
 
         # Collision
         self.hurtbox: pygame.Rect = None
@@ -107,10 +105,7 @@ class GameObject(Sprite):
         self._camera = camera
         return self
     
-    def add_player_controller(self, player_controller):
-        self.player_controller = player_controller
-        player_controller.owner = self
-        return self
+
 
     # ------------------------
     # Collision / Hurtbox
@@ -153,10 +148,6 @@ class GameObject(Sprite):
         if self.physics:
             self.physics.update(dt)
             self.on_ground = self.physics.on_ground  # Update on_ground state from physics component
-
-        if self.player_controller:
-            self.player_controller.update(dt)
-
 
         # additional sprite animation updates
         for sprite in self.sprites:

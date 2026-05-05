@@ -20,8 +20,7 @@ class TestState(GameState):
  
         self.player1 = GameObject(world_pos=(128, 128), render_anchor=RenderAnchor.BOTTOMCENTER).set_anim_name("gbFighter").set_frame_tag("Punch").set_scale(4)
         self.player1.add_physics(FighterPhysicsComponent())
-        self.player1.add_player_controller(PlayerController(1))
-    
+        
 
     def exit(self):
         pass

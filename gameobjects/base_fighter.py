@@ -1,11 +1,12 @@
+from gameobjects.sprite import RenderAnchor
 from gameobjects.game_object import GameObject
-from managers.input_manager import PlayerController, Action
+from managers.input_manager import Action
+from components.player_controller_component import PlayerController
 
 class Fighter(GameObject):
-    def __init__(self, pos: tuple[float, float], player_index: int = 0):
-        super().__init__(pos)
-        self.origin_center_bottom = True
-        
+    def __init__(self, world_pos, player_index: int = 0):
+        super().__init__(world_pos, render_anchor=RenderAnchor.BOTTOMCENTER)
+    
 
         # Movement attributes
         self.speed = 0.1
@@ -22,12 +23,14 @@ class Fighter(GameObject):
         }
 
         # Controller
-        self.controller = PlayerController(player_index, self)
+        self.player_controller = PlayerController(player_index, self)
 
     def update(self, dt):
-        actions = self.controller.actions
-        
-
+        # Player controller updates if there is a player controller attached
+        if self.player_controller:
+            self.player_controller.update(dt)
+            
+        actions = self.player_controller.actions
 
         # Horizontal movement
         if actions.get(Action.RIGHT, False):
@@ -38,6 +41,8 @@ class Fighter(GameObject):
             print("Left pressed")
             self.world_pos.x -= self.speed * dt
             self.facing_right = False
+
+        
 
         # Jump
         if actions.get(Action.UP, False) and self.on_ground:

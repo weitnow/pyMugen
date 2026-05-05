@@ -2,7 +2,6 @@ import pygame
 from enum import Enum, auto
 from decorators import singleton
 
-
 # --- Actions ---
 class Action(Enum):
     RIGHT = auto()
@@ -23,7 +22,6 @@ class Action(Enum):
 # --- Input Manager  ---
 @singleton
 class InputManager:
-
     def __init__(self):
   
         # Keyboard mappings for 2 players
@@ -97,8 +95,6 @@ class InputManager:
             for btn_id, action in self.button_map.items():
                 if js.get_button(btn_id):
                     actions.add(action)
-
-           
 
             # D-Pad
             hat_x, hat_y = js.get_hat(0)

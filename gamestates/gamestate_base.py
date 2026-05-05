@@ -8,6 +8,7 @@ from managers.debug_manager import DebugManager
 from managers.sound_manager import SoundManager
 from managers.settings_manager.settings_manager import SettingsManager
 
+
 from gameobjects.game_object import GameObject
 
 
@@ -25,6 +26,7 @@ class GameState(ABC): #ABC is Abstract Base Class
         self.sound_manager: SoundManager = SoundManager()
         self.settings_manager: SettingsManager = SettingsManager()
 
+  
         # references for easier access
         self.camera = self.view_manager.camera # reference for easy access
         self.GAME_VIEW_HEIGHT = self.view_manager.GAME_VIEW_HEIGHT

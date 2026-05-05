@@ -1,15 +1,17 @@
+from gameobjects.game_object import GameObject
 from managers.input_manager import InputManager, Action
 from collections import deque
 import time
-from typing import Optional
+from typing import Optional, Dict, List
 
 # --- PlayerController ---
 class PlayerController:
-    def __init__(self, player_index: int): # owner is the GameObject this controller is attached to
+    def __init__(self, player_index: int, owner: GameObject): 
+        """player_index 0 = player 1, player_index 1 = player 2"""
         self.player_index = player_index
         self.input_manager = InputManager()
-        self.owner = None # will be set by add_player_controller methode of game_object
-        self.specialmovelist = None # will be set by add_player_controller methode of game_object
+        self.owner = owner
+        self.specialmovelist: Dict[str, List[Action]] = {} 
         
         # Current frame actions
         self.actions: dict[Action, bool] = {action: False for action in Action}
