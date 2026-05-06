@@ -25,6 +25,9 @@ class TestState(GameState):
         #self.player1.add_physics(FighterPhysicsComponent())
 
         self.player1 = Fighter(world_pos=(128, 228), player_index=0).set_anim_name("gbFighter").set_frame_tag("Idle").set_scale(3)
+
+
+        self.ninja = Sprite().set_anim_name("highResNinja").set_scale(4)
         
 
     def exit(self):
@@ -59,11 +62,17 @@ class TestState(GameState):
 
     def update(self, dt):
         #self.view_manager.camera.update(self.player1, self.player2) # simple camera follow for testing, can be expanded later for more complex behavior (like lookahead, shake, etc)
+
+        self.ninja.update(dt)
+
         super().update(dt)
 
 
     def draw(self):
         super().draw()
+
+        self.ninja.draw((400, 550), RenderAnchor.BOTTOMCENTER)
+
         self.overlay.draw((0, 0), RenderAnchor.TOPLEFT)
 
 
