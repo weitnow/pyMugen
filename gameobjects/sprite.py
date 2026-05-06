@@ -134,7 +134,7 @@ class Sprite:
         If the scaled variant doesn't exist in GraphicManager yet, it is created
         automatically from the scale=1 source. Preserves the current tag.
         """
-        if self.base_name is None:
+        if self.base_name is None and not self.png:
             raise RuntimeError("No animation loaded. Call set_anim_name() first.")
         if scale < 1:
             raise ValueError(f"Scale factor must be >= 1, got {scale}.")
