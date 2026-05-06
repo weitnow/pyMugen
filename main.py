@@ -21,7 +21,9 @@ sp.graphic_manager.load_spritesheet("nesFighter", "assets/Graphics/Aseprite/nesF
 sp.graphic_manager.load_spritesheet("debug32", "assets/Graphics/Aseprite/debug32.png", "assets/Graphics/Aseprite/debug32.json") # example spritesheet without tags
 sp.graphic_manager.load_png("debug32x32", "assets/Graphics/Aseprite/debug32x32.png") # example single PNG
 sp.graphic_manager.load_spritesheet("stage", "assets/Graphics/Aseprite/stage.png", "assets/Graphics/Aseprite/stage.json")
-sp.graphic_manager.load_png("overlay", "assets/Graphics/Aseprite/overlay.png")
+sp.graphic_manager.load_spritesheet("gbOverlay", "assets/Graphics/Aseprite/gbOverlay.png", "assets/Graphics/Aseprite/gbOverlay.json")
+
+
 
 # --- Set Offsets for spritesheets ---
 #sp.graphic_manager.set_global_offset("gbFighter", x=0, y=0)

@@ -2,7 +2,7 @@ import json
 import pygame
 from typing import Dict
 from decorators import singleton
-import globals
+
 
 
 class AnimationData:
