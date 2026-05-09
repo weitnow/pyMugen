@@ -14,6 +14,14 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 320, "h": 180 },
     "sourceSize": { "w": 320, "h": 180 },
     "duration": 100
+   },
+   "2": {
+    "frame": { "x": 0, "y": 180, "w": 320, "h": 180 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 320, "h": 180 },
+    "sourceSize": { "w": 320, "h": 180 },
+    "duration": 100
    }
  },
  "meta": {
@@ -21,13 +29,14 @@
   "version": "1.3.17.2-x64",
   "image": "gbOverlay.png",
   "format": "RGBA8888",
-  "size": { "w": 640, "h": 180 },
+  "size": { "w": 640, "h": 360 },
   "scale": "1",
   "frameTags": [
   ],
   "layers": [
-   { "name": "Flattened", "opacity": 255, "blendMode": "normal" },
-   { "name": "Title", "opacity": 255, "blendMode": "normal" }
+   { "name": "Outline", "opacity": 255, "blendMode": "normal" },
+   { "name": "Panel", "opacity": 255, "blendMode": "normal" },
+   { "name": "Skulls", "opacity": 255, "blendMode": "normal" }
   ],
   "slices": [
   ]
