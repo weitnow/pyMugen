@@ -19,7 +19,7 @@ class TestState(GameState):
     def enter(self):
         self.stage = BaseStage().set_anim_name("stage").set_frame(2).set_scale(3)
 
-        self.overlay = Sprite().set_anim_name("gbOverlay").set_scale(3).use_camera(False).set_frame(2)
+        self.overlay = Sprite().set_anim_name("gbOverlay").set_scale(3).use_camera(False).set_frame(1)
  
         #self.player1 = GameObject(world_pos=(128, 128), render_anchor=RenderAnchor.BOTTOMCENTER).set_anim_name("gbFighter").set_frame_tag("Punch").set_scale(4)
         #self.player1.add_physics(FighterPhysicsComponent())
