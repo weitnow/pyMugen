@@ -1,0 +1,53 @@
+{ "frames": {
+   "0": {
+    "frame": { "x": 0, "y": 0, "w": 400, "h": 140 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 400, "h": 140 },
+    "sourceSize": { "w": 400, "h": 140 },
+    "duration": 100
+   },
+   "1": {
+    "frame": { "x": 0, "y": 0, "w": 400, "h": 140 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 400, "h": 140 },
+    "sourceSize": { "w": 400, "h": 140 },
+    "duration": 100
+   },
+   "0": {
+    "frame": { "x": 400, "y": 0, "w": 400, "h": 140 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 400, "h": 140 },
+    "sourceSize": { "w": 400, "h": 140 },
+    "duration": 100
+   },
+   "1": {
+    "frame": { "x": 0, "y": 140, "w": 400, "h": 140 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 400, "h": 140 },
+    "sourceSize": { "w": 400, "h": 140 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.3.17.2-x64",
+  "image": "stage1.png",
+  "format": "RGBA8888",
+  "size": { "w": 800, "h": 280 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "Idle", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
+   { "name": "Active", "from": 1, "to": 1, "direction": "forward", "color": "#000000ff" }
+  ],
+  "layers": [
+   { "name": "Back", "opacity": 255, "blendMode": "normal" },
+   { "name": "Front", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

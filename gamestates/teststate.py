@@ -17,7 +17,7 @@ from gameobjects.base_stage import BaseStage
 class TestState(GameState):
 
     def enter(self):
-        self.stage = BaseStage().set_anim_name("stage").set_frame(2).set_scale(3)
+        self.stage = BaseStage().set_anim_name("stage1").set_frame(0).set_scale(3)
 
         self.overlay = Sprite().set_anim_name("gbOverlay").set_scale(3).use_camera(False).set_frame(1)
  
