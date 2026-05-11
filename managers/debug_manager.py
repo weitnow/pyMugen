@@ -8,6 +8,7 @@ class DebugManager:
     def __init__(self):
         self.debug_on = True
         self.debug_text = True
+        self.DRAW_MOUSE_POS = True
 
         self.font = pygame.font.Font(None, 20)
         self.small_font = pygame.font.Font(None, 12)
@@ -53,6 +54,11 @@ class DebugManager:
 
         # draw camera pos
         self.draw_debug_text(64, 64, text=f"cam.x: {self.camera.x}, cam.y: {self.camera.y}")
+
+        # draw mouse pos
+        if self.DRAW_MOUSE_POS:
+            mx, my = pygame.mouse.get_pos()
+            self.draw_debug_text(128, 128, text=f"Mouse Screen: ({mx}, {my}))")
         
       
 

@@ -8,6 +8,13 @@ class ViewManager:
     def __init__(self):
         self.GAME_VIEW_WIDTH = 960
         self.GAME_VIEW_HEIGHT = 540
+        self.VIEW_LEFT_BOUND = 94 #first visible pixel on the left
+        self.VIEW_RIGHT_BOUND = 868 #first visible pixel on the right
+        self.VIEW_TOP_BOUND = 87 #first visible pixel on the up
+        self.VIEW_BOTTOM_BOUND = 454 #first visible pixel on the down
+        
+
+
         self.CLEAR_COLOR = (30, 30, 30)
 
         self._draw_rect = pygame.Rect(0, 0, 0, 0)  # Initialize the draw rect for reuse
