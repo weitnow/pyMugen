@@ -1,5 +1,5 @@
 { "frames": {
-   "0": {
+   "Back-0": {
     "frame": { "x": 0, "y": 0, "w": 400, "h": 140 },
     "rotated": false,
     "trimmed": false,
@@ -7,7 +7,7 @@
     "sourceSize": { "w": 400, "h": 140 },
     "duration": 100
    },
-   "1": {
+   "Back-1": {
     "frame": { "x": 0, "y": 0, "w": 400, "h": 140 },
     "rotated": false,
     "trimmed": false,
@@ -15,7 +15,7 @@
     "sourceSize": { "w": 400, "h": 140 },
     "duration": 100
    },
-   "0": {
+   "Front-0": {
     "frame": { "x": 400, "y": 0, "w": 400, "h": 140 },
     "rotated": false,
     "trimmed": false,
@@ -23,7 +23,7 @@
     "sourceSize": { "w": 400, "h": 140 },
     "duration": 100
    },
-   "1": {
+   "Front-1": {
     "frame": { "x": 0, "y": 140, "w": 400, "h": 140 },
     "rotated": false,
     "trimmed": false,
