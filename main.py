@@ -20,7 +20,8 @@ sp.graphic_manager.load_spritesheet("gbFighter", "assets/Graphics/Aseprite/gbFig
 sp.graphic_manager.load_spritesheet("nesFighter", "assets/Graphics/Aseprite/nesFighter.png", "assets/Graphics/Aseprite/nesFighter.json")
 sp.graphic_manager.load_spritesheet("debug32", "assets/Graphics/Aseprite/debug32.png", "assets/Graphics/Aseprite/debug32.json") # example spritesheet without tags
 sp.graphic_manager.load_png("debug32x32", "assets/Graphics/Aseprite/debug32x32.png") # example single PNG
-sp.graphic_manager.load_spritesheet("stage1", "assets/Graphics/Aseprite/stage1.png", "assets/Graphics/Aseprite/stage1.json")
+sp.graphic_manager.load_spritesheet("stage1-front", "assets/Graphics/Aseprite/stages/stage1-front.png", "assets/Graphics/Aseprite/stages/stage1-front.json")
+sp.graphic_manager.load_spritesheet("stage1-back", "assets/Graphics/Aseprite/stages/stage1-back.png", "assets/Graphics/Aseprite/stages/stage1-back.json")
 sp.graphic_manager.load_spritesheet("gbOverlay", "assets/Graphics/Aseprite/gbOverlay.png", "assets/Graphics/Aseprite/gbOverlay.json")
 sp.graphic_manager.load_spritesheet("highResNinja", "assets/Graphics/Aseprite/highResNinja.png", "assets/Graphics/Aseprite/highResNinja.json")
 
