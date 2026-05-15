@@ -1,43 +1,77 @@
 import pygame
+import random
+import math
 
 class Camera:
     def __init__(self, view_width, view_height, world_width, world_height):
         self.view_width = view_width
         self.view_height = view_height
-
         self.world_width = world_width
         self.world_height = world_height
 
-        self.x = 0
-        self.y = 0
+        self.x = 0.0
+        self.y = 0.0
 
-        self.smooth_speed = 0.1
+        self.smooth_speed = 0.12  # tweak to taste (0.0–1.0 feel)
 
-    def update(self, p1, p2):
-        # --- midpoint ---
-        mid_x = (p1.pos.x + p2.pos.x) / 2
-        mid_y = (p1.pos.y + p2.pos.y) / 2
+        # Screenshake (trauma-based)
+        self._trauma = 0.0
+        self._trauma_decay = 2.5   # trauma/second lost
+        self._max_shake_x = 8
+        self._max_shake_y = 6
+        self._shake_x = 0.0
+        self._shake_y = 0.0
 
-        # --- horizontal ---
+    # --------------------------
+    # Public API
+    # --------------------------
+    def add_trauma(self, amount: float):
+        """Add screenshake trauma. 0.0–1.0, stacks up to 1."""
+        self._trauma = min(1.0, self._trauma + amount)
+
+    def update(self, dt: float, p1, p2):
+        self._update_follow(dt, p1, p2)
+        self._update_shake(dt)
+
+    def apply(self, rect: pygame.Rect) -> pygame.Rect:
+        return rect.move(-self.x + self._shake_x, -self.y + self._shake_y)
+
+    def apply_vec2(self, pos) -> pygame.Vector2:
+        return pygame.Vector2(pos) - pygame.Vector2(
+            self.x - self._shake_x, self.y - self._shake_y
+        )
+
+    # --------------------------
+    # Private
+    # --------------------------
+    def _update_follow(self, dt: float, p1, p2):
+        mid_x = (p1.world_pos.x + p2.world_pos.x) / 2
+        mid_y = (p1.world_pos.y + p2.world_pos.y) / 2
+
         target_x = mid_x - self.view_width / 2
+        target_y = mid_y - self.view_height / 2
 
-        # --- vertical (minimal movement) ---
-        jump_offset = 0
-        if not p1.on_ground or not p2.on_ground:
-            jump_offset = -20  # smaller than before for your low resolution
+        # Soft vertical bias when either player is airborne
+        airborne_bias = -18 if (not p1.on_ground or not p2.on_ground) else 0
+        target_y += airborne_bias
 
-        target_y = mid_y - self.view_height / 2 + jump_offset
+        # Clamp to world bounds
+        target_x = max(0.0, min(target_x, self.world_width - self.view_width))
+        target_y = max(0.0, min(target_y, self.world_height - self.view_height))
 
-        # --- clamp ---
-        target_x = max(0, min(target_x, self.world_width - self.view_width))
-        target_y = max(0, min(target_y, self.world_height - self.view_height))
+        # Frame-rate independent lerp
+        t = 1.0 - (1.0 - self.smooth_speed) ** (dt * 60)
+        self.x += (target_x - self.x) * t
+        self.y += (target_y - self.y) * t
 
-        # --- smooth --- #TODO: uncomment both lines below
-        #self.x += (target_x - self.x) * self.smooth_speed
-        #self.y += (target_y - self.y) * self.smooth_speed
+    def _update_shake(self, dt: float):
+        if self._trauma <= 0.0:
+            self._shake_x = 0.0
+            self._shake_y = 0.0
+            return
 
-    def apply(self, rect):
-        return rect.move(-self.x, -self.y)
-    
-    def apply_vec2(self, pos):
-        return pygame.Vector2(pos) - pygame.Vector2(self.x, self.y)
+        self._trauma = max(0.0, self._trauma - self._trauma_decay * dt)
+        shake = self._trauma ** 2  # quadratic feels more natural than linear
+
+        self._shake_x = self._max_shake_x * shake * random.uniform(-1, 1)
+        self._shake_y = self._max_shake_y * shake * random.uniform(-1, 1)
