@@ -5,9 +5,13 @@ class BaseStage():
     def __init__(self, world_pos):
         self.stage_front = GameObject(world_pos, RenderAnchor.TOPLEFT)
         self.stage_back = GameObject(world_pos, RenderAnchor.TOPLEFT)
+        self.stage_width = 0
+        self.stage_height = 0
+        
 
     def update(self, dt):
-        pass
+        self.stage_front.update(dt)
+        self.stage_back.update(dt)
 
     def draw(self):
         
