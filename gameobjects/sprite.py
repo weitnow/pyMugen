@@ -1,5 +1,4 @@
 import pygame
-import managers.view_manager.camera as camera
 from managers.graphic_manager import GraphicManager
 from managers.debug_manager import DebugManager
 from enum import Enum, auto
@@ -41,9 +40,7 @@ class Sprite:
         self._gm: GraphicManager = GraphicManager()
         self._dm: DebugManager = DebugManager()
         self._vm: ViewManager = ViewManager()
-        self._draw_surface = self._vm.game_surface # surface to draw on, usually the main game surface but can be changed for special effects, etc
-        self._camera = self._vm.camera # dont modify camera directly from sprite, it should be handled by the view manager, this is just a reference for convenience when drawing
-        self._use_camera = True # whether to apply camera transformations when drawing this sprite, can be toggled for testing/debugging purposes
+        self._draw_surface = self._vm.game_surface # surface to draw on
         self._snapped_rotation: int = 0
         self._current_offset = (0, 0) # current frame offset, updated in update() if frame changes
         self._draw_rect = pygame.Rect(0, 0, 0, 0)
@@ -122,12 +119,6 @@ class Sprite:
             self.active = False
         return self
     
-    def use_camera(self, use: bool): #TODO at scrollfactor speed
-        """Set whether to apply camera transformations when drawing this sprite."""
-        self._use_camera = bool(use)
-        return self
-    
-
     def set_scale(self, scale: int):
         """
         Switch to a different scale of the current animation.
@@ -194,18 +185,13 @@ class Sprite:
             # Update current frame duration for the current frame, if there is none default to 100ms
             current_frame_duration = self.frame_durations.get(self.current_frame_idx, 100)
 
-    def draw(self, world_pos, render_anchor: RenderAnchor = RenderAnchor.CENTER):
+    def draw(self, screen_pos, render_anchor: RenderAnchor = RenderAnchor.CENTER):
 
         # if there are no frames or sprite size is (0,0), skip drawing to avoid errors
         if not self.frames or self.sprite_size == (0, 0) or not self.visible:
             return
 
-        x, y = world_pos
-
-        # --- Camera ---
-        if self._use_camera: # move x/y according to camera
-            x -= self._camera.x
-            y -= self._camera.y
+        x, y = screen_pos
 
         # --- Anchor adjustment ---
         if render_anchor == RenderAnchor.TOPLEFT:
@@ -245,13 +231,9 @@ class Sprite:
     # Debug Draw
     # ---------------------
 
-    def debug_draw(self, world_pos: pygame.Vector2, render_anchor: RenderAnchor = RenderAnchor.CENTER): #TODO: implement camera support
+    def debug_draw(self, screen_pos: pygame.Vector2, render_anchor: RenderAnchor = RenderAnchor.CENTER):
      
-        x, y = world_pos
-
-        if self._use_camera:
-            x -= self._camera.x
-            y -= self._camera.y
+        x, y = screen_pos
 
         # --- Anchor adjustment --- but only if sprite size is not (0,0) to avoid weird anchor behavior when there is no sprite loaded yet
         if self.sprite_size != (0, 0):
@@ -272,7 +254,6 @@ class Sprite:
         if self._flip_y:
             offset_y = -offset_y
 
-        
 
         # Draw the original sprite rect (with offset) for debugging
         self._vm.draw_rect_outline(
@@ -286,20 +267,23 @@ class Sprite:
         # Draw a small circle in the center of the sprite which is also the rotation point
         self._vm.draw_circle(x + offset_x, y + offset_y, radius=4, color=(255, 255, 0))
 
-        #Draw a small rectangle at the origin point
+       # Draw a small rectangle at the origin point
         self._vm.draw_rect(
-            world_pos[0] - 2 - self._camera.x if self._use_camera else world_pos[0] - 2,
-            world_pos[1] - 2 - self._camera.y if self._use_camera else world_pos[1] - 2,
+            screen_pos[0] - 2,
+            screen_pos[1] - 2,
             width=4,
             height=4,
             color=(255, 0, 255)
-
         )
 
-
-        # Draw text with world position and current tag for debugging
+        # Draw text with screen position and current tag for debugging
         if self._dm.debug_text:
-            self._dm.draw_debug_text(x + offset_x - self.sprite_size[0] // 2, y + offset_y - self.sprite_size[1] // 2 - 10, text=f"world_pos: {world_pos}, screen_pos: ({world_pos[0] - self._camera.x if self._use_camera else world_pos[0]}, {world_pos[1] - self._camera.y if self._use_camera else world_pos[1]}), cam_pos: ({self._camera.x}, {self._camera.y})", color=(247, 0, 255))
+            self._dm.draw_debug_text(
+                x + offset_x - self.sprite_size[0] // 2,
+                y + offset_y - self.sprite_size[1] // 2 - 10,
+                text=f"screen_pos: {screen_pos}, tag: {self.current_tag}, frame: {self.current_frame_idx}",
+                color=(247, 0, 255)
+            )
     
                                 
 

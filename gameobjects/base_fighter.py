@@ -8,6 +8,7 @@ class Fighter(GameObject):
     def __init__(self, world_pos, player_index: int = 0):
         super().__init__(world_pos, render_anchor=RenderAnchor.BOTTOMCENTER)
     
+        self.enable_camera()
 
         # Movement attributes
         self.speed = 100

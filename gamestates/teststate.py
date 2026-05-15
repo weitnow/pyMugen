@@ -20,7 +20,7 @@ class TestState(GameState):
     def enter(self):
         self.stage = Stage1()
 
-        self.overlay = Sprite().set_anim_name("gbOverlay").set_scale(3).use_camera(False).set_frame(1)
+        self.overlay = Sprite().set_anim_name("gbOverlay").set_scale(3).set_frame(1)
  
 
 
