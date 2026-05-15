@@ -30,8 +30,8 @@
   "layers": [
    { "name": "Front", "opacity": 255, "blendMode": "normal" },
    { "name": "Front-Sky", "opacity": 255, "blendMode": "normal" },
-   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" },
-   { "name": "dragon", "opacity": 255, "blendMode": "normal" }
+   { "name": "Front-Uppersky", "opacity": 255, "blendMode": "normal" },
+   { "name": "dragon", "opacity": 247, "blendMode": "normal" }
   ],
   "slices": [
   ]
