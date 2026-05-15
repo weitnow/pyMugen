@@ -20,7 +20,7 @@ class ViewManager:
 
         self._draw_rect = pygame.Rect(0, 0, 0, 0)  # Initialize the draw rect for reuse
 
-        self.camera = Camera(self.GAME_VIEW_WIDTH, self.GAME_VIEW_HEIGHT, 213, 213)
+        self.camera = Camera(self.GAME_VIEW_WIDTH, self.GAME_VIEW_HEIGHT, 1280, 540) #TODO, here has to be passed the world height and with depending on the stage
 
         self.screen = pygame.display.set_mode(
             (self.GAME_VIEW_WIDTH, self.GAME_VIEW_HEIGHT),

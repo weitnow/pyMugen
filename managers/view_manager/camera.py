@@ -51,6 +51,9 @@ class Camera:
         target_x = mid_x - self.view_width / 2
         target_y = mid_y - self.view_height / 2
 
+        print(f"p1: {p1.world_pos}  p2: {p2.world_pos}")
+        print(f"target: ({target_x:.1f}, {target_y:.1f})  cam: ({self.x:.1f}, {self.y:.1f})")
+
         # Soft vertical bias when either player is airborne
         airborne_bias = -18 if (not p1.on_ground or not p2.on_ground) else 0
         target_y += airborne_bias

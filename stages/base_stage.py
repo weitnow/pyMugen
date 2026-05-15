@@ -20,6 +20,7 @@ class BaseStage():
         self.stage_width = 0
         self.stage_height = 0
 
+
         
         
 

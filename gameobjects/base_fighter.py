@@ -13,7 +13,6 @@ class Fighter(GameObject):
         # Movement attributes
         self.speed = 100
         self.jump_velocity = -0.4
-        self.on_ground = True
         self.facing_right = True
 
         # Special move list
@@ -30,30 +29,23 @@ class Fighter(GameObject):
         self.player_controller = PlayerController(player_index, self)
 
     def update(self, dt):
-        # Update player controller
         if self.player_controller:
             self.player_controller.update(dt)
 
-        # Get current actions from player controller
         actions = self.player_controller.actions
 
-        # Horizontal movement
+        # Delegate movement to physics component
         if actions.get(Action.RIGHT, False):
-            print("Right pressed")
-            self.world_pos.x += self.speed * dt
+            self.physics.move_right()
             self.facing_right = True
-        if actions.get(Action.LEFT, False):
-            print("Left pressed")
-            self.world_pos.x -= self.speed * dt
+        elif actions.get(Action.LEFT, False):
+            self.physics.move_left()
             self.facing_right = False
+        else:
+            self.physics.stop()
 
-        
+        if actions.get(Action.UP, False):
+            self.physics.move_up()  # move_up already checks on_ground internally
 
-        # Jump
-        if actions.get(Action.UP, False) and self.on_ground:
-            self.vel.y = self.jump_velocity
-            self.on_ground = False
-
-        # Call GameObject update (physics + sprite animation)
-        super().update(dt)
+        super().update(dt)  # runs physics + sprite animation
         

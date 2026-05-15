@@ -25,6 +25,7 @@ class TestState(GameState):
 
 
         self.player1 = Fighter(world_pos=(128, 228), player_index=0).set_anim_name("gbFighter").set_frame_tag("Idle").set_scale(3)
+        self.player2 = Fighter(world_pos=(384, 228), player_index=1).set_anim_name("gbFighter").set_frame_tag("Idle").set_scale(3)
 
 
       
@@ -46,10 +47,11 @@ class TestState(GameState):
             pass
  
         if Action.UP in actions:
-            pass
+            
+            self.view_manager.camera.add_trauma(1)
 
         if Action.DOWN in actions:
-            pass
+            self.view_manager.camera.y += 1
    
         #temp
         keys = pygame.key.get_pressed()
@@ -61,7 +63,7 @@ class TestState(GameState):
 
 
     def update(self, dt):
-        #self.view_manager.camera.update(self.player1, self.player2) # simple camera follow for testing, can be expanded later for more complex behavior (like lookahead, shake, etc)
+        self.view_manager.camera.update(dt, self.player1, self.player2) #TODO: move it to view_manager update -> simple camera follow for testing, can be expanded later for more complex behavior (like lookahead, shake, etc)
         super().update(dt)
 
 
