@@ -19,6 +19,8 @@ class TestState(GameState):
 
     def enter(self):
         self.stage = Stage1()
+        self.stage.configure_camera()
+
 
         self.overlay = Sprite().set_anim_name("gbOverlay").set_scale(3).set_frame(1)
  
@@ -37,6 +39,10 @@ class TestState(GameState):
     def handle_input(self):
         actions = self.input_manager.get_just_pressed_actions(0)
         actions_held = self.input_manager.get_pressed_actions(0)
+        
+        # temp
+        cam = self.camera
+        cam.follow_enabled = False
 
         if Action.RIGHT in actions_held:
             pass
@@ -46,12 +52,13 @@ class TestState(GameState):
         else:
             pass
  
-        if Action.UP in actions:
-            
-            self.view_manager.camera.add_trauma(1)
+        if Action.UP in actions_held:
+            cam.y = max(0.0, cam.y - 1)
+          
 
-        if Action.DOWN in actions:
-            self.view_manager.camera.y += 1
+        if Action.DOWN in actions_held:
+            cam.y = min(cam.world_height - cam.view_height, cam.y + 1)
+         
    
         #temp
         keys = pygame.key.get_pressed()

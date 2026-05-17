@@ -12,6 +12,8 @@ class Camera:
         self.x = 0.0
         self.y = 0.0
 
+        self.follow_enabled = True
+
         self.smooth_speed = 0.12  # tweak to taste (0.0–1.0 feel)
 
         # Screenshake (trauma-based)
@@ -30,7 +32,8 @@ class Camera:
         self._trauma = min(1.0, self._trauma + amount)
 
     def update(self, dt: float, p1, p2):
-        self._update_follow(dt, p1, p2)
+        if self.follow_enabled:
+            self._update_follow(dt, p1, p2)
         self._update_shake(dt)
 
     def apply_vec2(self, pos, shake_factor: float = 1.0) -> pygame.Vector2:
@@ -47,9 +50,6 @@ class Camera:
 
         target_x = mid_x - self.view_width / 2
         target_y = mid_y - self.view_height / 2
-
-        print(f"p1: {p1.world_pos}  p2: {p2.world_pos}")
-        print(f"target: ({target_x:.1f}, {target_y:.1f})  cam: ({self.x:.1f}, {self.y:.1f})")
 
         # Soft vertical bias when either player is airborne
         airborne_bias = -18 if (not p1.on_ground or not p2.on_ground) else 0
