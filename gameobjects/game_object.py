@@ -61,6 +61,7 @@ class GameObject(Sprite):
 
         # Camera
         self._use_camera = False
+        self.shake_factor = 1.0 # 1.0 = full shake, 0.0 = no shake 
 
         # Components
         self.physics = None
@@ -104,7 +105,7 @@ class GameObject(Sprite):
     def draw(self):
         if not self.visible:
             return
-        screen_pos = self._vm.camera.apply_vec2(self.world_pos) if self._use_camera else self.world_pos
+        screen_pos = self._vm.camera.apply_vec2(self.world_pos, self.shake_factor) if self._use_camera else self.world_pos
         super().draw(screen_pos, self.anchor)
 
     # ------------------------

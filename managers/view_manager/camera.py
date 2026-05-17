@@ -33,13 +33,10 @@ class Camera:
         self._update_follow(dt, p1, p2)
         self._update_shake(dt)
 
-    def apply(self, rect: pygame.Rect) -> pygame.Rect:
-        return rect.move(-self.x + self._shake_x, -self.y + self._shake_y)
-
-    def apply_vec2(self, pos) -> pygame.Vector2:
-        return pygame.Vector2(pos) - pygame.Vector2(
-            self.x - self._shake_x, self.y - self._shake_y
-        )
+    def apply_vec2(self, pos, shake_factor: float = 1.0) -> pygame.Vector2:
+        shake_x = self._shake_x * shake_factor
+        shake_y = self._shake_y * shake_factor
+        return pygame.Vector2(pos) - pygame.Vector2(self.x - shake_x, self.y - shake_y)
 
     # --------------------------
     # Private
