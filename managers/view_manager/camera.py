@@ -1,6 +1,5 @@
 import pygame
 import random
-import math
 
 class Camera:
     def __init__(self, view_width, view_height, world_width, world_height):
