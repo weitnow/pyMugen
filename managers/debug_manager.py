@@ -31,9 +31,11 @@ class DebugManager:
         self._debug_line_height = 0
         self._upper_section_max_y = 0
         self._lower_section_min_y = 0
+        self._lower_section_max_y = 0
         self._debug_column_width = 0
         self._debug_max_columns = 0
         self._current_column = 0
+        self._in_middle_section = False
         self._in_lower_section = False
 
         # Set by bind_view_manager()
@@ -83,7 +85,7 @@ class DebugManager:
             self.line(f"Mousepos: ({mx}, {my})")
 
 
-        for i in range(100):
+        for i in range(138):
             self.line(f"Debug line {i+1}")
 
     def draw_debug_text(self, x=8, y=8, text="", color=(255, 255, 0)):
@@ -103,6 +105,7 @@ class DebugManager:
         line_height=None,
         upper_section_max_y=78,
         lower_section_min_y=420,
+        lower_section_max_y=530,
         column_width=150,
         max_columns=6
     ):
@@ -112,9 +115,11 @@ class DebugManager:
         self._debug_cursor_y = y
         self._upper_section_max_y = upper_section_max_y
         self._lower_section_min_y = lower_section_min_y
+        self._lower_section_max_y = lower_section_max_y
         self._debug_column_width = column_width
         self._debug_max_columns = max_columns
         self._current_column = 0
+        self._in_middle_section = False
         self._in_lower_section = False
 
         if line_height is None:
@@ -131,17 +136,26 @@ class DebugManager:
 
         self._debug_cursor_y += self._debug_line_height
 
-        if not self._in_lower_section:
+        if not self._in_middle_section and not self._in_lower_section:
             if self._debug_cursor_y >= self._upper_section_max_y:
                 if self._current_column < self._debug_max_columns - 1:
                     self._current_column += 1
                     self._debug_cursor_x += self._debug_column_width
                     self._debug_cursor_y = self._debug_start_y
                 else:
-                    self._in_lower_section = True
-                    self._debug_cursor_x = 8
-        else:
+                    self._in_middle_section = True
+                    self._debug_cursor_x = self._debug_start_x
+                    self._debug_cursor_y = self._upper_section_max_y
+                    self._current_column = 0
+        elif self._in_middle_section:
             if self._debug_cursor_y >= self._lower_section_min_y:
+                self._in_middle_section = False
+                self._in_lower_section = True
+                self._debug_cursor_x = self._debug_start_x
+                self._debug_cursor_y = self._lower_section_min_y
+                self._current_column = 0
+        else:
+            if self._debug_cursor_y >= self._lower_section_max_y:
                 if self._current_column < self._debug_max_columns - 1:
                     self._current_column += 1
                     self._debug_cursor_x += self._debug_column_width
