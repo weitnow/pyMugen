@@ -8,8 +8,7 @@ class DebugManager:
     def __init__(self):
         self.debug_on = True
         self.debug_text = True
-        self.DRAW_MOUSE_POS = True
-
+       
         self._sp = None  # set by ServiceProvider after all managers are initialized
 
         self._small_font = pygame.font.Font(None, 12)
@@ -51,10 +50,12 @@ class DebugManager:
     def bind_service_provider(self, sp):
         self._sp = sp
 
-        if self._sp is not None:
-            self.bind_view_manager(self._sp.view_manager)
 
-    def bind_view_manager(self, view_manager):
+
+        if self._sp is not None:
+            self._bind_view_manager(self._sp.view_manager)
+
+    def _bind_view_manager(self, view_manager):
         self._view_manager = view_manager
         self._game_surface = view_manager.game_surface
         self._game_view_width = view_manager.GAME_VIEW_WIDTH
@@ -88,13 +89,14 @@ class DebugManager:
         self.line(f"RAM: {self._mem_used_mb:.1f} MB")
         self.line(f"CAMpos: ({self._camera.x}, {self._camera.y})")
 
-        if self.DRAW_MOUSE_POS:
-            mx, my = pygame.mouse.get_pos()
-            self.line(f"MOUSEpos: ({mx}, {my})")
+        mx, my = pygame.mouse.get_pos()
+        self.line(f"MOUSEpos: ({mx}, {my})")
 
+        self.line(f"game_view_width: {self._game_view_width}")
+        self.line(f"game_view_height: {self._game_view_height}")
 
-        for i in range(138):
-            self.line(f"Debug line {i+1}")
+        self.line(f"world_width: {self._camera.world_width}")
+        self.line(f"world_height: {self._camera.world_height}")
 
     def draw_debug_text(self, x=8, y=8, text="", color=(255, 255, 0)):
         if not self.debug_on or self._view_manager is None:
