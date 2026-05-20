@@ -10,224 +10,118 @@ class DebugManager:
         self.debug_text = True
         self.DRAW_MOUSE_POS = True
 
-        self.small_font = pygame.font.Font(None, 12)
-        self.last_time = time.time()
-        self.fps = 0
-        self.frame_time_ms = 0
-                
-        self.last_system_info_update = 0
-        self.system_info_update_interval = 3.0
-        self.cpu_percent = 0
-        self.mem_used_mb = 0
-        self.process = psutil.Process()
+        self._small_font = pygame.font.Font(None, 12)
+        self._last_time = time.time()
+        self._fps = 0
+        self._frame_time_ms = 0
 
-        self._rect_cache = {} # key: (w, h, color, alpha)  #used by _get_rect_surface
+        self._last_system_info_update = 0
+        self._system_info_update_interval = 3.0
+        self._cpu_percent = 0
+        self._mem_used_mb = 0
+        self._process = psutil.Process()
 
-        # used by begin_panel() and line()
+        self._rect_cache = {}  # key: (w, h, color, alpha)
+
+        # Panel state — updated by begin_panel(), used by line()
+        self._debug_start_x = 0
+        self._debug_start_y = 0
         self._debug_cursor_x = 0
         self._debug_cursor_y = 0
         self._debug_line_height = 0
+        self._upper_section_max_y = 0
+        self._lower_section_min_y = 0
+        self._debug_column_width = 0
+        self._debug_max_columns = 0
+        self._current_column = 0
         self._in_lower_section = False
 
+        # Set by bind_view_manager()
+        self._view_manager = None
+        self._game_surface = None
+        self._game_view_width = 0
+        self._game_view_height = 0
+        self._debug_overlay = None
+        self._camera = None
+
     def bind_view_manager(self, view_manager):
-        self.view_manager = view_manager
-        self.game_surface = view_manager.game_surface
-        self.GAME_VIEW_WIDTH = view_manager.GAME_VIEW_WIDTH
-        self.GAME_VIEW_HEIGHT = view_manager.GAME_VIEW_HEIGHT
-        self.debug_overlay = self._get_rect_surface(self.GAME_VIEW_WIDTH, self.GAME_VIEW_HEIGHT, (0, 0, 0), 138)
-        self.camera = view_manager.camera
+        self._view_manager = view_manager
+        self._game_surface = view_manager.game_surface
+        self._game_view_width = view_manager.GAME_VIEW_WIDTH
+        self._game_view_height = view_manager.GAME_VIEW_HEIGHT
+        self._debug_overlay = self._get_rect_surface(
+            self._game_view_width, self._game_view_height, (0, 0, 0), 138
+        )
+        self._camera = view_manager.camera
 
     def update(self, dt):
         if not self.debug_on:
             return
         now = time.time()
-        self.frame_time_ms = dt * 1000.0
-        self.fps = 1.0 / dt if dt > 0 else 0
-        self.last_time = now
-        if now - self.last_system_info_update >= self.system_info_update_interval:
+        self._frame_time_ms = dt * 1000.0
+        self._fps = 1.0 / dt if dt > 0 else 0
+        self._last_time = now
+        if now - self._last_system_info_update >= self._system_info_update_interval:
             self._update_system_info()
-            self.last_system_info_update = now
+            self._last_system_info_update = now
 
     def debug_draw(self):
         if not self.debug_on:
             return
 
-        self.game_surface.blit(self.debug_overlay, (0, 0))
+        self._game_surface.blit(self._debug_overlay, (0, 0))
 
         self.begin_panel(8, 8)
 
-        self.line(f"FPS: {self.fps:.1f}")
-        self.line(f"CPU: {self.cpu_percent:.1f}%")
-        self.line(f"RAM: {self.mem_used_mb:.1f} MB")
-        self.line(f"Campos: ({self.camera.x}, {self.camera.y})")
+        self.line(f"FPS: {self._fps:.1f}")
+        self.line(f"CPU: {self._cpu_percent:.1f}%")
+        self.line(f"RAM: {self._mem_used_mb:.1f} MB")
+        self.line(f"Campos: ({self._camera.x}, {self._camera.y})")
 
         if self.DRAW_MOUSE_POS:
             mx, my = pygame.mouse.get_pos()
             self.line(f"Mousepos: ({mx}, {my})")
 
-        self.line("test1")
-        self.line("test2") #78
 
-        self.line("test3fdsfadfsdfasdfafdsfasfasadsf")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-        self.line("test3")
-
-
-        
-      
+        for i in range(100):
+            self.line(f"Debug line {i+1}")
 
     def draw_debug_text(self, x=8, y=8, text="", color=(255, 255, 0)):
-        if not self.debug_on or self.view_manager is None:
+        if not self.debug_on or self._view_manager is None:
             return
-        img = self.small_font.render(text, True, color)
-        self.view_manager.game_surface.blit(img, (x, y))
+        img = self._small_font.render(text, True, color)
+        self._view_manager.game_surface.blit(img, (x, y))
 
     def draw_rect_overlay(self, x, y, width, height, color, alpha=128):
         surf = self._get_rect_surface(width, height, color, alpha)
-        self.game_surface.blit(surf, (x, y))
+        self._game_surface.blit(surf, (x, y))
 
-    def _draw_fps_systeminfo(self, x, y):
-        text = f"FPS: {self.fps:.1f} | CPU: {self.cpu_percent:.1f}% | RAM: {self.mem_used_mb:.1f} MB"
-        if not self.debug_on or self.view_manager is None:
-            return
-        img = self.small_font.render(text, True, (255, 255, 0))
-        self.view_manager.game_surface.blit(img, (x, y))
-
-    def _update_system_info(self):
-        self.cpu_percent = self.process.cpu_percent()
-        mem_info = self.process.memory_info()
-        self.mem_used_mb = mem_info.rss / (1024 * 1024)
-
-    
-    def _get_rect_surface(self, width, height, color, alpha):
-        key = (width, height, color, alpha)
-
-        if key not in self._rect_cache:
-            surf = pygame.Surface((width, height), pygame.SRCALPHA)
-            surf.fill((*color, alpha))
-            self._rect_cache[key] = surf
-
-        return self._rect_cache[key]
-    
     def begin_panel(
         self,
         x=8,
         y=8,
         line_height=None,
-
         upper_section_max_y=78,
         lower_section_min_y=420,
-
         column_width=150,
         max_columns=6
     ):
-        self.debug_start_x = x
-        self.debug_start_y = y
-
+        self._debug_start_x = x
+        self._debug_start_y = y
         self._debug_cursor_x = x
         self._debug_cursor_y = y
-
-        self.upper_section_max_y = upper_section_max_y
-        self.lower_section_min_y = lower_section_min_y
-
-        self.debug_column_width = column_width
-        self.debug_max_columns = max_columns
-
-        self.current_column = 0
-
+        self._upper_section_max_y = upper_section_max_y
+        self._lower_section_min_y = lower_section_min_y
+        self._debug_column_width = column_width
+        self._debug_max_columns = max_columns
+        self._current_column = 0
         self._in_lower_section = False
 
         if line_height is None:
-            line_height = self.small_font.get_height() + 2
-
+            line_height = self._small_font.get_height() + 2
         self._debug_line_height = line_height
 
     def line(self, text="", color=(255, 255, 0)):
-
         self.draw_debug_text(
             x=self._debug_cursor_x,
             y=self._debug_cursor_y,
@@ -237,36 +131,38 @@ class DebugManager:
 
         self._debug_cursor_y += self._debug_line_height
 
-        # =========================
-        # UPPER SECTION
-        # =========================
-
         if not self._in_lower_section:
-
-            if self._debug_cursor_y >= self.upper_section_max_y:
-
-                # still allowed to create columns
-                if self.current_column < self.debug_max_columns - 1:
-                    self.current_column += 1
-                    self._debug_cursor_x += self.debug_column_width
-                    self._debug_cursor_y = self.debug_start_y
-
-                # switch to lower section
+            if self._debug_cursor_y >= self._upper_section_max_y:
+                if self._current_column < self._debug_max_columns - 1:
+                    self._current_column += 1
+                    self._debug_cursor_x += self._debug_column_width
+                    self._debug_cursor_y = self._debug_start_y
                 else:
                     self._in_lower_section = True
                     self._debug_cursor_x = 8
-
-        # =========================
-        # LOWER SECTION
-        # =========================
-
         else:
+            if self._debug_cursor_y >= self._lower_section_min_y:
+                if self._current_column < self._debug_max_columns - 1:
+                    self._current_column += 1
+                    self._debug_cursor_x += self._debug_column_width
+                    self._debug_cursor_y = self._lower_section_min_y
 
-            if self._debug_cursor_y >= self.lower_section_min_y:
+    def _draw_fps_systeminfo(self, x, y):
+        if not self.debug_on or self._view_manager is None:
+            return
+        text = f"FPS: {self._fps:.1f} | CPU: {self._cpu_percent:.1f}% | RAM: {self._mem_used_mb:.1f} MB"
+        img = self._small_font.render(text, True, (255, 255, 0))
+        self._view_manager.game_surface.blit(img, (x, y))
 
-                self.current_column += 1
-                self._debug_cursor_x += self.debug_column_width
-                self._debug_cursor_y = self.lower_section_min_y
-    
-    
-    
+    def _update_system_info(self):
+        self._cpu_percent = self._process.cpu_percent()
+        mem_info = self._process.memory_info()
+        self._mem_used_mb = mem_info.rss / (1024 * 1024)
+
+    def _get_rect_surface(self, width, height, color, alpha):
+        key = (width, height, color, alpha)
+        if key not in self._rect_cache:
+            surf = pygame.Surface((width, height), pygame.SRCALPHA)
+            surf.fill((*color, alpha))
+            self._rect_cache[key] = surf
+        return self._rect_cache[key]
