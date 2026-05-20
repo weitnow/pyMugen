@@ -19,3 +19,7 @@ class ServiceProvider:
         self.settings_manager = SettingsManager()
         self.view_manager = ViewManager()
 
+        # Bind service provider to managers that need it
+        self.debug_manager.bind_service_provider(self)
+        self.view_manager.bind_service_provider(self)
+

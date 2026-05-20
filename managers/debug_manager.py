@@ -10,6 +10,8 @@ class DebugManager:
         self.debug_text = True
         self.DRAW_MOUSE_POS = True
 
+        self._sp = None  # set by ServiceProvider after all managers are initialized
+
         self._small_font = pygame.font.Font(None, 12)
         self._last_time = time.time()
         self._fps = 0
@@ -46,6 +48,12 @@ class DebugManager:
         self._debug_overlay = None
         self._camera = None
 
+    def bind_service_provider(self, sp):
+        self._sp = sp
+
+        if self._sp is not None:
+            self.bind_view_manager(self._sp.view_manager)
+
     def bind_view_manager(self, view_manager):
         self._view_manager = view_manager
         self._game_surface = view_manager.game_surface
@@ -78,11 +86,11 @@ class DebugManager:
         self.line(f"FPS: {self._fps:.1f}")
         self.line(f"CPU: {self._cpu_percent:.1f}%")
         self.line(f"RAM: {self._mem_used_mb:.1f} MB")
-        self.line(f"Campos: ({self._camera.x}, {self._camera.y})")
+        self.line(f"CAMpos: ({self._camera.x}, {self._camera.y})")
 
         if self.DRAW_MOUSE_POS:
             mx, my = pygame.mouse.get_pos()
-            self.line(f"Mousepos: ({mx}, {my})")
+            self.line(f"MOUSEpos: ({mx}, {my})")
 
 
         for i in range(138):

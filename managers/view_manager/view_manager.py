@@ -6,6 +6,9 @@ from managers.view_manager.camera import Camera
 @singleton
 class ViewManager:
     def __init__(self):
+        self._sp = None  # set by ServiceProvider after all managers are initialized
+        self.debug_manager = None  # set in bind_service_provider
+
         self.GAME_VIEW_WIDTH = 960
         self.GAME_VIEW_HEIGHT = 540
 
@@ -34,8 +37,12 @@ class ViewManager:
 
         self.game_surface = pygame.Surface((self.GAME_VIEW_WIDTH, self.GAME_VIEW_HEIGHT))
 
-        self.debug_manager = DebugManager()
-        self.debug_manager.bind_view_manager(self)
+        
+
+    def bind_service_provider(self, sp):
+        self._sp = sp
+        self.debug_manager = sp.debug_manager
+        
 
     def update(self, dt):
         pass
