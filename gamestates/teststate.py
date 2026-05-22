@@ -53,11 +53,11 @@ class TestState(GameState):
             pass
  
         if Action.UP in actions_held:
-            cam.y = max(0.0, cam.y - 1)
+            pass
           
 
         if Action.DOWN in actions_held:
-            cam.y = min(cam.world_height - cam.view_height, cam.y + 1)
+            pass
          
    
         #temp
@@ -70,7 +70,7 @@ class TestState(GameState):
 
 
     def update(self, dt):
-        self.view_manager.camera.update(dt, self.player1, self.player2) #TODO: move it to view_manager update -> simple camera follow for testing, can be expanded later for more complex behavior (like lookahead, shake, etc)
+        self.view_manager.camera.update(dt, self.player1, self.player2)
         super().update(dt)
 
 
@@ -78,6 +78,8 @@ class TestState(GameState):
         super().draw()
 
         self.overlay.draw((0, 0), RenderAnchor.TOPLEFT)
+
+       
 
 
     def debug_draw(self):
