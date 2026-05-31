@@ -96,7 +96,8 @@ class DebugManager:
         self.line(f"world_height: {self._camera.world_height}")
         
         
-        self._view_manager.draw_circle(self._camera.x, self._camera.y, 5, (255, 0, 0))
+        self.line(f"world_center_x: {self._camera.world_center_x}")
+        self.line(f"world_center_y: {self._camera.world_center_y}")
     
         
 

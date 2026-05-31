@@ -20,6 +20,7 @@ class TestState(GameState):
     def enter(self):
         self.stage = Stage1()
         self.stage.configure_camera()
+        
 
 
         self.overlay = Sprite().set_anim_name("gbOverlay").set_scale(3).set_frame(1)
@@ -40,7 +41,7 @@ class TestState(GameState):
         
         # temp
         cam = self.camera
-        cam.follow_enabled = True
+        cam.follow_enabled = False
 
         if Action.RIGHT in actions_held:
             pass

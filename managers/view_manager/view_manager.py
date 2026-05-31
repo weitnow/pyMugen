@@ -18,7 +18,7 @@ class ViewManager:
         self.VIEW_RIGHT_BOUND = 868 #first visible pixel on the right
         self.VIEW_WIDTH = self.VIEW_RIGHT_BOUND - self.VIEW_LEFT_BOUND # 774
    
-        self.VIEW_TOP_BOUND = 87 #first visible pixel on the up
+        self.VIEW_TOP_BOUND = 86 #first visible pixel on the up
         self.VIEW_BOTTOM_BOUND = 454 #first visible pixel on the down
         self.VIEW_HEIGHT = self.VIEW_BOTTOM_BOUND - self.VIEW_TOP_BOUND # 367
     
