@@ -3,20 +3,22 @@ import random
 
 class Camera:
     def __init__(self, view_width, view_height):
-        self.view_width = view_width
-        self.view_height = view_height
+        self.view_width = view_width # 774 is the width of the visible area of the stage, which is 960 game window width minus 94 pixels of left wall and 94 pixels of right wall
+        self.view_height = view_height # 368 is the height of the visible area of the stage, which is 540 game window height minus 86 pixels of top wall and 86 pixels of bottom wall
         self.world_width = 0    # will be set by the stage, but we initialize it to 0 here #1200
         self.world_height = 0   # will be set by the stage, but we initialize it to 0 here #420
         self.world_center_x = 0 # will be set by the stage, but we initialize it to 0 here #600
         self.world_center_y = 0 # will be set by the stage, but we initialize it to 0 here #210
-
+        self.x_travel = 0      # how far the camera can move in x from the center of the stage, will be set by the stage based on world width and view width #213
+        self.y_travel_min = 0      # how far the camera can move in y from the center of the stage, will be set by the stage based on world height and view height #
+        self.y_travel_max = 0      # how far the camera can move in y from the center of the stage, will be set by the stage based on world height and view height #
         # Cam should be clampet to -213 and +213 on x because the stage is 1200 wide and the view is 774 wide, so 1200-774=426, and half of that is 213. We can see 94 pixels of the left wall and 94 pixels of the right wall, so we can move the camera 94 pixels in either direction before we start seeing empty space. So the camera's center can move 212 pixels to the left and 212 pixels to the right from the center of the stage.
 
         self._x = 0.0
         self._y = 0.0
 
         self.follow_enabled = True
-        self.clamp_to_world = False # only relevant for manual movement of camera with property x and y, not the built-in follow behavior
+        self.clamp_to_world = True 
 
         self.smooth_speed = 0.12  # tweak to taste (0.0–1.0 feel)
 
@@ -37,7 +39,9 @@ class Camera:
     def x(self, value):
         self._x = value
         if self.clamp_to_world:
-            self._x = max(0.0, min(self._x, self.world_width - self.view_width))
+            min_x = -self.x_travel 
+            max_x = self.x_travel 
+            self._x = max(min_x, min(self._x, max_x))
 
     @property
     def y(self): return self._y
@@ -45,7 +49,9 @@ class Camera:
     def y(self, value):
         self._y = value
         if self.clamp_to_world:
-            self._y = max(0.0, min(self._y, self.world_height - self.view_height))
+            min_y = self.y_travel_min 
+            max_y = self.y_travel_max
+            self._y = max(min_y, min(self._y, max_y))   
 
 
     # --------------------------
@@ -81,13 +87,9 @@ class Camera:
         airborne_bias = -18 if (not p1.on_ground or not p2.on_ground) else 0
         target_y += airborne_bias
 
-        # Clamp to world bounds
-        target_x = max(0.0, min(target_x, self.world_width - self.view_width))
-        target_y = max(0.0, min(target_y, self.world_height - self.view_height))
-
         # Frame-rate independent lerp
         t = 1.0 - (1.0 - self.smooth_speed) ** (dt * 60)
-        self._x += (target_x - self._x) * t
+        self.x += (target_x - self._x) * t
         self.y += (target_y - self.y) * t
 
 

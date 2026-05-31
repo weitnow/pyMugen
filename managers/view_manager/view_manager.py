@@ -9,10 +9,9 @@ class ViewManager:
         self._sp = None  # set by ServiceProvider after all managers are initialized
         self.debug_manager = None  # set in bind_service_provider
 
-        self.GAME_VIEW_WIDTH = 960
-        self.GAME_VIEW_HEIGHT = 540
-        self.GAME_VIEW_CENTER_X = self.GAME_VIEW_WIDTH // 2
-        self.GAME_VIEW_CENTER_Y = self.GAME_VIEW_HEIGHT // 2
+        self.GAME_WINDOW_WIDTH = 960
+        self.GAME_WINDOW_HEIGHT = 540
+
 
         self.VIEW_LEFT_BOUND = 94 #first visible pixel on the left
         self.VIEW_RIGHT_BOUND = 868 #first visible pixel on the right
@@ -20,7 +19,7 @@ class ViewManager:
    
         self.VIEW_TOP_BOUND = 86 #first visible pixel on the up
         self.VIEW_BOTTOM_BOUND = 454 #first visible pixel on the down
-        self.VIEW_HEIGHT = self.VIEW_BOTTOM_BOUND - self.VIEW_TOP_BOUND # 367
+        self.VIEW_HEIGHT = self.VIEW_BOTTOM_BOUND - self.VIEW_TOP_BOUND # 368
     
         
 
@@ -28,16 +27,16 @@ class ViewManager:
 
         self._draw_rect = pygame.Rect(0, 0, 0, 0)  # Initialize the draw rect for reuse
 
-        self.camera = Camera(self.GAME_VIEW_WIDTH, self.GAME_VIEW_HEIGHT) 
+        self.camera = Camera(self.VIEW_WIDTH, self.VIEW_HEIGHT) 
 
         self.screen = pygame.display.set_mode(
-            (self.GAME_VIEW_WIDTH, self.GAME_VIEW_HEIGHT),
+            (self.GAME_WINDOW_WIDTH, self.GAME_WINDOW_HEIGHT),
             pygame.SCALED | pygame.FULLSCREEN,
             vsync=1
         )
         pygame.display.set_caption("Game View")
 
-        self.game_surface = pygame.Surface((self.GAME_VIEW_WIDTH, self.GAME_VIEW_HEIGHT))
+        self.game_surface = pygame.Surface((self.GAME_WINDOW_WIDTH, self.GAME_WINDOW_HEIGHT))
 
         
 

@@ -14,6 +14,8 @@ class BaseStage():
         self.stage_width = 0 # will be set by the stage, but we initialize it to 0 here
         self.stage_height = 0 # will be set by the stage, but we initialize it to 0 here
 
+        self.allowed_camera_y_travel_min = 0 # how far the camera can move in y from the center of the stage, will be set by the stage based on world height and view height
+        self.allowed_camera_y_travel_max = 0 # how far the camera can move in y from the center of the stage, will be set by the stage based on world height and view height
 
     def update(self, dt):
         self.stage_front.update(dt)
@@ -31,5 +33,8 @@ class BaseStage():
     def configure_camera(self):
         self.camera.world_width = self.stage_width
         self.camera.world_height = self.stage_height
-        self.camera.world_center_x = self.stage_center_x
-        self.camera.world_center_y = self.stage_center_y
+        self.camera.world_center_x = self.stage_front.world_pos.x # anchor is bottomcenter, so we can use the x position of the stage front as the center of the stage
+        self.camera.world_center_y = self.stage_front.world_pos.y - self.stage_height // 2 # anchor is bottomcenter, so we can use the y position of the stage front minus half the stage height as the center of the stage
+        self.camera.x_travel = (self.stage_width - self.camera.view_width) / 2
+        self.camera.y_travel_min = self.allowed_camera_y_travel_min
+        self.camera.y_travel_max = self.allowed_camera_y_travel_max

@@ -41,7 +41,7 @@ class TestState(GameState):
         
         # temp
         cam = self.camera
-        cam.follow_enabled = False
+        cam.follow_enabled = True
 
         if Action.RIGHT in actions_held:
             pass
@@ -65,6 +65,11 @@ class TestState(GameState):
             self.view_manager.camera.x -= 1
         elif keys[pygame.K_m]:
             self.view_manager.camera.x += 1
+
+        if keys[pygame.K_j]:
+            self.view_manager.camera.y -= 1
+        elif keys[pygame.K_k]:
+            self.view_manager.camera.y += 1
         
 
 

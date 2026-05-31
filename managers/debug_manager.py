@@ -42,8 +42,8 @@ class DebugManager:
         # Set by bind_view_manager()
         self._view_manager = None
         self._game_surface = None
-        self._game_view_width = 0
-        self._game_view_height = 0
+        self._game_window_width = 0
+        self._game_window_height = 0
         self._debug_overlay = None
         self._camera = None
 
@@ -52,10 +52,10 @@ class DebugManager:
 
         self._view_manager = self._sp.view_manager
         self._game_surface = self._view_manager.game_surface
-        self._game_view_width = self._view_manager.GAME_VIEW_WIDTH
-        self._game_view_height = self._view_manager.GAME_VIEW_HEIGHT
+        self._game_window_width = self._view_manager.GAME_WINDOW_WIDTH
+        self._game_window_height = self._view_manager.GAME_WINDOW_HEIGHT
         self._debug_overlay = self._get_rect_surface(
-            self._game_view_width, self._game_view_height, (0, 0, 0), 138
+            self._game_window_width, self._game_window_height, (0, 0, 0), 138
         )
         self._camera = self._view_manager.camera
         self._gamestate_manager = self._sp.gamestate_manager
@@ -89,8 +89,8 @@ class DebugManager:
         mx, my = pygame.mouse.get_pos()
         self.line(f"MOUSEpos: ({mx}, {my})")
 
-        self.line(f"game_view_width: {self._game_view_width}")
-        self.line(f"game_view_height: {self._game_view_height}")
+        self.line(f"game_window_width: {self._game_window_width}")
+        self.line(f"game_window_height: {self._game_window_height}")
 
         self.line(f"world_width: {self._camera.world_width}")
         self.line(f"world_height: {self._camera.world_height}")
@@ -98,6 +98,10 @@ class DebugManager:
         
         self.line(f"world_center_x: {self._camera.world_center_x}")
         self.line(f"world_center_y: {self._camera.world_center_y}")
+
+        self.line(f"cam_x_travel: {self._camera.x_travel}")
+        self.line(f"cam_y_travel_min: {self._camera.y_travel_min}")
+        self.line(f"cam_y_travel_max: {self._camera.y_travel_max}")
     
         
 
