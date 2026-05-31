@@ -2,7 +2,7 @@
 
 from gamestates.gamestate_base import GameState
 from gameobjects.game_object import GameObject, HitboxType, HurtboxType
-from gameobjects.base_fighter import Fighter
+from gameobjects.base_fighter import BaseFighter
 from managers.input_manager import Action
 from gameobjects.sprite import Sprite
 from gameobjects.components.physics_components import FighterPhysicsComponent
@@ -26,12 +26,10 @@ class TestState(GameState):
  
 
 
-        self.player1 = Fighter(world_pos=(128, 228), player_index=0).set_anim_name("gbFighter").set_frame_tag("Idle").set_scale(3)
-        self.player2 = Fighter(world_pos=(384, 228), player_index=1).set_anim_name("gbFighter").set_frame_tag("Idle").set_scale(3)
+        self.player1 = BaseFighter(world_pos=(128, 228), player_index=0).set_anim_name("gbFighter").set_frame_tag("Idle").set_scale(3)
+        self.player2 = BaseFighter(world_pos=(384, 228), player_index=1).set_anim_name("gbFighter").set_frame_tag("Idle").set_scale(3)
 
 
-      
-        
 
     def exit(self):
         pass
@@ -42,7 +40,7 @@ class TestState(GameState):
         
         # temp
         cam = self.camera
-        cam.follow_enabled = False
+        cam.follow_enabled = True
 
         if Action.RIGHT in actions_held:
             pass

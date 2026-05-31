@@ -4,7 +4,7 @@ from managers.input_manager import Action
 from gameobjects.components.player_controller_component import PlayerController
 from gameobjects.components.physics_components import FighterPhysicsComponent
 
-class Fighter(GameObject):
+class BaseFighter(GameObject):
     def __init__(self, world_pos, player_index: int = 0):
         super().__init__(world_pos, render_anchor=RenderAnchor.BOTTOMCENTER)
     

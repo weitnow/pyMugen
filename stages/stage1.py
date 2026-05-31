@@ -9,4 +9,8 @@ class Stage1(BaseStage):
         self.stage_back.set_anim_name("stage1-back").set_frame_tag("Idle").set_scale(3).enable_camera()
         self.stage_width = self.stage_front.sprite_size[0]
         self.stage_height = self.stage_front.sprite_size[1]
+        self.stage_center_x = self.stage_width / 2
+        self.stage_center_y = self.stage_height / 2
+        
+        self.configure_camera()
 

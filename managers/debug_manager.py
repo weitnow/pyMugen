@@ -50,20 +50,17 @@ class DebugManager:
     def bind_service_provider(self, sp):
         self._sp = sp
 
-
-
-        if self._sp is not None:
-            self._bind_view_manager(self._sp.view_manager)
-
-    def _bind_view_manager(self, view_manager):
-        self._view_manager = view_manager
-        self._game_surface = view_manager.game_surface
-        self._game_view_width = view_manager.GAME_VIEW_WIDTH
-        self._game_view_height = view_manager.GAME_VIEW_HEIGHT
+        self._view_manager = self._sp.view_manager
+        self._game_surface = self._view_manager.game_surface
+        self._game_view_width = self._view_manager.GAME_VIEW_WIDTH
+        self._game_view_height = self._view_manager.GAME_VIEW_HEIGHT
         self._debug_overlay = self._get_rect_surface(
             self._game_view_width, self._game_view_height, (0, 0, 0), 138
         )
-        self._camera = view_manager.camera
+        self._camera = self._view_manager.camera
+        self._gamestate_manager = self._sp.gamestate_manager
+
+        
 
     def update(self, dt):
         if not self.debug_on:
@@ -97,6 +94,11 @@ class DebugManager:
 
         self.line(f"world_width: {self._camera.world_width}")
         self.line(f"world_height: {self._camera.world_height}")
+        
+        
+        self._view_manager.draw_circle(self._camera.x, self._camera.y, 5, (255, 0, 0))
+    
+        
 
     def draw_debug_text(self, x=8, y=8, text="", color=(255, 255, 0)):
         if not self.debug_on or self._view_manager is None:

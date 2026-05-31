@@ -2,11 +2,13 @@ import pygame
 import random
 
 class Camera:
-    def __init__(self, view_width, view_height, world_width, world_height):
+    def __init__(self, view_width, view_height):
         self.view_width = view_width
         self.view_height = view_height
-        self.world_width = world_width
-        self.world_height = world_height
+        self.world_width = 0    # will be set by the stage, but we initialize it to 0 here
+        self.world_height = 0   # will be set by the stage, but we initialize it to 0 here
+        self.world_center_x = 0 # will be set by the stage, but we initialize it to 0 here
+        self.world_center_y = 0 # will be set by the stage, but we initialize it to 0 here
 
         self.x = 0.0
         self.y = 0.0

@@ -29,8 +29,7 @@ class GameState(ABC): #ABC is Abstract Base Class
   
         # references for easier access
         self.camera = self.view_manager.camera # reference for easy access
-        self.GAME_VIEW_HEIGHT = self.view_manager.GAME_VIEW_HEIGHT
-        self.GAME_VIEW_WIDTH = self.view_manager.GAME_VIEW_WIDTH
+  
 
         # --- Game Objects ---
         self.player1: GameObject = None

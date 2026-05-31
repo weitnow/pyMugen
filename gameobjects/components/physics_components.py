@@ -40,7 +40,7 @@ class PhysicsComponent:
             self.on_ground = False
 
 class FighterPhysicsComponent(PhysicsComponent):
-    def __init__(self, gravity=1180, ground_y=420, jump_speed=400, walk_speed=100):
+    def __init__(self, gravity=1180, ground_y=420, jump_speed=600, walk_speed=100):
         super().__init__(gravity, ground_y, jump_speed, walk_speed)
         # Additional fighter-specific physics properties can be added here
 
