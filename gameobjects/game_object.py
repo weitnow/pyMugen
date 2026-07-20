@@ -57,7 +57,7 @@ class GameObject(Sprite):
         self.anchor = render_anchor
         self.world_pos = pygame.Vector2(world_pos)
         self.on_ground = None
-        self.vel = pygame.Vector2(0, 0) #TODO: should maybe in the physics component
+        self.vel = pygame.Vector2(0, 0) #TODO: should might be in the physics component
 
         # Camera
         self._use_camera = False

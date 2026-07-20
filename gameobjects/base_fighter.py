@@ -12,7 +12,7 @@ class BaseFighter(GameObject):
 
         # Movement attributes
         self.speed = 100
-        self.jump_velocity = -0.4
+        self.jump_velocity = -0.4 
         self.facing_right = True
 
         # Special move list
