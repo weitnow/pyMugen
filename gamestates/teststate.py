@@ -1,6 +1,6 @@
 
 
-from gamestates.gamestate_base import GameState
+from gamestates.gamestate import GameState
 from gameobjects.game_object import GameObject, HitboxType, HurtboxType
 from gameobjects.base_fighter import BaseFighter
 from managers.input_manager import Action

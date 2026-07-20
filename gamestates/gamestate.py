@@ -32,14 +32,14 @@ class GameState(ABC): #ABC is Abstract Base Class
   
 
         # --- Game Objects ---
-        self.player1: GameObject = None
-        self.player2: GameObject = None
+        self.player1: GameObject | None = None
+        self.player2: GameObject | None = None
         self.projectiles_p1 = []
         self.projectiles_p2 = []
         self.game_objects = []
 
         # --- Stage ---
-        self.stage: GameObject = None
+        self.stage: GameObject | None = None
 
     @abstractmethod
     def enter(self):

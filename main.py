@@ -26,6 +26,7 @@ sp.graphic_manager.load_spritesheet("gbOverlay", "assets/Graphics/Aseprite/gbOve
 sp.graphic_manager.load_spritesheet("highResNinja", "assets/Graphics/Aseprite/highResNinja.png", "assets/Graphics/Aseprite/highResNinja.json")
 
 
+
 # --- Set Offsets for spritesheets ---
 #sp.graphic_manager.set_global_offset("gbFighter", x=0, y=0)
 #sp.graphic_manager.set_global_offset("debug32x32", x=0, y=0)
@@ -44,7 +45,7 @@ sp.gamestate_manager.add_state("test", TestState())
 
 
 
-sp.gamestate_manager.change_state("test") # start in performance test state
+sp.gamestate_manager.change_state("test") 
 
 # --- Block certain events from pygame event queue to optimize ---
 pygame.event.set_blocked(None) # block all events
