@@ -10,6 +10,7 @@ from managers.settings_manager.settings_manager import SettingsManager
 
 
 from gameobjects.game_object import GameObject
+from stages.base_stage import BaseStage
 
 
 class GameState(ABC): #ABC is Abstract Base Class
@@ -39,7 +40,7 @@ class GameState(ABC): #ABC is Abstract Base Class
         self.game_objects = []
 
         # --- Stage ---
-        self.stage: GameObject | None = None
+        self.stage: BaseStage | None = None
 
     @abstractmethod
     def enter(self):

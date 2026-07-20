@@ -33,8 +33,8 @@ class BaseStage():
     def configure_camera(self):
         self.camera.world_width = self.stage_width
         self.camera.world_height = self.stage_height
-        self.camera.world_center_x = self.stage_front.world_pos.x # anchor is bottomcenter, so we can use the x position of the stage front as the center of the stage
-        self.camera.world_center_y = self.stage_front.world_pos.y - self.stage_height // 2 # anchor is bottomcenter, so we can use the y position of the stage front minus half the stage height as the center of the stage
-        self.camera.x_travel = (self.stage_width - self.camera.view_width) / 2
+        self.camera.world_center_x = int(self.stage_front.world_pos.x) # anchor is bottomcenter, so we can use the x position of the stage front as the center of the stage
+        self.camera.world_center_y = int(self.stage_front.world_pos.y - self.stage_height // 2) # anchor is bottomcenter, so we can use the y position of the stage front minus half the stage height as the center of the stage
+        self.camera.x_travel = int((self.stage_width - self.camera.view_width) / 2)
         self.camera.y_travel_min = self.allowed_camera_y_travel_min
         self.camera.y_travel_max = self.allowed_camera_y_travel_max

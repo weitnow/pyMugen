@@ -18,9 +18,9 @@ class HitboxData:
     """Represents a hitbox with activation conditions."""
     rect: pygame.Rect
     hitbox_type: HitboxType
-    base_name: str = None
-    tag_name: str = None
-    frame: int = None
+    base_name: str | None = None
+    tag_name: str | None = None
+    frame: int | None = None
 
     def is_active(self, current_base_name: str, current_tag_name: str, current_frame: int) -> bool:
         if self.base_name and self.base_name != current_base_name:
@@ -36,9 +36,9 @@ class HurtboxData:
     """Represents a hurtbox with activation conditions."""
     rect: pygame.Rect
     hurtbox_type: HurtboxType
-    base_name: str = None
-    tag_name: str = None
-    frame: int = None
+    base_name: str | None = None
+    tag_name: str | None = None
+    frame: int | None = None
 
     def is_active(self, current_base_name: str, current_tag_name: str, current_frame: int) -> bool:
         if self.base_name and self.base_name != current_base_name:
@@ -127,12 +127,12 @@ class GameObject(Sprite):
     # Hitboxes / Hurtboxes
     # ------------------------
     def add_hitbox(self, rect: pygame.Rect, hitbox_type: HitboxType,
-                   base_name: str = None, tag_name: str = None, frame: int = None):
+                   base_name: str = None, tag_name: str = None, frame: int = None): # type: ignore
         """Add a hitbox. rect is relative to world_pos."""
         self.hitboxes.append(HitboxData(rect.copy(), hitbox_type, base_name, tag_name, frame))
 
     def add_hurtbox(self, rect: pygame.Rect, hurtbox_type: HurtboxType,
-                    base_name: str = None, tag_name: str = None, frame: int = None):
+                    base_name: str = None, tag_name: str = None, frame: int = None): # type: ignore
         """Add a hurtbox. rect is relative to world_pos."""
         self.hurtboxes.append(HurtboxData(rect.copy(), hurtbox_type, base_name, tag_name, frame))
 
