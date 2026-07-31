@@ -20,16 +20,15 @@ class TestState(GameState):
     def enter(self):
         self.stage = Stage1()
         self.stage.configure_camera()
-        
 
+        #TODO: remove this
+        cam = self.camera
+        cam.follow_enabled = False
 
         self.overlay = Sprite().set_anim_name("gbOverlay").set_scale(3).set_frame(1)
  
-
-
         self.player1 = BaseFighter(world_pos=(128, 228), player_index=0).set_anim_name("gbFighter").set_frame_tag("Idle").set_scale(3)
         self.player2 = BaseFighter(world_pos=(384, 228), player_index=1).set_anim_name("gbFighter").set_frame_tag("Idle").set_scale(3)
-
 
 
     def exit(self):
@@ -39,10 +38,6 @@ class TestState(GameState):
         actions = self.input_manager.get_just_pressed_actions(0)
         actions_held = self.input_manager.get_pressed_actions(0)
         
-        # temp
-        cam = self.camera
-        cam.follow_enabled = True
-
         if Action.RIGHT in actions_held:
             pass
 
@@ -59,7 +54,7 @@ class TestState(GameState):
             pass
          
    
-        #temp
+        #TODO: remove this, just for testing camera movement
         keys = pygame.key.get_pressed()
         if keys[pygame.K_n]:
             self.view_manager.camera.x -= 1
@@ -70,6 +65,9 @@ class TestState(GameState):
             self.view_manager.camera.y -= 1
         elif keys[pygame.K_k]:
             self.view_manager.camera.y += 1
+
+        if keys[pygame.K_u]:
+            self.view_manager.camera.add_trauma(0.1)
         
 
 
@@ -84,8 +82,6 @@ class TestState(GameState):
         self.overlay.draw((0, 0), RenderAnchor.TOPLEFT)
 
        
-
-
     def debug_draw(self):
         super().debug_draw()
 

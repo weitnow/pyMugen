@@ -53,7 +53,6 @@ class Camera:
             max_y = self.y_travel_max
             self._y = max(min_y, min(self._y, max_y))   
 
-
     # --------------------------
     # Public API
     # --------------------------
@@ -61,6 +60,12 @@ class Camera:
         """Add screenshake trauma. 0.0–1.0, stacks up to 1."""
         self._trauma = min(1.0, self._trauma + amount)
 
+
+    # --------------------------
+    # Public API used (automatically) by the gamestate and gameobjects to update the camera every frame and apply the camera offset to the worldpos-position of objects
+    # --------------------------
+
+    # this is called by the gamestate every frame
     def update(self, dt: float, p1, p2):
         if self.follow_enabled:
             self._update_follow(dt, p1, p2)
