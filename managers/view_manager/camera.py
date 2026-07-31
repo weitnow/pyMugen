@@ -66,6 +66,7 @@ class Camera:
             self._update_follow(dt, p1, p2)
         self._update_shake(dt)
 
+    #this is used by the render manager to apply the camera offset to the worldpos-position of objects
     def apply_vec2(self, pos, shake_factor: float = 1.0) -> pygame.Vector2:
         shake_x = self._shake_x * shake_factor
         shake_y = self._shake_y * shake_factor
