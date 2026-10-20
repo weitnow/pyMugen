@@ -2,7 +2,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace PyMugen.Managers;
 
-public enum Action
+public enum GameAction
 {
     Left,
     Right,

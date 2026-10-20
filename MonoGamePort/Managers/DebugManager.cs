@@ -9,7 +9,7 @@ public sealed class DebugManager
 
     public bool DebugOn { get; set; }
 
-    public void Bind(ServiceProvider serviceProvider)
+    public void Bind(GameServiceProvider serviceProvider)
     {
         // no-op binding retained to mirror the Python architecture
     }

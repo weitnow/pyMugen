@@ -15,8 +15,8 @@ public sealed class TestState : GameState
 
     public override void Enter()
     {
-        GameObjects.Clear();
-        GameObjects.Add(_demoSprite);
+        _gameObjects.Clear();
+        AddGameObject(_demoSprite);
     }
 
     public override void Draw(SpriteBatch spriteBatch)

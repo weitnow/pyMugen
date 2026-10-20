@@ -9,7 +9,12 @@ public sealed class ViewManager
     public Camera Camera { get; } = new();
     public Vector2 ScreenSize { get; private set; } = new(1280, 720);
 
-    public void Bind(ServiceProvider serviceProvider)
+    public void SetScreenSize(int width, int height)
+    {
+        ScreenSize = new Vector2(width, height);
+    }
+
+    public void Bind(GameServiceProvider serviceProvider)
     {
         // no-op binding retained to mirror the Python architecture
     }

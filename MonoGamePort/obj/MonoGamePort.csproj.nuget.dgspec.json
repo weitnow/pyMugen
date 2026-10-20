@@ -10,7 +10,7 @@
         "projectUniqueName": "/home/runner/work/pyMugen/pyMugen/MonoGamePort/MonoGamePort.csproj",
         "projectName": "MonoGamePort",
         "projectPath": "/home/runner/work/pyMugen/pyMugen/MonoGamePort/MonoGamePort.csproj",
-        "packagesPath": "/home/runner/.nuget/packages/",
+        "packagesPath": "/tmp/codeql-scratch-c1686073bced4f55/dbs/csharp/working/packages",
         "outputPath": "/home/runner/work/pyMugen/pyMugen/MonoGamePort/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
@@ -66,6 +66,20 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.linux-x64",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"

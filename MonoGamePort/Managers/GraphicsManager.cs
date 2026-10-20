@@ -4,9 +4,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace PyMugen.Managers;
 
-public sealed class GraphicManager
-{
-    private ContentManager? _contentManager;
+public sealed class GraphicsManager
+{    private ContentManager? _contentManager;
     private readonly Dictionary<string, Texture2D> _textures = new();
 
     public void SetContentManager(ContentManager contentManager)
